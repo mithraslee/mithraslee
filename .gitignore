@@ -1,0 +1,11 @@
+*.log
+*.xml
+.idea
+.DS_Store
+target
+pc-config/
+project/META-INF/
+project/project
+project/target
+src/main/scala/META-INF/
+out
