@@ -584,6 +584,11 @@ public class TestString {
 //        StringTest.characterReplacement("ABABB", 2);
         StringTest.characterReplacement("AAAB", 0);
 
+        StringTest.frequencySort("tree");
+        StringTest.frequencySort2("tree");
+        StringTest.frequencySort("Aabb");
+        StringTest.frequencySort2("Aabb");
+
 //        StringTest.originalDigits("owoztneoer");
 //        StringTest.originalDigits("fviefuro");
     }

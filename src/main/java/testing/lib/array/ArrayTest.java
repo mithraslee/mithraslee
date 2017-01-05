@@ -6985,6 +6985,17 @@ public class ArrayTest <T extends Number> {
         return res.subList(0, k);
     }
 
+    /**
+     * Find All Duplicates in an Array
+     * Given an array of integers, 1 ≤ a[i] ≤ n (n = size of array), some elements appear twice and others appear once.
+     * Find all the elements that appear twice in this array.
+     * Could you do it without extra space and in O(n) runtime?
+     * Example:
+     * Input:
+     *         [4,3,2,7,8,2,3,1]
+     * Output:
+     *         [2,3]
+     */
     public static List<Integer> findDuplicates(int[] nums) {
         System.out.println("\nStart function topKFrequent()");
         printArray(nums, "\tNums:");
@@ -7005,6 +7016,41 @@ public class ArrayTest <T extends Number> {
         }
 
         System.out.println("\tRes = " + res);
+        return res;
+    }
+
+    /**
+     * Find All Numbers Disappeared in an Array
+     * Given an array of integers where 1 ≤ a[i] ≤ n (n = size of array), some elements appear twice and others appear once.
+     *
+     * Find all the elements of [1, n] inclusive that do not appear in this array.
+     *
+     * Could you do it without extra space and in O(n) runtime? You may assume the returned list does not count as extra space.
+     *
+     * Example:
+     *
+     * Input:
+     *         [4,3,2,7,8,2,3,1]
+     *
+     * Output:
+     *         [5,6]
+     */
+    public static List<Integer> findDisappearedNumbers(int[] nums) {
+        System.out.println("\nStart function topKFrequent()");
+        printArray(nums, "\tNums:");
+
+        List<Integer> res = new ArrayList<>();
+        int len = nums.length;
+        for (int i = 0; i < len; i++) {
+            while (nums[i] != i+1 && nums[nums[i] - 1] != nums[i]) {
+                swap(nums, i, nums[i]-1);
+            }
+        }
+        for (int i = 0; i < len; i++) {
+            if (nums[i] != i+1) {
+                res.add(i+1);
+            }
+        }
         return res;
     }
 
@@ -7120,7 +7166,7 @@ public class ArrayTest <T extends Number> {
      * Both numbers with value 2 are both considered as second maximum.
      */
     public static int thirdMax(int[] nums) {
-        System.out.println("\nStart function trapRainWater()");
+        System.out.println("\nStart function thirdMax()");
         printArray(nums, "\tNums:");
         Integer n1 = null;
         Integer n2 = null;
@@ -7143,6 +7189,23 @@ public class ArrayTest <T extends Number> {
         return (n3 == null) ? n1 : n3;
     }
 
+    /**
+     * Arithmetic Slices
+     * A sequence of number is called arithmetic if it consists of at least three elements and if the difference between any two consecutive elements is the same.
+     * For example, these are arithmetic sequence:
+     *         1, 3, 5, 7, 9
+     *         7, 7, 7, 7
+     *         3, -1, -5, -9
+     * The following sequence is not arithmetic.
+     *         1, 1, 2, 5, 7
+     * A zero-indexed array A consisting of N numbers is given. A slice of that array is any pair of integers (P, Q) such that 0 <= P < Q < N.
+     *         A slice (P, Q) of array A is called arithmetic if the sequence:
+     * A[P], A[p + 1], ..., A[Q - 1], A[Q] is arithmetic. In particular, this means that P + 1 < Q.
+     * The function should return the number of arithmetic slices in the array A.
+     *         Example:
+     * A = [1, 2, 3, 4]
+     *         return: 3, for 3 arithmetic slices in A: [1, 2, 3], [2, 3, 4] and [1, 2, 3, 4] itself.
+     */
     public static int numberOfArithmeticSlices(int[] A) {
         System.out.println("\nStart function numberOfArithmeticSlices()");
         printArray(A, "\tA:");
@@ -7706,6 +7769,223 @@ public class ArrayTest <T extends Number> {
         } else {
             return -1;
         }
+    }
+
+    /**
+     * Minimum Moves to Equal Array Elements
+     * Given a non-empty integer array of size n, find the minimum number of moves required to make all array elements equal, where a move is incrementing n - 1 elements by 1.
+     * Example:
+     * Input:
+     *         [1,2,3]
+     * Output:
+     *         3
+     * Explanation:
+     * Only three moves are needed (remember each move increments two elements):
+     *         [1,2,3]  =>  [2,3,3]  =>  [3,4,3]  =>  [4,4,4]
+     */
+    public static int minMoves(int[] nums) {
+        Integer min = Integer.MAX_VALUE;
+        for (int i : nums) {
+            min = Math.min(min, i);
+        }
+        int sum = 0;
+        for (int i : nums) {
+            sum += (i - min);
+        }
+        return sum;
+    }
+
+    /**
+     * Minimum Moves to Equal Array Elements II
+     * Given a non-empty integer array, find the minimum number of moves required to make all array elements equal, where a move is incrementing a selected element by 1 or decrementing a selected element by 1.
+     * You may assume the array's length is at most 10,000.
+     * Example:
+     * Input:
+     *         [1,2,3]
+     * Output:
+     *         2
+     * Explanation:
+     * Only two moves are needed (remember each move increments or decrements one element):
+     *         [1,2,3]  =>  [2,2,3]  =>  [2,2,2]
+     */
+    // This version is wrong
+    public static int minMoves2(int[] nums) {
+        System.out.println("\nStart function minMoves2()");
+        printArray(nums, "\tNums:");
+        int len = nums.length;
+        int sum = 0;
+        for (int i : nums) {
+            sum += i;
+        }
+        int average = sum/len;
+        if (sum % len != 0) {
+            int smaller = 0;
+            int larger = 0;
+            for (int i : nums) {
+                if (i <= average) smaller++;
+                if (i > average) larger++;
+            }
+            if (larger > smaller) {
+                average++;
+            }
+        }
+
+        int res = 0;
+        for (int i : nums) {
+            res += Math.abs(i - average);
+        }
+        System.out.println("\tAverage = " + average);
+        System.out.println("\tminMoves = " + res);
+        return res;
+    }
+    public static int minMoves2_2(int[] nums) {
+        System.out.println("\nStart function minMoves2_2()");
+        Arrays.sort(nums);
+        printArray(nums, "\tNums:");
+
+        Integer min = nums[0];
+        int sum = 0;
+        for (int i : nums) {
+            sum += (i - min);
+        }
+
+        int average = min;
+        int len = nums.length;
+        int index = 0;
+        while (index < len) {
+            int nextStart = index + 1;
+            while (nextStart < len && nums[nextStart] == nums[index]) {
+                nextStart++;
+            }
+            if (nextStart < len) {
+                int diff = nums[nextStart] - nums[index];
+                int minus = (len - nextStart) * diff;
+                int add = nextStart * diff;
+                if (minus > add) {
+                    sum = sum - minus + add;
+                    average = nums[nextStart];
+                } else {
+                    break;
+                }
+            }
+            index = nextStart;
+        }
+        System.out.println("\tAverage = " + average);
+        System.out.println("\tminMoves = " + sum);
+        return sum;
+    }
+    public static int minMoves2_3(int[] nums) {
+        System.out.println("\nStart function minMoves2_3()");
+        Arrays.sort(nums);
+        printArray(nums, "\tNums:");
+
+        int len = nums.length;
+        int index = 0;
+
+        while (index < len) {
+            int nextStart = index + 1;
+            while (nextStart < len && nums[nextStart] == nums[index]) {
+                nextStart++;
+            }
+            if (nextStart < len) {
+                int diff = nums[nextStart] - nums[index];
+                int minus = diff * (len - nextStart);
+                int add = diff * nextStart;
+                if (minus <= add) {
+                    break;
+                }
+            }
+            index = nextStart;
+        }
+        index = index == len ? len - 1 : index;
+        int sum = 0;
+        for (int i : nums) {
+            sum += Math.abs(nums[index] - i);
+        }
+
+        System.out.println("\tAverage = " + nums[index]);
+        System.out.println("\tminMoves = " + sum);
+        return sum;
+    }
+
+    /**
+     * Minimum Number of Arrows to Burst Balloons
+     * There are a number of spherical balloons spread in two-dimensional space. For each balloon, provided input is the start and end coordinates of the horizontal diameter. Since it's horizontal, y-coordinates don't matter and hence the x-coordinates of start and end of the diameter suffice. Start is always smaller than end. There will be at most 104 balloons.
+     * An arrow can be shot up exactly vertically from different points along the x-axis. A balloon with xstart and xendbursts by an arrow shot at x if xstart ≤ x ≤ xend. There is no limit to the number of arrows that can be shot. An arrow once shot keeps travelling up infinitely. The problem is to find the minimum number of arrows that must be shot to burst all balloons.
+     * Example:
+     * Input:
+     *         [[10,16], [2,8], [1,6], [7,12]]
+     * Output:
+     *         2
+     * Explanation:
+     * One way is to shoot one arrow for example at x = 6 (bursting the balloons [2,8] and [1,6]) and another arrow at x = 11 (bursting the other two balloons).
+     */
+    public static int findMinArrowShots(int[][] points) {
+        System.out.println("\nStart function findMinArrowShots()");
+        Arrays.sort(points, (a, b) -> a[0] - b[0]);
+        printTwoDimentinalArray(points, "Points:");
+        int len = points.length;
+        if (len < 1) return 0;
+
+        int res = 0;
+        int[] curPoint = points[0];
+        for (int i = 1; i < len; i++) {
+            int[] point = points[i];
+            if (point[0] > curPoint[1]) {
+                res++;
+                curPoint = point;
+            } else {
+                curPoint[1] = Math.min(point[1], curPoint[1]);
+            }
+        }
+        res++;
+
+        System.out.println("\tRes = " + res);
+        return res;
+    }
+
+    /**
+     * Number of Boomerangs
+     * Given n points in the plane that are all pairwise distinct, a "boomerang" is a tuple of points (i, j, k) such that the distance between i and j equals the distance between i and k (the order of the tuple matters).
+     * Find the number of boomerangs. You may assume that n will be at most 500 and coordinates of points are all in the range [-10000, 10000] (inclusive).
+     * Example:
+     * Input:
+     *         [[0,0],[1,0],[2,0]]
+     * Output:
+     *         2
+     * Explanation:
+     * The two boomerangs are [[1,0],[0,0],[2,0]] and [[1,0],[2,0],[0,0]]
+     */
+    public static int numberOfBoomerangs(int[][] points) {
+        System.out.println("\nStart function numberOfBoomerangs()");
+        printTwoDimentinalArray(points, "Points:");
+        int R = points.length;
+        if (R < 1) return 0;
+
+        int sum = 0;
+        for (int i = 0; i < R; i++) {
+            HashMap<Double, Integer> map = new HashMap<>();
+            for (int j = 0; j < R; j++) {
+                if (j == i) continue;
+                double dist = getDistance(points[i], points[j]);
+                if (map.containsKey(dist)) {
+                    map.put(dist, map.get(dist) + 1);
+                } else {
+                    map.put(dist, 1);
+                }
+            }
+            for (double d : map.keySet()) {
+                int count = map.get(d);
+                if (map.get(d) >= 2) {
+                    sum += count * (count-1);
+                }
+            }
+        }
+        System.out.println("\tSum = " + sum);
+        return sum;
+    }
+    private static double getDistance(int[] p1, int[] p2) {
+        return Math.sqrt((p1[0] - p2[0]) * (p1[0] - p2[0]) + (p1[1] - p2[1]) * (p1[1] - p2[1]));
     }
 }
 

@@ -652,19 +652,21 @@ public class TestArray {
         ArrayTest.canPartition(new int[]{100,100,100,100,100,100,100,100});
 
         ArrayTest.numberOfArithmeticSlices(new int[]{1, 2, 3, 4});
+        ArrayTest.numberOfArithmeticSlices(new int[]{2, 4, 6, 8, 10});
+
 //        ArrayTest.trapRainWater(new int[][]{
 //                {1,4,3,1,3,2},
 //                {3,2,1,3,2,4},
 //                {2,3,3,2,3,1}
 //        });
 
-//        ArrayTest.trapRainWater(new int[][]{
-//                {12, 13, 1, 12},
-//                {13, 4, 13, 12},
-//                {13, 8, 10, 12},
-//                {12, 13, 12, 12},
-//                {13, 13, 13, 13}
-//        });
+        ArrayTest.trapRainWater(new int[][]{
+                {12, 13, 1, 12},
+                {13, 4, 13, 12},
+                {13, 8, 10, 12},
+                {12, 13, 12, 12},
+                {13, 13, 13, 13}
+        });
 
         ArrayTest.pacificAtlantic(new int[][]{
                 {1,2},
@@ -714,6 +716,26 @@ public class TestArray {
         });
         ArrayTest.findRightInterval(new ArrayTest.Interval2[]{
                 new ArrayTest.Interval2(4,5), new ArrayTest.Interval2(2,3), new ArrayTest.Interval2(1,2)
+        });
+
+        ArrayTest.minMoves2(new int[]{6, 7, 8, 12, 4});
+        ArrayTest.minMoves2(new int[]{6, 7, 8, 12, 5});
+        ArrayTest.minMoves2(new int[]{1, 2, 3, 6, 7, 8});
+        ArrayTest.minMoves2(new int[]{1, 3, 5, 5, 6, 7});
+        ArrayTest.minMoves2(new int[]{1, 0, 0, 8, 6});
+        ArrayTest.minMoves2_2(new int[]{1, 0, 0, 8, 6});
+        ArrayTest.minMoves2_3(new int[]{1, 0, 0, 8, 6});
+
+        ArrayTest.findMinArrowShots(new int[][]{
+                {10,16}, {2,8}, {1,6}, {7,12}
+        });
+
+        ArrayTest.findMinArrowShots(new int[][]{
+                {1,4}, {2,3}, {3,8}, {4,6}, {5,7}, {6, 8}
+        });
+
+        ArrayTest.numberOfBoomerangs(new int[][]{
+                {0,0}, {1,0}, {-1,0}, {0,1}, {0,-1}
         });
     }
 //        try {

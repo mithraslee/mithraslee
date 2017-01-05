@@ -6506,6 +6506,104 @@ public class StringTest {
         return maxL;
     }
 
+    /**
+     * Sort Characters By Frequency
+     * Given a string, sort it in decreasing order based on the frequency of characters.
+     *         Example 1:
+     * Input:
+     *         "tree"
+     * Output:
+     *         "eert"
+     * Explanation:
+     *         'e' appears twice while 'r' and 't' both appear once.
+     *         So 'e' must appear before both 'r' and 't'. Therefore "eetr" is also a valid answer.
+     *         Example 2:
+     * Input:
+     *         "cccaaa"
+     * Output:
+     *         "cccaaa"
+     * Explanation:
+     * Both 'c' and 'a' appear three times, so "aaaccc" is also a valid answer.
+     * Note that "cacaca" is incorrect, as the same characters must be together.
+     * Example 3:
+     * Input:
+     *         "Aabb"
+     * Output:
+     *         "bbAa"
+     * Explanation:
+     *         "bbaA" is also a valid answer, but "Aabb" is incorrect.
+     * Note that 'A' and 'a' are treated as two different characters.
+     */
+    private static class CharWithFreq {
+        public Character c;
+        public int index;
+        public int freq;
+        public CharWithFreq(char c, int i) {
+            this.c = c;
+            index = i;
+            freq = 1;
+        }
+    }
+    public static String frequencySort(String s) {
+        System.out.println("\nStart function frequencySort()");
+        System.out.println("\ts = " + s);
+        HashMap<Character, CharWithFreq> map = new HashMap<>();
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+
+            if (map.containsKey(c)) {
+                map.get(c).freq++;
+            } else {
+                CharWithFreq newRecord = new CharWithFreq(c, i);
+                map.put(c, newRecord);
+            }
+        }
+        PriorityQueue<CharWithFreq> Q = new PriorityQueue<>((a, b) -> b.freq - a.freq);
+        for (char k : map.keySet()) {
+            Q.add(map.get(k));
+        }
+        StringBuilder sb = new StringBuilder();
+        while (!Q.isEmpty()) {
+            CharWithFreq r = Q.poll();
+            int count = r.freq;
+            while (count-- > 0) {
+                sb.append(r.c);
+            }
+        }
+        System.out.println("\tSorted = " + sb.toString());
+        return sb.toString();
+    }
+    // Better version
+    public static String frequencySort2(String s) {
+        System.out.println("\nStart function frequencySort2()");
+        System.out.println("\ts = " + s);
+        HashMap<Character, Integer> map = new HashMap<>();
+        for (char c : s.toCharArray()) {
+            if (map.containsKey(c)) {
+                map.put(c, map.get(c)+1);
+            } else {
+                map.put(c, 1);
+            }
+        }
+        PriorityQueue<int[]> Q = new PriorityQueue<>((a, b) -> b[1] - a[1]);
+        for (char k : map.keySet()) {
+            Q.add(new int[]{k-'a', map.get(k)});
+        }
+        StringBuilder sb = new StringBuilder();
+        while (!Q.isEmpty()) {
+            int[] r = Q.poll();
+            int count = r[1];
+            while (count-- > 0) {
+                sb.append((char)(r[0] + 'a'));
+            }
+        }
+        System.out.println("\tSorted = " + sb.toString());
+        return sb.toString();
+    }
+
+
+
+
     public static String originalDigits2(String s) {
         System.out.println("\nStart function originalDigits()");
         System.out.println("\ts = " + s);
