@@ -9,6 +9,8 @@ public class FenwickTree {
     // https://www.hackerearth.com/practice/notes/binary-indexed-tree-or-fenwick-tree/
     public ArrayList<Integer> arr;
     public int len;
+
+    // 关键要记住BIT array的size需要比arr大1
     private int lowbit(int x) {
         return x & -x;
     }

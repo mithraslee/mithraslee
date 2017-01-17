@@ -46,5 +46,31 @@ public class TestSearch {
         Integer[] testArr = {2, 1};
         int k = Search.<Integer>findKthLargest(testArr, 1);
         System.out.println(k);
+
+        System.out.println();
+        int[] nums = new int[]{1,2,2,3,4,6,6,6,13,18};
+        System.out.println(Search.lowerBound(nums, 6)); // 5
+        System.out.println(Search.lowerBound2(nums, 6)); // 5
+        System.out.println(Search.upperBound(nums, 6)); // 7
+        System.out.println(Search.upperBound2(nums, 6)); // 7
+        System.out.println();
+        System.out.println(Search.lowerBound(nums, 7)); // 8
+        System.out.println(Search.lowerBound2(nums, 7)); // 8
+        System.out.println(Search.upperBound(nums, 7)); // 7
+        System.out.println(Search.upperBound2(nums, 7)); // 7
+
+        Search.searchRange(new int[]{5, 7, 7, 8, 8, 10}, 5);
+        Search.searchRange(new int[]{5, 7, 7, 8, 8, 10}, 7);
+        Search.searchRange(new int[]{5, 7, 7, 8, 8, 10}, 8);
+        Search.searchRange(new int[]{5, 7, 7, 8, 8, 10}, 10);
+        Search.searchRange(new int[]{5, 7, 7, 8, 8, 10}, 3);
+        Search.searchRange(new int[]{5, 7, 7, 8, 8, 10}, 6);
+        Search.searchRange(new int[]{5, 7, 7, 8, 8, 10}, 9);
+        Search.searchRange(new int[]{5, 7, 7, 8, 8, 10}, 11);
+
+        int[] testArr2 = new int[]{1, 3, 4, 5, 8, 9, 13, 18};
+        for (int i = 0; i < 20; i++) {
+            Search.searchForClosestDemo(testArr2, i);
+        }
     }
 }

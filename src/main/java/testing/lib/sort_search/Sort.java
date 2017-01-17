@@ -253,14 +253,12 @@ public class Sort {
     public static <T extends Number> Pilot<T> partition (ListNode<T> begin, ListNode<T> end) {
         if (begin == null || end == null || begin == end)
             return new Pilot<> (null, begin);
-        
+
         if (begin.compareTo(end) > 0) {
-            T temp = begin.getData();
-            begin.setData(end.getData());
-            end.setData(temp);
+            swapListNode(begin, end);
         }
-        
-        ListNode<T> last = end.next;
+
+        ListNode<T> last = end.next;    // This line can be removed. Since end.next is always null
         ListNode<T> prev = begin;
         ListNode<T> cur = begin.next;
         ListNode<T> tail = end;
@@ -277,17 +275,18 @@ public class Sort {
             }
         }
         if (end != tail) {
-            {
-                T temp = end.getData();
-                end.setData(end.next.getData());
-                end.next.setData(temp);
-            }
+            swapListNode(end, end.next);
             prev.next = end.next;
             tail.next = end;
-            end.next = last;
+            end.next = last;            // This line can be removed. Since end.next is always null
         }
         
         return (prev != null) ? new Pilot<> (prev, prev.next) : new Pilot<> (null, begin);
+    }
+    private static <T extends Number> void swapListNode (ListNode<T> a, ListNode<T> b) {
+        T temp = a.getData();
+        a.setData(b.getData());
+        b.setData(temp);
     }
 
     public static <T extends Number> void insertionSort (SingleList<T> sList) {
@@ -308,14 +307,14 @@ public class Sort {
                         cur.setData(iter.getData());
                         iter.setData(temp);
                     }
+                    cur = pre.next;
+                    break;
                 }
                 iter = iter.next;
             }
             if (iter == cur) {
                 pre = cur;
                 cur = cur.next;
-            } else {
-                cur = pre.next;
             }
         }
     }

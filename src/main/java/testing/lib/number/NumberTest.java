@@ -2095,6 +2095,88 @@ public class NumberTest {
     }
 
     /**
+     * K-th Smallest in Lexicographical Order
+     *
+     * Given integers n and k, find the lexicographically k-th smallest integer in the range from 1 to n.
+     *
+     * Note: 1 ≤ k ≤ n ≤ 109.
+     *
+     * Example:
+     *
+     * Input:
+     * n: 13   k: 2
+     *
+     * Output:
+     *         10
+     *
+     * Explanation:
+     * The lexicographical order is [1, 10, 11, 12, 13, 2, 3, 4, 5, 6, 7, 8, 9], so the second smallest number is 10.
+     */
+    // Memory out
+    public static int findKthNumber(int n, int k) {
+        System.out.println("\nStart function findKthNumber(). n = " + n + "; k = " + k);
+        ArrayList<Integer> res = new ArrayList<>();
+        for (int i = 1; i <= 9; i++) {
+            findKthNumberDFS(i, n, k, res);
+        }
+        //System.out.println("\t" + res);
+        System.out.println("\tKth element = " + res.get(res.size()-1));
+        return res.get(res.size()-1);
+    }
+    private static boolean findKthNumberDFS(int cur, int n, int k, ArrayList<Integer> res) {
+        if (cur > n) {
+            return false;
+        }
+        if (res.size() >= k) {
+            return true;
+        }
+        res.add(cur);
+        for (int i = 0; i <= 9; i++) {
+            if (cur * 10 + i <= n) {
+                if (findKthNumberDFS(cur * 10 + i, n, k, res)) {
+                    return true;
+                };
+            } else {
+                break;
+            }
+        }
+        return false;
+    }
+    // Times out
+    private static int resCount = 0;
+    private static int kth = 0;
+    public static int findKthNumber2(int n, int k) {
+        System.out.println("\nStart function findKthNumber2(). n = " + n + "; k = " + k);
+        resCount = 0;
+        kth = 0;
+        for (int i = 1; i <= 9; i++) {
+            findKthNumberDFS2(i, n, k);
+        }
+        System.out.println("\tKth element = " + kth);
+        return kth;
+    }
+    private static boolean findKthNumberDFS2(int cur, int n, int k) {
+        if (cur > n) {
+            return false;
+        }
+        if (resCount >= k) {
+            return true;
+        }
+        kth = cur;
+        resCount++;
+        for (int i = 0; i <= 9; i++) {
+            if (cur * 10 + i <= n) {
+                if (findKthNumberDFS2(cur * 10 + i, n, k)) {
+                    return true;
+                };
+            } else {
+                break;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Water and Jug Problem
      * You are given two jugs with capacities x and y litres. There is an infinite amount of water supply available. You need to determine whether it is possible to measure exactly z litres using these two jugs.
      *         If z liters of water is measurable, you must have z liters of water contained within one or both buckets by the end.
@@ -2149,5 +2231,362 @@ public class NumberTest {
         }
         System.out.println("\tRes = " + sb.toString());
         return sb.toString();
+    }
+
+    /**
+     * Arranging Coins
+     * You have a total of n coins that you want to form in a staircase shape, where every k-th row must have exactly k coins.
+     *
+     * Given n, find the total number of full staircase rows that can be formed.
+     *
+     * n is a non-negative integer and fits within the range of a 32-bit signed integer.
+     *
+     *         Example 1:
+     *
+     * n = 5
+     *
+     * The coins can form the following rows:
+     * ¤
+     * ¤ ¤
+     * ¤ ¤
+     *
+     * Because the 3rd row is incomplete, we return 2.
+     * Example 2:
+     *
+     * n = 8
+     *
+     * The coins can form the following rows:
+     * ¤
+     * ¤ ¤
+     * ¤ ¤ ¤
+     * ¤ ¤
+     *
+     * Because the 4th row is incomplete, we return 3.
+     */
+    public static int arrangeCoins(int n) {
+        int i = 1;
+        for (; i <= n; i++) {
+            if (n >= i) {
+                n -= i;
+            } else {
+                break;
+            }
+        }
+        return i-1;
+    }
+
+    public static int findMaximumXOR(int[] nums) {
+        System.out.println("\nStart function findMaximumXOR()");
+        printArray(nums, "\tNums: ");
+        int max = 0, mask = 0;
+        for(int i = 31; i >= 0; i--){
+            mask = mask | (1 << i);
+            Set<Integer> set = new HashSet<>();
+            for(int num : nums){
+                set.add(num & mask);
+            }
+            System.out.println("\tSet: " + set);
+            int tmp = max | (1 << i);
+            for(int prefix : set){
+                if(set.contains(tmp ^ prefix)) {
+                    max = tmp;
+                    break;
+                }
+            }
+        }
+        return max;
+    }
+
+    /**
+     * Can I Win
+     *
+     * In the "100 game," two players take turns adding, to a running total, any integer from 1..10. The player who first causes the running total to reach or exceed 100 wins.
+     *
+     * What if we change the game so that players cannot re-use integers?
+     *
+     * For example, two players might take turns drawing from a common pool of numbers of 1..15 without replacement until they reach a total >= 100.
+     *
+     * Given an integer maxChoosableInteger and another integer desiredTotal, determine if the first player to move can force a win, assuming both players play optimally.
+     *
+     * You can always assume that maxChoosableInteger will not be larger than 20 and desiredTotal will not be larger than 300.
+     *
+     * Example
+     *
+     * Input:
+     * maxChoosableInteger = 10
+     * desiredTotal = 11
+     *
+     * Output:
+     *         false
+     *
+     * Explanation:
+     * No matter which integer the first player choose, the first player will lose.
+     * The first player can choose an integer from 1 up to 10.
+     * If the first player choose 1, the second player can only choose integers from 2 up to 10.
+     * The second player will win by choosing 10 and get a total = 11, which is >= desiredTotal.
+     * Same with other integers chosen by the first player, the second player will always win.
+     */
+    public static boolean canIWin(int maxChoosableInteger, int desiredTotal) {
+        if (maxChoosableInteger >= desiredTotal) return true;
+        if (maxChoosableInteger * (maxChoosableInteger + 1) / 2 < desiredTotal) return false;
+
+        HashMap<Integer, Boolean> map = new HashMap<>();
+        return canIWin(maxChoosableInteger, desiredTotal, 0, map);
+    }
+    private static boolean canIWin(int maxChoosableInteger, int desiredTotal, int used, HashMap<Integer, Boolean> map) {
+        if (map.containsKey(used)) {
+            return map.get(used);
+        }
+        for (int i = 0; i < maxChoosableInteger; i++) {
+            int cur = (1 << i);
+            if ((cur & used) == 0) {
+                if (desiredTotal <= i+1 || !canIWin(maxChoosableInteger, desiredTotal - (i+1), (cur | used), map)) {
+                    map.put(used, true);
+                    return true;
+                }
+            }
+        }
+        map.put(used, false);
+        return false;
+    }
+
+    /**
+     * Print Numbers by Recursion
+     *
+     * Print numbers from 1 to the largest number with N digits by recursion.
+     *         Example
+     * Given N = 1, return [1,2,3,4,5,6,7,8,9].
+     * Given N = 2, return [1,2,3,4,5,6,7,8,9,10,11,12,...,99].
+     * Note
+     * It's pretty easy to do recursion like:
+     * recursion(i) {
+     *     if i > largest number:
+     *     return
+     *             results.add(i)
+     *     recursion(i + 1)
+     * }
+     * however this cost a lot of recursion memory as the recursion depth maybe very large.
+     * Can you do it in another way to recursive with at most N depth?
+     * Challenge
+     * Do it in recursion, not for-loop.
+     */
+    public static List<Integer> numbersByRecursion(int n) {
+        System.out.println("\nStart function numbersByRecursion(). n = " + n);
+        if (n <= 0) return new LinkedList<>();
+        List<Integer> last = numbersByRecursion(n-1);
+        ArrayList<Integer> list = new ArrayList(last);
+        int begin = (int)Math.pow(10, n-1);
+        int end = (int)Math.pow(10, n);
+        for (int i = begin; i < end; i++) {
+            list.add(i);
+        }
+        System.out.println("\tRes = " + list);
+        return list;
+    }
+
+    /**
+     * Number Complement
+     *
+     * Given a positive integer, output its complement number. The complement strategy is to flip the bits of its binary representation.
+     *
+     * Note:
+     * The given integer is guaranteed to fit within the range of a 32-bit signed integer.
+     * You could assume no leading zero bit in the integer’s binary representation.
+     *         Example 1:
+     * Input: 5
+     * Output: 2
+     * Explanation: The binary representation of 5 is 101 (no leading zero bits), and its complement is 010. So you need to output 2.
+     * Example 2:
+     * Input: 1
+     * Output: 0
+     * Explanation: The binary representation of 1 is 1 (no leading zero bits), and its complement is 0. So you need to output 0.
+     */
+    public static int findComplement(int num) {
+        System.out.println("\nStart function findComplement(). n = " + num);
+        int cnt = 0;
+        int tmp = num;
+        while (tmp > 0) {
+            cnt++;
+            tmp >>= 1;
+        }
+        int mask = (0x1 << cnt) - 1;
+        System.out.println("\t" + (~num & mask));
+        return ~num & mask;
+    }
+
+    /**
+     * Strobogrammatic Number 
+     * A strobogrammatic number is a number that looks the same when rotated 180 degrees (looked at upside down).
+     * Write a function to determine if a number is strobogrammatic. The number is represented as a string.
+     * For example, the numbers "69", "88", and "818" are all strobogrammatic.
+     */
+    public static void isStrobogrammaticDemo(String num) {
+        System.out.println("\nStart function isStrobogrammaticDemo(). n = " + num);
+        System.out.println("\tRes = " + isStrobogrammatic(num));
+    }
+    public static boolean isStrobogrammatic(String num) {
+        HashMap<Character, Character> map = new HashMap<>();
+        map.put('6', '9');
+        map.put('9', '6');
+        map.put('1', '1');
+        map.put('8', '8');
+        map.put('0', '0');
+
+        int low = 0, high = num.length() - 1;
+        while (low <= high) {
+            char l = num.charAt(low);
+            char h = num.charAt(high);
+
+            if (!map.containsKey(l) ||
+                map.get(l) != h) {
+                return false;
+            }
+            low++;
+            high--;
+        }
+        return true;
+    }
+
+    /**
+     * Strobogrammatic Number II
+     *
+     *
+     * A strobogrammatic number is a number that looks the same when rotated 180 degrees (looked at upside down).
+     *
+     * Find all strobogrammatic numbers that are of length = n.
+     *
+     *         For example,
+     * Given n = 2, return ["11","69","88","96"].
+     *
+     * Hint:
+     *
+     * Try to use recursion and notice that it should recurse with n - 2 instead of n - 1.
+     */
+    public static List<String> findStrobogrammatic(int n) {
+        System.out.println("\nStart function findStrobogrammatic(). n = " + n);
+        List<String> res = findStrobogrammaticHelper(n, n);
+        System.out.println("\tRes = " + res);
+        return res;
+    }
+    public static List<String> findStrobogrammaticHelper(int n, int m) {
+        List<String> res = new ArrayList<String>();
+        if (m == 0) {
+            res.add("");
+            return res;
+        }
+        if (m == 1) {
+            res.add("0");
+            res.add("1");
+            res.add("8");
+            return res;
+        }
+        List<String> tmp = findStrobogrammaticHelper(n, m - 2);
+        for (String t : tmp) {
+            if (m != n) {
+                res.add("0" + t + "0");
+            }
+            res.add("1" + t + "1");
+            res.add("6" + t + "9");
+            res.add("8" + t + "8");
+            res.add("9" + t + "6");
+        }
+        return res;
+    }
+
+    /**
+     * Strobogrammatic Number III 
+     * A strobogrammatic number is a number that looks the same when rotated 180 degrees (looked at upside down).
+     * Write a function to count the total strobogrammatic numbers that exist in the range of low <= num <= high.
+     *         For example,
+     * Given low = "50", high = "100", return 3. Because 69, 88, and 96 are three strobogrammatic numbers.
+     * Note:
+     * Because the range might be a large number, the low and high numbers are represented as string.
+     */
+    public static int strobogrammaticInRange(String low, String high) {
+        HashSet<String> res = new HashSet<>();
+
+        strobogrammaticInRangeHelper(low, high, "", res);
+        strobogrammaticInRangeHelper(low, high, "0", res);
+        strobogrammaticInRangeHelper(low, high, "1", res);
+        strobogrammaticInRangeHelper(low, high, "8", res);
+
+        return res.size();
+    }
+    private static void strobogrammaticInRangeHelper(String low, String high, String tmp, HashSet<String> res) {
+        if (tmp.length() >= low.length() && tmp.length() <= high.length()) {
+            if ((tmp.length() == low.length() && tmp.compareTo(low) < 0) || (tmp.length() == high.length() && tmp.compareTo(high) > 0)) {
+                return;
+            }
+            if (!(tmp.length() > 1 && tmp.startsWith("0"))) {
+                res.add(tmp);
+            }
+//            if (tmp.length() > 1 && tmp.startsWith("0")) {
+//                return;
+//            }
+//            res.add(tmp);
+        }
+        if (tmp.length() + 2 > high.length()) {
+            return;
+        }
+        strobogrammaticInRangeHelper(low, high, "0" + tmp + "0", res);
+        strobogrammaticInRangeHelper(low, high, "1" + tmp + "1", res);
+        strobogrammaticInRangeHelper(low, high, "6" + tmp + "9", res);
+        strobogrammaticInRangeHelper(low, high, "8" + tmp + "8", res);
+        strobogrammaticInRangeHelper(low, high, "9" + tmp + "6", res);
+    }
+
+    /**
+     * Find the Celebrity
+     * Suppose you are at a party with n people (labeled from 0 to n - 1) and among them, there may exist one celebrity. The definition of a celebrity is that all the other n - 1 people know him/her but he/she does not know any of them.
+     * Now you want to find out who the celebrity is or verify that there is not one. The only thing you are allowed to do is to ask questions like: "Hi, A. Do you know B?" to get information of whether A knows B. You need to find out the celebrity (or verify there is not one) by asking as few questions as possible (in the asymptotic sense).
+     * You are given a helper function bool knows(a, b) which tells you whether A knows B. Implement a function int findCelebrity(n), your function should minimize the number of calls to knows.
+     *         Note: There will be exactly one celebrity if he/she is in the party. Return the celebrity's label if there is a celebrity in the party. If there is no celebrity, return -1.
+     */
+    private static boolean knows(int a, int b) {
+        boolean[][] tmp = new boolean[][] {
+            {true, false, true, true},
+            {true, true,  true, false},
+            {false, false, false, false},
+            {true, false, true, true}
+        };
+        return tmp[a][b];
+    }
+    public static int findCelebrityDemo(int n) {
+        System.out.println("\nStart function findCelebrityDemo(). n = " + n);
+        int celebrity = findCelebrity(n);
+        System.out.println("\tCelebrity = " + celebrity);
+        return celebrity;
+    }
+    public static int findCelebrity(int n) {
+        if (n < 1) return -1;
+        if (n == 1) return 0;
+
+        HashSet<Integer> not = new HashSet<>();
+        for (int i = 0; i < n; i++) {
+            if (not.contains(i)) continue;
+            int j = 0;
+            for (; j < n; j++) {
+                if (j == i) continue;
+                if (knows(i, j)) {
+                    not.add(i);
+                    break;
+                } else {
+                    not.add(j);
+                }
+            }
+            if (j == n) {
+                int k = 0;
+                for (; k < n; k++) {
+                    if (k != i && !knows(k, i)) {
+                        not.add(i);
+                        break;
+                    }
+                }
+                if (k == n) {
+                    return i;
+                }
+            }
+        }
+        return -1;
     }
 }

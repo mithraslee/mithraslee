@@ -4,7 +4,9 @@ import testing.lib.number.NumberTest;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collector;
 
 /**
  * Created by yun.li on 9/30/16.
@@ -167,9 +169,42 @@ public class TestNumber {
 //        NumberTest.lastRemaining(1000000);
 
         NumberTest.lexicalOrder(13);
+        NumberTest.findKthNumber2(13, 1);
+        NumberTest.findKthNumber2(13, 2);
+        NumberTest.findKthNumber2(13, 3);
+        NumberTest.findKthNumber2(13, 4);
+        NumberTest.findKthNumber2(13, 5);
+        NumberTest.findKthNumber2(13, 6);
+        NumberTest.findKthNumber2(13, 7);
+        NumberTest.findKthNumber2(13, 8);
+        NumberTest.findKthNumber2(13, 9);
+        NumberTest.findKthNumber2(13, 10);
+        NumberTest.findKthNumber2(13, 11);
+        NumberTest.findKthNumber2(13, 12);
+        NumberTest.findKthNumber2(13, 13);
+        NumberTest.findKthNumber(99, 8);
+        NumberTest.findKthNumber2(99, 8);
 
 //        NumberTest.toHex(26);
         NumberTest.toHex(-1);
-    }
 
+        NumberTest.findMaximumXOR(new int[]{3, 10, 5, 25, 2, 8});
+
+        NumberTest.numbersByRecursion(2);
+
+        NumberTest.findComplement(5);
+
+        NumberTest.isStrobogrammaticDemo("69");
+        NumberTest.isStrobogrammaticDemo("818");
+        NumberTest.isStrobogrammaticDemo("868");
+
+        NumberTest.findStrobogrammatic(0);
+        NumberTest.findStrobogrammatic(1);
+        NumberTest.findStrobogrammatic(2);
+        NumberTest.findStrobogrammatic(3);
+
+        NumberTest.strobogrammaticInRange("100", "200");
+
+        NumberTest.findCelebrityDemo(4);
+    }
 }

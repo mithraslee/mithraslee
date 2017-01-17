@@ -10,10 +10,10 @@ public class TrieNode {
     public HashMap<Character, TrieNode> children;
 
     public TrieNode () {
-        this(null, new HashMap<Character, TrieNode>());
+        this(null, new HashMap<>());
     }
     public TrieNode (Character d) {
-        this(d, new HashMap<Character, TrieNode>());
+        this(d, new HashMap<>());
     }
     public TrieNode (Character d, HashMap<Character, TrieNode> c) {
         v = d;

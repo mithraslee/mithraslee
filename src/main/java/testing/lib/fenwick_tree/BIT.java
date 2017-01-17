@@ -11,6 +11,7 @@ public class BIT {
         return x & -x;
     }
 
+    // 关键要记住BIT array的size需要比arr大1
     public BIT(int[] nums) {
         int len = nums.length;
         if (len < 1) return;

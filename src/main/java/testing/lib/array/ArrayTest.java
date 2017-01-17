@@ -5,10 +5,7 @@
 package testing.lib.array;
 
 import java.util.*;
-import java.util.function.BooleanSupplier;
 
-import com.sun.xml.internal.bind.annotation.OverrideAnnotationOf;
-import com.sun.xml.internal.ws.api.addressing.WSEndpointReference;
 import testing.lib.fenwick_tree.FenwickTree;
 import testing.lib.sort_search.*;
 
@@ -35,6 +32,14 @@ public class ArrayTest <T extends Number> {
         return a;
     }
 
+    private static Double[] convertDoubleArrToDoubleArr(double[] arr) {
+        Double[] a = new Double[arr.length];
+        for (int i = 0; i < arr.length; i++) {
+            a[i] = arr[i];
+        }
+        return a;
+    }
+
     private static Integer[][] convertIntArrToIntegerArr(int[][] arr) {
         int M = arr.length;
         int N = arr[0].length;
@@ -47,26 +52,44 @@ public class ArrayTest <T extends Number> {
         return a;
     }
 
+    private static Double[][] convertDoubleArrToDoubleArr(double[][] arr) {
+        int M = arr.length;
+        int N = arr[0].length;
+        Double[][] a = new Double[M][N];
+        for (int i = 0; i < M; i++) {
+            for (int j = 0; j < N; j++) {
+                a[i][j] = arr[i][j];
+            }
+        }
+        return a;
+    }
+
     private static void printArray(int[] arr) {
         printArray(convertIntArrToIntegerArr(arr), null, false);
     }
-
     private static void printArray(int[] arr, String note) {
         printArray(convertIntArrToIntegerArr(arr), note, false);
     }
-
     private static void printArray(int[] arr, String note, boolean printDimension) {
         printArray(convertIntArrToIntegerArr(arr), note, false);
+    }
+
+    private static void printArray(double[] arr) {
+        printArray(convertDoubleArrToDoubleArr(arr), null, false);
+    }
+    private static void printArray(double[] arr, String note) {
+        printArray(convertDoubleArrToDoubleArr(arr), note, false);
+    }
+    private static void printArray(double[] arr, String note, boolean printDimension) {
+        printArray(convertDoubleArrToDoubleArr(arr), note, false);
     }
 
     private static <T> void printArray(T[] arr) {
         printArray(arr, null, false);
     }
-
     private static <T> void printArray(T[] arr, String note) {
         printArray(arr, note, false);
     }
-
     private static <T> void printArray(T[] arr, boolean printDimension) {
         printArray(arr, null, printDimension);
     }
@@ -90,6 +113,16 @@ public class ArrayTest <T extends Number> {
     }
     private static void printTwoDimentinalArray(int[][] arr, boolean printDimension) {
         printTwoDimentinalArray(convertIntArrToIntegerArr(arr), null, printDimension);
+    }
+
+    private static void printTwoDimentinalArray(double[][] arr) {
+        printTwoDimentinalArray(convertDoubleArrToDoubleArr(arr), null, false);
+    }
+    private static void printTwoDimentinalArray(double[][] arr, String note) {
+        printTwoDimentinalArray(convertDoubleArrToDoubleArr(arr), note, false);
+    }
+    private static void printTwoDimentinalArray(double[][] arr, boolean printDimension) {
+        printTwoDimentinalArray(convertDoubleArrToDoubleArr(arr), null, printDimension);
     }
 
     private static <T> void printTwoDimentinalArray(T[][] arr) {
@@ -140,11 +173,11 @@ public class ArrayTest <T extends Number> {
     /**
      * convert array:	{ a1, a2, a3, ..., an, b1, b2, b3, ..., bn }
      * to:				{ a1, b1, a2, b2, a3, b3, ........, an, bn }
-     * {(a1, a2, a3, a4, b1, b2, b3, b4)}
+     *    {(a1, a2, a3, a4, b1, b2, b3, b4)}
      * => {(a1, a2, b1, b2), (a3, a4, b3, b4)}
      * => {(a1, b1), (a2, b2), (a3, b3), (a4, b4)}
      * <p>
-     * {(a1, a2, a3, a4, a5, b1, b2, b3, b4, b5)}
+     *    {(a1, a2, a3, a4, a5, b1, b2, b3, b4, b5)}
      * => {(a1, a2, b1, b2), b3, a3, (a4, a5, b4, b5)}
      * => {(a1, a2, b1, b2), a3, b3, (a4, a5, b4, b5)}
      * => {(a1, b1), (a2, b2), (a3, b3), (a4, b4), (a5, b5)}
@@ -224,6 +257,59 @@ public class ArrayTest <T extends Number> {
         }
         System.out.println("Array:      " + Arrays.asList(a));
         System.out.println("Temp array: " + Arrays.asList(temp));
+    }
+
+    /**
+     * Find Minimum in Rotated Sorted Array
+     *
+     * Suppose a sorted array is rotated at some pivot unknown to you beforehand.
+     *         (i.e., 0 1 2 4 5 6 7 might become 4 5 6 7 0 1 2).
+     * Find the minimum element.
+     * There could be duplicated elements
+     * You may assume no duplicate exists in the array.
+     */
+    public static int findMin(int[] num) {
+        if (num == null) return -1;
+        int len = num.length;
+        if (len < 1) return -1;
+
+        int begin = 0;
+        int end = len - 1;
+        int mid;
+        while (begin <= end) {
+            mid = begin + (end- begin)/2;
+            if (mid == begin) {
+                return Math.min(num[begin], num[end]);
+            } else if (num[mid] > num[end]) {
+                begin = mid + 1;
+            } else if (num[mid] < num[mid - 1]) {
+                return num[mid];
+            } else {
+                end = mid + 1;
+            }
+        }
+        return -1;
+    }
+    public int findMin2(int[] num) {
+        if (num == null || num.length == 0) return Integer.MIN_VALUE;
+
+        int lb = 0, ub = num.length - 1;
+        // case1: num[0] < num[num.length - 1]
+        if (num[lb] < num[ub]) return num[lb];
+
+        // case2: num[0] > num[num.length - 1] or num[0] < num[num.length - 1]
+        while (lb + 1 < ub) {
+            int mid = lb + (ub - lb) / 2;
+            if (num[mid] < num[ub]) {
+                ub = mid;
+            } else if (num[mid] > num[ub]){
+                lb = mid;
+            } else {
+                ub--;
+            }
+        }
+
+        return Math.min(num[lb], num[ub]);
     }
 
     /**
@@ -498,6 +584,33 @@ public class ArrayTest <T extends Number> {
         }
         return maxSquare;
     }
+    public static int largestSquareArea2(Integer[] height) {
+        int maxSquareLen = -1;
+        int len = height.length;
+        Stack S = new Stack();
+        for (int i = 0; i < len; i++) {
+            if (!S.isEmpty()) {
+                while (!S.isEmpty() && height[i] < height[(Integer) S.peek()]) {
+                    int temp = (Integer) S.pop();
+                    if (S.isEmpty()) {
+                        maxSquareLen = Math.max(maxSquareLen, Math.min(i, height[temp]));
+                    } else {
+                        maxSquareLen = Math.max(maxSquareLen, Math.min(i - (int) S.peek() - 1, height[temp]));
+                    }
+                }
+            }
+            S.push(i);
+        }
+        while (!S.isEmpty()) {
+            int temp = (Integer) S.pop();
+            if (S.isEmpty()) {
+                maxSquareLen = Math.max(maxSquareLen, Math.min(len, height[temp]));
+            } else {
+                maxSquareLen = Math.max(maxSquareLen, Math.min(len - 1 - (int) S.peek(), height[temp]));
+            }
+        }
+        return maxSquareLen * maxSquareLen;
+    }
 
     /**
      * The gray code is a binary numeral system where two successive values differ in only one bit.
@@ -546,9 +659,9 @@ public class ArrayTest <T extends Number> {
      * row below.
      * For example, given the following triangle
      * [
-     * [2],
-     * [3,4],
-     * [6,5,7],
+     *    [2],
+     *   [3,4],
+     *  [6,5,7],
      * [4,1,8,3]
      * ]
      * The minimum path sum from top to bottom is 11 
@@ -710,6 +823,52 @@ public class ArrayTest <T extends Number> {
     static private void appendSpace(StringBuilder sb, int num) {
         for (int i = 1; i <= num; i++)
             sb.append(" ");
+    }
+    // Another version, cleaner
+    public static List<String> fullJustify2(String[] words, int maxWidth) {
+        ArrayList<String> res = new ArrayList<>();
+        if (words == null) return res;
+        int len = words.length;
+        if (len <= 0) return res;
+        if (maxWidth <= 0) return res;
+
+        Integer[] wlens = new Integer[len];
+        for (int i = 0; i < len; i++) {
+            wlens[i] = words[i].length();
+        }
+        int start = 0;
+        int tmpLen = 0;
+        for (int cur = 0; cur < len; cur++) {
+            int wordNum = cur - start + 1;
+            if (tmpLen + wordNum - 1 + wlens[cur] > maxWidth) {
+                res.add(genString(words, start, cur - 1, tmpLen, maxWidth));
+                tmpLen = 0;
+                start = cur;
+            }
+            tmpLen += wlens[cur];
+        }
+        res.add(genString(words, start, len - 1, tmpLen, maxWidth));
+        return res;
+    }
+    private static String genString(String[] words, int start, int end, int tmpLen, int maxWidth) {
+        int wordCount = end - start + 1;
+        if (wordCount == 1) return words[start];
+
+        int intervalCount = wordCount - 1;
+        int totalSpaces = maxWidth - tmpLen;
+        int [] spaceWidths = new int [intervalCount];
+        for (int i = 0; i < intervalCount; i++) {
+            spaceWidths[i] = totalSpaces/intervalCount + (i < totalSpaces%intervalCount ? 1 : 0);
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(words[start]);
+        for (int i = 0; i < intervalCount; i++) {
+            for (int j = 0; j < spaceWidths[i]; j++)
+                sb.append(" ");
+            sb.append(words[start + i + 1]);
+        }
+        return sb.toString();
     }
 
     /**
@@ -1035,6 +1194,59 @@ public class ArrayTest <T extends Number> {
     }
 
     /**
+     * Maximum Size Subarray Sum Equals k
+     *
+     * Given an array nums and a target value k, find the maximum length of a subarray that sums to k. If there isn't one, return 0 instead.
+     * Note:
+     * The sum of the entire nums array is guaranteed to fit within the 32-bit signed integer range.
+     * Example 1:
+     * Given nums = [1, -1, 5, -2, 3], k = 3,
+     *         return 4. (because the subarray [1, -1, 5, -2] sums to 3 and is the longest)
+     * Example 2:
+     * Given nums = [-2, -1, 2, 1], k = 1,
+     *         return 2. (because the subarray [-1, 2] sums to 1 and is the longest)
+     * Follow Up:
+     * Can you do it in O(n) time?
+     */
+    public static int maxSubArrayLen(int[] nums, int k) {
+        System.out.println("\nStart function maxSubArrayLen(). K = " + k);
+        printArray(nums, "\tNums:");
+
+        int len = nums.length;
+        if (len < 1) return 0;
+
+        int res = 0;
+        HashMap<Long, HashSet<Integer>> map = new HashMap<>();
+        long[] sum = new long[len];
+        for (int i = 0; i < len; i++) {
+            sum[i] = nums[i];
+            if (i > 0) {
+                sum[i] += sum[i - 1];
+            }
+            if (nums[i] == k) {
+                res = Math.max(res, 1);
+            }
+            if (sum[i] == k) {
+                res = Math.max(res, i + 1);
+            }
+            Long diff = sum[i] - (long)k;
+            if (map.containsKey(diff)) {
+                for (int idx : map.get(diff)) {
+                    res = Math.max(res, i - idx);
+                }
+            }
+
+            if (map.containsKey(sum[i])) {
+                map.get(sum[i]).add(i);
+            } else {
+                map.put(sum[i], new HashSet<>(Arrays.asList(new Integer[]{i})));
+            }
+        }
+        System.out.println("\tRes = " + res);
+        return res;
+    }
+
+    /**
      * Attention! Important!
      */
     public static int getKthFromTwoSortedArray(Integer A[], Integer B[], int kth) {
@@ -1080,7 +1292,7 @@ public class ArrayTest <T extends Number> {
         }
     }
 
-    // Optimal solution!
+    // Optimal solution!!!
     public static int getKthFromTwoSortedArray2(Integer[] A, Integer[] B, int kth) {
         assert A != null : "Array A is null";
         assert B != null : "Array B is null";
@@ -1441,7 +1653,7 @@ public class ArrayTest <T extends Number> {
         for (int i = 0; i < M; i++) {
             for (int j = 0; j < N; j++) {
                 if (arr[i][j] == 'O') {
-                    addToMap(arr, M, N, i, j, dict);
+                    addToQueue(arr, M, N, i, j, dict);
                     if (!dict.isEmpty()) {
                         boolean clear = true;
                         if (dict.keySet().contains(0) || dict.keySet().contains(M - 1))
@@ -1466,7 +1678,7 @@ public class ArrayTest <T extends Number> {
         printTwoDimentinalArray(arr, "Converted array");
     }
 
-    private static void addToMap(Character[][] arr, int M, int N, int i, int j, HashMap<Integer, HashSet<Integer>> dict) {
+    private static void addToQueue(Character[][] arr, int M, int N, int i, int j, HashMap<Integer, HashSet<Integer>> dict) {
         if (i >= M || i < 0 || j >= N || j < 0)
             return;
         if (arr[i][j] != 'O')
@@ -1482,10 +1694,10 @@ public class ArrayTest <T extends Number> {
                 dict.put(i, new HashSet<Integer>());
                 dict.get(i).add(j);
             }
-            addToMap(arr, M, N, i + 1, j, dict);
-            addToMap(arr, M, N, i - 1, j, dict);
-            addToMap(arr, M, N, i, j + 1, dict);
-            addToMap(arr, M, N, i, j - 1, dict);
+            addToQueue(arr, M, N, i + 1, j, dict);
+            addToQueue(arr, M, N, i - 1, j, dict);
+            addToQueue(arr, M, N, i, j + 1, dict);
+            addToQueue(arr, M, N, i, j - 1, dict);
         }
     }
 
@@ -2865,6 +3077,55 @@ public class ArrayTest <T extends Number> {
 
         return res;
     }
+
+    public static void dragonChallengeDemo(ArrayList<Integer> arr) {
+        System.out.println("\nStart function dragonChallengeDemo()");
+        System.out.println("\tArr = " + arr);
+        System.out.println("\tPath = " + dragonChallenge(arr));
+    }
+    public static List<Integer> dragonChallenge(ArrayList<Integer> arr) {
+        assert arr != null : "Input array is null!";
+
+        LinkedList<Integer> emptyRes = new LinkedList<Integer>();
+        int len = arr.size();
+        if (len < 1) return emptyRes;
+        if (len == 1) {
+            if (arr.get(0) <= 0) return emptyRes;
+            else return new ArrayList<Integer>(arr);
+        }
+
+        HashSet<LinkedList<Integer>> nextStep = new HashSet<>();
+        HashSet<LinkedList<Integer>> curStep = new HashSet<>();
+        curStep.add(new LinkedList<>(Arrays.asList(new Integer[]{0})));
+
+        while (!curStep.isEmpty()) {
+            nextStep.clear();
+
+            for (LinkedList<Integer> cur : curStep) {
+                if (cur.isEmpty()) continue;
+
+                Integer curIndex = cur.getLast();
+                if (curIndex + arr.get(curIndex) > len - 1) {
+                    return cur;
+                } else {
+                    for (int j = 1; j <= arr.get(curIndex); j++) {
+                        if (arr.get(curIndex+j) != 0) {
+                            LinkedList<Integer> newList = new LinkedList<>(cur);
+                            newList.add(curIndex+j);
+                            if (curIndex + j == len - 1) {
+                                return newList;
+                            } else {
+                                nextStep.add(newList);
+                            }
+                        }
+                    }
+                }
+            }
+            curStep.clear();
+            curStep.addAll(nextStep);
+        }
+        return emptyRes;
+    }
     //endregion
 
     // region Search Paths
@@ -2997,7 +3258,7 @@ public class ArrayTest <T extends Number> {
      * Explanation: You cannot find a way to form a square with all the matchsticks.
      */
     public static void makesquareDemo(int[] nums) {
-        System.out.println("\nStart function findRadius()");
+        System.out.println("\nStart function makesquareDemo()");
         printArray(nums, "\tNums:");
         System.out.println("\tSquarable: " + makesquare(nums));
     }
@@ -4176,6 +4437,59 @@ public class ArrayTest <T extends Number> {
         return result;
     }
 
+    public static List<Integer> knapsackWithRepetition(Integer[] value, Integer[] weight, Integer W) {
+        System.out.println("\nStart function knapsackWithRepetition()");
+        assert value != null && weight != null && W > 0;
+
+        printArray(value, "Input Value:");
+        printArray(weight, "Input Weight:");
+        System.out.println("Input W = " + W);
+
+        int len = value.length;
+        assert len == weight.length;
+
+        Integer[][] DP = new Integer[len + 1][W + 1];
+        for (int i = 0; i <= len; i++) {
+            Arrays.fill(DP[i], 0);
+        }
+        for (int i = 1; i <= len; i++) {
+            for (int j = 1; j <= W; j++) {
+                if (weight[i - 1] > j) {
+                    DP[i][j] = DP[i - 1][j];
+                } else {
+                    DP[i][j] = Math.max(DP[i - 1][j], value[i - 1] + DP[i][j - weight[i - 1]]);
+                }
+            }
+        }
+
+        printTwoDimentinalArray(DP, "DP array in knapsackWithRepetition:");
+
+        LinkedList<Integer> result = new LinkedList<>();
+        for (int i = len, j = W; i >= 1; i--) {
+            if (DP[i][j] > DP[i - 1][j]) {
+                result.addFirst(i - 1);
+                j -= weight[i - 1];
+                i++;
+            }
+        }
+
+        int totalVal = 0;
+        System.out.print("\tValues: ");
+        for (int i : result) {
+            System.out.print(value[i] + " ");
+            totalVal += value[i];
+        }
+        System.out.println("\tTotal value = " + totalVal);
+        int totalWei = 0;
+        System.out.print("\tWeights: ");
+        for (int i : result) {
+            System.out.print(weight[i] + " ");
+            totalWei += weight[i];
+        }
+        System.out.println("\tTotal weight = " + totalWei);
+
+        return result;
+    }
 
     /**
      * Given an array, partition it into two sub-arrays, while the difference between sums of these two sub-arrays is minimal.
@@ -4694,11 +5008,8 @@ public class ArrayTest <T extends Number> {
     }
 
     /**
-     * Guess Number Higher or Lower II QuestionEditorial Solution  My Submissions
-     * Total Accepted: 13653
-     * Total Submissions: 39327
-     * Difficulty: Medium
-     * Contributors: Admin
+     * Guess Number Higher or Lower II Question
+     *
      * We are playing the Guess Game. The game is as follows:
      *
      * I pick a number from 1 to n. You have to guess which number I picked.
@@ -4720,15 +5031,23 @@ public class ArrayTest <T extends Number> {
      * You end up paying $5 + $7 + $9 = $21.
      * Given a particular n ≥ 1, find out how much money you need to have to guarantee a win.
      *
-     *         Hint:
+     * Hint:
      *
-     * The best strategy to play the game is to minimize the maximum loss you could possibly face. Another strategy is to minimize the expected loss. Here, we are interested in the first scenario.
+     * The best strategy to play the game is to minimize the maximum loss you could possibly face.
+     * Another strategy is to minimize the expected loss.
+     * Here, we are interested in the first scenario.
+     *
      * Take a small example (n = 3). What do you end up paying in the worst case?
      * Check out this article if you're still stuck.
      * The purely recursive implementation of minimax would be worthless for even a small n. You MUST use dynamic programming.
      * As a follow-up, how would you modify your code to solve the problem of minimizing the expected loss, instead of the worst-case loss?
      *
      * DP Problem
+     *
+     * 此题是之前那道Guess Number Higher or Lower的拓展，难度增加了不少。
+     * 根据题目中的提示，这道题需要用到Minimax极小化极大算法，关于这个算法可以参见这篇讲解。
+     * 并且题目中还说明了要用DP来做，那么我们需要建立一个二维的dp数组，其中dp[i][j]表示从数字i到j之间猜中任意一个数字最少需要花费的钱数。
+     * 那么我们需要遍历每一段区间[j, i]，维护一个全局最小值global_min变量，然后遍历该区间中的每一个数字，计算局部最大值local_max = k + max(dp[j][k - 1], dp[k + 1][i])，这个正好是将该区间在每一个位置都分为两段，然后取当前位置的花费加上左右两段中较大的花费之和为局部最大值，然后更新全局最小值，最后在更新dp[j][i]的时候看j和i是否是相邻的，相邻的话赋为i，否则赋为global_min，参见代码如下：
      */
     public static int getMoneyAmount(int n) {
         System.out.println("\nStart function getMoneyAmount()");
@@ -4881,13 +5200,21 @@ public class ArrayTest <T extends Number> {
 
         PriorityQueue<Integer> points = new PriorityQueue<>();
         PriorityQueue<Block> Q = new PriorityQueue<>(buildings.length, (Block b1, Block b2) -> -Integer.compare(b1.height, b2.height));
+//        PriorityQueue<Block> Q = new PriorityQueue<>(buildings.length, (Block b1, Block b2) -> -Integer.compare(b1.height, b2.height));
 
-        LinkedList<Block> blocks = new LinkedList<>();
+        PriorityQueue<Block> blocks = new PriorityQueue<>(buildings.length, (a, b) -> a.start - b.start);
         for (int i = 0; i < buildings.length; i++) {
             blocks.add(new Block(buildings[i][0], buildings[i][1], buildings[i][2]));
             points.add(buildings[i][0]);
             points.add(buildings[i][1]);
         }
+//        LinkedList<Block> blocks = new LinkedList<>();
+//        for (int i = 0; i < buildings.length; i++) {
+//            blocks.add(new Block(buildings[i][0], buildings[i][1], buildings[i][2]));
+//            points.add(buildings[i][0]);
+//            points.add(buildings[i][1]);
+//        }
+//        Collections.sort(blocks, (a,b) -> a.start - b.start);
 
         int curHeight = 0;
 
@@ -4899,9 +5226,14 @@ public class ArrayTest <T extends Number> {
             // At first, 'if' instead of 'while' is used, which would be wrong for
             // inputs: (1, 2, 1), (1, 2, 2), (1, 2, 3)
             //if (!blocks.isEmpty() && index == blocks.getFirst().start) {
-            while (!blocks.isEmpty() && index == blocks.getFirst().start) {
-                Q.add(blocks.removeFirst());
+
+            while (!blocks.isEmpty() && index >= blocks.peek().start) {
+                Q.add(blocks.poll());
             }
+
+//            while (!blocks.isEmpty() && index >= blocks.getFirst().start) {
+//                Q.add(blocks.removeFirst());
+//            }
 
             if (!Q.isEmpty() && curHeight != Q.peek().height) {
                 res.add(new int[]{index, Q.peek().height});
@@ -4933,7 +5265,7 @@ public class ArrayTest <T extends Number> {
      *
      * DP Problem
      */
-    // dp[i][j] = max(dp[i][j], nums[i - 1]*nums[k]*nums[j + 1] + dp[i][k - 1] + dp[k + 1][j])                 ( i ≤ k ≤ j )
+    // dp[i][j] = max(dp[i][j], nums[i - 1]*nums[k]*nums[j + 1] + dp[i][k - 1] + dp[k + 1][j])      ( i ≤ k ≤ j )
     public static int maxCoins(Integer[] nums) {
         System.out.println("\nStart function maxCoins()");
         printArray(nums, "\tNums: ");
@@ -5685,7 +6017,7 @@ public class ArrayTest <T extends Number> {
         for (int i = 1; i < len; i++) {
             if ((i%2 == 1 && nums[i] < nums[i-1]) ||
                 (i%2 == 0 && nums[i] > nums[i-1])) {
-                swap(nums, i, i -1);
+                swap(nums, i, i - 1);
             }
         }
         printArray(nums, "\tNums Sorted:");
@@ -5820,6 +6152,7 @@ public class ArrayTest <T extends Number> {
             Range newRange = new Range(heaters[i], heaters[i] + (heaters[i+1] - heaters[i])/2);
             ranges.add(newRange);
         }
+        // This line is important. Make sure the last heater is included
         ranges.add(new Range(heaters[hLen-1], Integer.MAX_VALUE));
 
         int curRangeIndex = 0;
@@ -6383,7 +6716,9 @@ public class ArrayTest <T extends Number> {
 
             int nextPosition = Arrays.binarySearch(stones, index + 1, stones.length, nextJump);
             if (nextPosition > 0) {
-                if (canCrossDFS2(stones, nextPosition, i)) return true;
+                if (canCrossDFS2(stones, nextPosition, i)) {
+                    return true;
+                }
             }
         }
 
@@ -6400,7 +6735,9 @@ public class ArrayTest <T extends Number> {
         return canCrossDFS3(stoneSet, 0, last, k);
     }
     private static boolean canCrossDFS3(HashSet<Integer> stoneSet, int curStone, int destStone, int k) {
-        if (destStone == curStone) return true;
+        if (destStone == curStone) {
+            return true;
+        }
         for (int i = k - 1; i <= k + 1; i++) {
             int nextStone = curStone + i;
 
@@ -6410,7 +6747,6 @@ public class ArrayTest <T extends Number> {
                 }
             }
         }
-
         return false;
     }
 
@@ -6855,6 +7191,39 @@ public class ArrayTest <T extends Number> {
         System.out.println("\tkth element = " + curVal);
         return curVal;
     }
+    // Better solution with PriorityQueue
+    public static int kthSmallest2(int[][] matrix, int k) {
+        System.out.println("\nStart function kthSmallest2(); k = " + k);
+        printTwoDimentinalArray(matrix, "\tMatrix:");
+        int R = matrix.length;
+        int C = matrix[0].length;
+        Boolean[][] visited = new Boolean[R][C];
+        for (int i = 0; i < R; i++) {
+            Arrays.fill(visited[i], false);
+        }
+        PriorityQueue<PointWithVal> Q = new PriorityQueue<>((a, b) -> a.val - b.val);
+        PointWithVal cur = new PointWithVal(0, 0, matrix[0][0]);
+        Q.add(cur);
+        visited[0][0] = true;
+        int count = 1;
+        while (!Q.isEmpty() && count <= k) {
+            cur = Q.poll();
+            if (count == k) {
+                break;
+            }
+            count++;
+            if (cur.i + 1 < R && !visited[cur.i + 1][cur.j]) {
+                Q.add(new PointWithVal(cur.i + 1, cur.j, matrix[cur.i + 1][cur.j]));
+                visited[cur.i + 1][cur.j] = true;
+            }
+            if (cur.j + 1 < C && !visited[cur.i][cur.j + 1]) {
+                Q.add(new PointWithVal(cur.i, cur.j + 1, matrix[cur.i][cur.j + 1]));
+                visited[cur.i][cur.j + 1] = true;
+            }
+        }
+        System.out.println("\tkth element = " + cur.val);
+        return cur.val;
+    }
 
     /**
      * Intersection of Two Arrays
@@ -7242,6 +7611,55 @@ public class ArrayTest <T extends Number> {
         return count;
     }
 
+    public static int numberOfArithmeticSlicesII(int[] A) {
+        System.out.println("\nStart function numberOfArithmeticSlicesII()");
+        printArray(A, "\tA:");
+        int len = A.length;
+        int maxVal = Integer.MIN_VALUE;
+        int minVal = Integer.MAX_VALUE;
+        HashMap<Integer, HashSet<Integer>> valToIndex = new HashMap<>();
+        for (int i = 0; i < len; i++) {
+            if (valToIndex.containsKey(A[i])) {
+                valToIndex.get(A[i]).add(i);
+            } else {
+                HashSet<Integer> newSet = new HashSet<>();
+                newSet.add(i);
+                valToIndex.put(A[i], newSet);
+            }
+            maxVal = Math.max(maxVal, A[i]);
+            minVal = Math.min(minVal, A[i]);
+        }
+        int sum = 0;
+        for (int i = 0; i < len-3; i++) {
+            for (int j = i + 2; j < len; j++) {
+                int diff = A[j] - A[i];
+                int count = 2;
+                int tempVal = A[i] + count * diff;
+                HashMap<Integer, HashSet<Integer>> tempMap = (HashMap<Integer, HashSet<Integer>>)valToIndex.clone();
+                while (tempVal <= maxVal && tempVal >= minVal && tempMap.containsKey(tempVal)) {
+                    boolean updated = false;
+                    for (int k : tempMap.get(tempVal)) {
+                        if (k > j) {
+                            tempMap.remove(tempVal);
+                            count++;
+                            tempVal = A[i] + count *diff;
+                            updated = true;
+                        }
+                    }
+//                    if (tempVal == A[i] + 2 * diff) {
+                    if (!updated) {
+                        break;
+                    }
+                }
+                if (count >= 3) {
+                    sum += countOfArithmeticSlices(count);
+                }
+            }
+        }
+        System.out.println("\tSum = " + sum);
+        return sum;
+    }
+
     /**
      * Partition Equal Subset Sum
      * Given a non-empty array containing only positive integers, find if the array can be partitioned into two subsets such that the sum of elements in both subsets is equal.
@@ -7283,6 +7701,84 @@ public class ArrayTest <T extends Number> {
         // Used '==' instead of 'equals', which led to wrong answer
         //return DP[len][half] == half;
         return DP[len][half].equals(half);
+    }
+
+    /**
+     * Number of Islands
+     *
+     * Given a 2d grid map of '1's (land) and '0's (water), count the number of islands. An island is surrounded by water and is formed by connecting adjacent lands horizontally or vertically. You may assume all four edges of the grid are all surrounded by water.
+     * Example 1:
+     *         11110
+     *         11010
+     *         11000
+     *         00000
+     * Answer: 1
+     * Example 2:
+     *         11000
+     *         11000
+     *         00100
+     *         00011
+     * Answer: 3
+     */
+    public int numIslands(char[][] grid) {
+        if (grid == null) return 0;
+        int M = grid.length;
+        if (M == 0) return 0;
+        int N = grid[0].length;
+        if (N == 0) return 0;
+
+        int count = 0;
+        for (int i = 0; i < M; i++) {
+            for (int j = 0; j < N; j++) {
+                if (grid[i][j] != '0') {
+                    count++;
+                    pollute(grid, i, j, M, N);
+                }
+            }
+        }
+        return count;
+    }
+    private void pollute(char[][] grid, int i, int j, int M, int N) {
+        if (i < 0 || i >= M || j < 0 || j >= N) return;
+        if (grid[i][j] == '0') return;
+        grid[i][j] = '0';
+        pollute(grid, i+1, j, M, N);
+        pollute(grid, i-1, j, M, N);
+        pollute(grid, i, j+1, M, N);
+        pollute(grid, i, j-1, M, N);
+    }
+    // Better version
+    public int numIslands2(char[][] grid) {
+        if (grid == null) return 0;
+        int M = grid.length;
+        if (M == 0) return 0;
+        int N = grid[0].length;
+        if (N == 0) return 0;
+
+        int[][] dirs = new int[][]{
+                {-1, 0},{1, 0},{0, -1},{0, 1}
+        };
+
+        int count = 0;
+        for (int i = 0; i < M; i++) {
+            for (int j = 0; j < N; j++) {
+                if (grid[i][j] != '0') {
+                    count++;
+                    pollute2(grid, i, j, M, N, dirs);
+                }
+            }
+        }
+        return count;
+    }
+    private void pollute2(char[][] grid, int i, int j, int M, int N, int[][] dirs) {
+        grid[i][j] = '0';
+        for (int[] dir : dirs) {
+            int x = i + dir[0];
+            int y = j + dir[1];
+            if (x >= 0 && x < M && y >= 0 && y < N && grid[x][y] != '0') {
+                pollute2(grid, x, y, M, N, dirs);
+            }
+        }
     }
 
     /**
@@ -7987,6 +8483,1355 @@ public class ArrayTest <T extends Number> {
     private static double getDistance(int[] p1, int[] p2) {
         return Math.sqrt((p1[0] - p2[0]) * (p1[0] - p2[0]) + (p1[1] - p2[1]) * (p1[1] - p2[1]));
     }
+
+    /**
+     * Majority Element
+     *
+     * Given an array of size n, find the majority element. The majority element is the element that appears more than ⌊ n/2 ⌋ times.
+     * You may assume that the array is non-empty and the majority element always exist in the array.
+     */
+    public static int majorityElement(int[] nums) {
+        int len = nums.length;
+        int maj = nums[0];
+        int count = 1;
+        for (int i : nums) {
+            if (maj == i) {
+                count++;
+            } else {
+                count--;
+            }
+
+            if (count == 0) {
+                maj = i;
+                count = 1;
+            }
+        }
+        return maj;
+    }
+
+    /**
+     * Majority Element II
+     *
+     * Given an integer array of size n, find all elements that appear more than ⌊ n/3 ⌋ times. The algorithm should run in linear time and in O(1) space.
+     * Hint:
+     *         1. How many majority elements could it possibly have?
+     * Do you have a better hint? Suggest it!
+     */
+    public static List<Integer> majorityElementII(int[] nums) {
+        System.out.println("\nStart function majorityElementII()");
+        printArray(nums, "\tNums:");
+        List<Integer> res = new ArrayList<>();
+        int len = nums.length;
+        Integer m1 = null;
+        Integer m2 = null;
+        int c1 = 0, c2 = 0;
+        for (int i : nums) {
+            if ((m1 == null || c1 == 0) && (m2 == null || (m2 != null && i != m2))) {
+                m1 = i;
+                c1 = 1;
+            } else if (m1 == i) {
+                c1++;
+            } else if (m2 == null || c2 == 0) {
+                m2 = i;
+                c2 = 1;
+            } else if (m2 == i) {
+                c2++;
+            } else {
+                c1--;
+                c2--;
+            }
+        }
+
+        c1 = 0;
+        c2 = 0;
+        for (int i : nums) {
+            if (i == m1) {
+                c1++;
+            } else if (i == m2) {
+                c2++;
+            }
+        }
+
+        if (c1 > len/3) res.add(m1);
+        if (c2 > len/3) res.add(m2);
+
+        System.out.println("\tRes: " + res);
+        return res;
+    }
+    public static List<Integer> majorityElementII2(int[] nums) {
+        System.out.println("\nStart function majorityElementII2()");
+        printArray(nums, "\tNums:");
+        List<Integer> res = new ArrayList<>();
+        int len = nums.length;
+        int m1 = Integer.MIN_VALUE, m2 = Integer.MIN_VALUE, c1 = 0, c2 = 0;
+        for (int i : nums) {
+            if (i == m1) {
+                c1++;
+            } else if (i == m2) {
+                c2++;
+            } else if (c1 == 0) {
+                m1 = i;
+                c1++;
+            } else if (c2 == 0) {
+                m2 = i;
+                c2++;
+            } else {
+                c1--;
+                c2--;
+            }
+        }
+        c1 = 0;
+        c2 = 0;
+        for (int i : nums) {
+            if (i == m1) {
+                c1++;
+            } else if (i == m2) {
+                c2++;
+            }
+        }
+
+        if (c1 > len/3) res.add(m1);
+        if (c2 > len/3) res.add(m2);
+        System.out.println("\tRes: " + res);
+        return res;
+    }
+    public static List<Integer> majorityElementII3(int[] nums) {
+        System.out.println("\nStart function majorityElementII3()");
+        printArray(nums, "\tNums:");
+        List<Integer> res = new ArrayList<>();
+        int len = nums.length;
+        int m1 = -1;
+        int m2 = -1;
+        int c1 = 0;
+        int c2 = 0;
+
+        for (int i : nums) {
+            if (c1 == 0 && m2 != i) {
+                m1 = i;
+                c1 = 1;
+                continue;
+            } else if (c2 == 0 && m1 != i) {
+                m2 = i;
+                c2 = 1;
+                continue;
+            }
+
+            if (i == m1) {
+                c1++;
+            } else if (i == m2) {
+                c2++;
+            } else {
+                c1--;
+                c2--;
+            }
+        }
+
+        c1 = 0;
+        c2 = 0;
+        for (int i : nums) {
+            if (i == m1) {
+                c1++;
+            } else if (i == m2) {
+                c2++;
+            }
+        }
+        if (c1 > len/3) res.add(m1);
+        if (c2 > len/3) res.add(m2);
+        System.out.println("\tRes: " + res);
+        return res;
+    }
+
+    /**
+     * Majority Number III
+     *
+     * Given an array of integers and a number k, the majority number is the number that occurs more than 1/k of the size of the array.
+     *
+     * Find it.
+     *
+     * majorityNumber
+     */
+    public static List<Integer> majorityElementIII(int[] nums, int k) {
+        System.out.println("\nStart function majorityElementIII()");
+        printArray(nums, "\tNums:");
+
+        List<Integer> res = new ArrayList<>();
+        if (nums == null) return res;
+        int len = nums.length;
+        if (len < 1) return res;
+
+        HashMap<Integer, Integer> map = new HashMap<>();
+        for (int n : nums) {
+            if (map.containsKey(n)) {
+                map.put(n, map.get(n) + 1);
+            } else {
+                map.put(n, 1);
+                if (map.size() >= k) {
+                    removeZeroCount(map);
+                }
+            }
+        }
+
+        for (int n : map.keySet()) {
+            map.put(n, 0);
+        }
+        for (int n : nums) {
+            if (map.containsKey(n)) {
+                map.put(n, map.get(n) + 1);
+            }
+        }
+        for (int n : map.keySet()) {
+            if (map.get(n) > len/k) {
+                res.add(n);
+            }
+        }
+        System.out.println("\tRes: " + res);
+        return res;
+    }
+    private static void removeZeroCount(HashMap<Integer, Integer> map) {
+        for (int n : map.keySet()) {
+            map.put(n, map.get(n) - 1);
+        }
+        //        while(iter.hasNext()) {
+//           Map.Entry<Integer, Integer> entry = iter.next();
+//            if (entry.getValue() == 0) {
+//                iter.remove();
+//            }
+//        }
+        map.entrySet().removeIf(entry -> entry.getValue() == 0);
+    }
+
+    /**
+     * Split Array Largest Sum
+     * Given an array which consists of non-negative integers and an integer m, you can split the array into m non-empty continuous subarrays. Write an algorithm to minimize the largest sum among these m subarrays.
+     *
+     * Note:
+     * Given m satisfies the following constraint: 1 ≤ m ≤ length(nums) ≤ 14,000.
+     *
+     * Examples:
+     *
+     * Input:
+     * nums = [7,2,5,10,8]
+     * m = 2
+     *
+     * Output:
+     *         18
+     *
+     * Explanation:
+     * There are four ways to split nums into two subarrays.
+     * The best way is to split it into [7,2,5] and [10,8],
+     * where the largest sum among the two subarrays is only 18.
+     */
+    // Works, but timed out
+    // Optimal solution: http://www.cnblogs.com/grandyang/p/5933787.html
+    public static int splitArray(int[] nums, int m) {
+        System.out.println("\nStart function splitArray()");
+        printArray(nums, "Nums:");
+        System.out.println("\tm = " + m);
+        int len = nums.length;
+
+        Integer[][] S = new Integer[len][len];
+        for (int i = 0; i < len; i++) {
+            Arrays.fill(S[i], 0);
+            int sum = 0;
+            for (int j = i; j < len; j++) {
+                sum += nums[j];
+                S[i][j] = sum;
+            }
+        }
+        printTwoDimentinalArray(S, "\tSums:");
+
+        int maxSum = splitArrayHelper(S, 0, len-1, m);
+        System.out.println("\tMaxSum = " + maxSum);
+        return maxSum;
+    }
+    private static int splitArrayHelper(Integer[][] S, int start, int end, int m) {
+        if (start > end || (end-start+1) < m) {
+            return 0;
+        }
+        if (m == 1) {
+            return S[start][end];
+        }
+        int globalMin = Integer.MAX_VALUE;
+        int localMax = Integer.MIN_VALUE;
+        for (int i = start + 1; i <= end; i++) {
+            localMax = Math.max(S[start][i-1], splitArrayHelper(S, i, end, m-1));
+            globalMin = Math.min(globalMin, localMax);
+        }
+
+        return globalMin;
+    }
+
+    /**
+     * 3Sum Smaller
+     *
+     * Given an array of n integers nums and a target, find the number of index triplets i, j, k with 0 <= i < j < k < n that satisfy the condition nums[i] + nums[j] + nums[k] < target.
+     *
+     * For example, given nums = [-2, 0, 1, 3], and target = 2.
+     *
+     * Return 2. Because there are two triplets which sums are less than 2:
+     *
+     *         [-2, 0, 1]
+     *         [-2, 0, 3]
+     * Follow up:
+     * Could you solve it in O(n2) runtime?
+     */
+    public static int threeSumSmaller(int[] nums, int target) {
+        int len = nums.length;
+        Arrays.sort(nums);
+        int res = 0;
+        for (int i = 0; i < len - 2; i++) {
+            int left = i + 1;
+            int right = len - 1;
+            int sum = target - nums[i];
+            while (left < right) {
+                if (nums[left] + nums[right] < sum) {
+                    res += (right - left);
+                    left++;
+                } else {
+                    right--;
+                }
+            }
+        }
+        return res;
+    }
+
+    /**
+     * Find Peak Element - Accepted
+     *
+     * A peak element is an element that is greater than its neighbors.
+     * Given an input array where num[i] ≠ num[i+1], find a peak element and return its index.
+     * The array may contain multiple peaks, in that case return the index to any one of the peaks is fine.
+     * You may imagine that num[-1] = num[n] = -∞.
+     * For example, in array [1, 2, 3, 1], 3 is a peak element and your function should return the index number 2.
+     */
+    public static void findPeakElementDemo(int[] nums) {
+        System.out.println("\nStart function findPeakElementDemo()");
+        printArray(nums, "Nums:");
+        int index = findPeakElement(nums);
+        System.out.println("\tPeak index = " + index);
+        System.out.println("\tPeak value = " + nums[index]);
+    }
+    public static int findPeakElement(int[] nums) {
+        if (nums == null || nums.length < 1) return -1;
+        if (nums.length == 1) return 0;
+        int begin = 0;
+        int end = nums.length - 1;
+
+        while (begin < end) {
+            int mid = begin + (end - begin)/2;
+            if (nums[mid] < nums[mid + 1]) {
+                begin = mid + 1;
+            } else if (mid > 0 && nums[mid] < nums[mid - 1]) {
+                end = mid - 1;
+            } else {
+                return mid;
+            }
+        }
+        return nums[begin] > nums[end] ? begin : end;
+    }
+    public static int findPeakElement2(int[] nums) {
+        if (nums == null || nums.length < 1) return -1;
+        if (nums.length == 1) return 0;
+        int begin = 0;
+        int end = nums.length - 1;
+
+        while (begin + 1 < end) {
+            int mid = begin + (end - begin)/2;
+            if (nums[mid] < nums[mid + 1]) {
+                begin = mid;
+            } else if (nums[mid] < nums[mid - 1]) {
+                end = mid;
+            } else {
+                return mid;
+            }
+        }
+        return nums[begin] > nums[end] ? begin : end;
+    }
+
+    /**
+     * Find the Duplicate Number
+     *
+     * Given an array nums containing n + 1 integers where each integer is between 1 and n (inclusive), prove that at least one duplicate number must exist. Assume that there is only one duplicate number, find the duplicate one.
+     *
+     * Note:
+     * You must not modify the array (assume the array is read only).
+     * You must use only constant, O(1) extra space.
+     * Your runtime complexity should be less than O(n2).
+     * There is only one duplicate number in the array, but it could be repeated more than once.
+     */
+    public static int findDuplicate(int[] nums) {
+        int low = 1;
+        int high = nums.length - 1;
+        while (low < high) {
+            int mid = low + (high-low)/2;
+            int cnt = 0;
+            for (int a : nums) {
+                if (a <= mid) {
+                    cnt++;
+                }
+            }
+            if (cnt <= mid) {
+                low = mid+1;
+            } else {
+                high = mid;
+            }
+        }
+        return low;
+    }
+    public static int findDuplicate2(int[] nums) {
+        int slow = 0, fast = 0;
+        while (true) {
+            slow = nums[slow];
+            fast = nums[nums[fast]];
+            if (slow == fast) {
+                break;
+            }
+        }
+        int t = 0;
+        while (true) {
+            slow = nums[slow];
+            t = nums[t];
+            if (slow == t) {
+                break;
+            }
+        }
+        return slow;
+    }
+
+    /**
+     * Sliding Window Maximum
+     *
+     * Given an array nums, there is a sliding window of size k which is moving from the very left of the array to the very right. You can only see the k numbers in the window. Each time the sliding window moves right by one position.
+     *
+     * For example,
+     * Given nums = [1,3,-1,-3,5,3,6,7], and k = 3.
+     *
+     *         Window position                Max
+     *         ------------------------       -----
+     *        [1  3  -1] -3  5  3  6  7       3
+     *         1 [3  -1  -3] 5  3  6  7       3
+     *         1  3 [-1  -3  5] 3  6  7       5
+     *         1  3  -1 [-3  5  3] 6  7       5
+     *         1  3  -1  -3 [5  3  6] 7       6
+     *         1  3  -1  -3  5 [3  6  7]      7
+     * Therefore, return the max sliding window as [3,3,5,5,6,7].
+     */
+    public static int[] maxSlidingWindow(int[] nums, int k) {
+        System.out.println("\nStart function maxSlidingWindow(). K = " + k);
+        printArray(nums, "Nums:");
+        int len = nums.length;
+        if (k > len || len < 1) return new int[]{};
+
+        int[] res = new int[len - k + 1];
+        TreeMap<Integer, Integer> map = new TreeMap<>((a, b) -> b - a);
+        int end = 0, start = 0;
+        while (end < k) {
+            if (map.containsKey(nums[end])) {
+                map.put(nums[end], map.get(nums[end]) + 1);
+            } else {
+                map.put(nums[end], 1);
+            }
+            end++;
+        }
+        for (; end < len; end++) {
+            res[start] = map.firstKey();
+            map.put(nums[start], map.get(nums[start]) - 1);
+            if (map.get(nums[start]) == 0) {
+                map.remove(nums[start]);
+            }
+            start++;
+            if (map.containsKey(nums[end])) {
+                map.put(nums[end], map.get(nums[end]) + 1);
+            } else {
+                map.put(nums[end], 1);
+            }
+        }
+        res[start] = map.firstKey();
+        printArray(res, "Res:");
+        return res;
+    }
+
+    /**
+     * Sliding Window Median
+     *
+     * Median is the middle value in an ordered integer list. If the size of the list is even, there is no middle value. So the median is the mean of the two middle value.
+     *
+     *         Examples:
+     *         [2,3,4] , the median is 3
+     *
+     *         [2,3], the median is (2 + 3) / 2 = 2.5
+     *
+     * Given an array nums, there is a sliding window of size k which is moving from the very left of the array to the very right. You can only see the k numbers in the window. Each time the sliding window moves right by one position. Your job is to output the median array for each window in the original array.
+     *
+     * For example,
+     * Given nums = [1,3,-1,-3,5,3,6,7], and k = 3.
+     *
+     * Window position                Median
+     * ---------------               -----
+     *         [1  3  -1] -3  5  3  6  7       1
+     *         1 [3  -1  -3] 5  3  6  7       -1
+     *         1  3 [-1  -3  5] 3  6  7       -1
+     *         1  3  -1 [-3  5  3] 6  7       3
+     *         1  3  -1  -3 [5  3  6] 7       5
+     *         1  3  -1  -3  5 [3  6  7]      6
+     * Therefore, return the median sliding window as [1,-1,-1,3,5,6].
+     */
+    public static double[] medianSlidingWindow(int[] nums, int k) {
+        System.out.println("\nStart function medianSlidingWindow(). K = " + k);
+        printArray(nums, "Nums:");
+        int len = nums.length;
+        if (k > len || len < 1) return new double[]{};
+
+        double[] res = new double[len - k + 1];
+        PriorityQueue<Long> upperhalf = new PriorityQueue<>((a, b) -> Long.compare(a, b));
+        PriorityQueue<Long> lowerhalf = new PriorityQueue<>((a, b) -> -Long.compare(a, b));
+        int end = 0, start = 0;
+        while (end < k) {
+            int val = nums[end];
+            lowerhalf.add((long)val);
+            end++;
+        }
+        rebalanceHeap(upperhalf, lowerhalf);
+        for (; end < len; end++) {
+            res[start] = getMedian(upperhalf, lowerhalf);
+            if (lowerhalf.contains((long)nums[start])) {
+                lowerhalf.remove((long)nums[start]);
+            } else {
+                upperhalf.remove((long)nums[start]);
+            }
+            start++;
+            if (!upperhalf.isEmpty() && nums[end] >= upperhalf.peek()) {
+                upperhalf.add((long)nums[end]);
+            } else {
+                lowerhalf.add((long)nums[end]);
+            }
+            rebalanceHeap(upperhalf, lowerhalf);
+        }
+        res[start] = getMedian(upperhalf, lowerhalf);
+        printArray(res, "Res:");
+        return res;
+    }
+    private static void rebalanceHeap(PriorityQueue<Long> upper, PriorityQueue<Long> lower) {
+        while (upper.size() > lower.size()) {
+            lower.add(upper.poll());
+        }
+        while (lower.size() > upper.size() + 1) {
+            upper.add(lower.poll());
+        }
+    }
+    private static double getMedian(PriorityQueue<Long> upper, PriorityQueue<Long> lower) {
+        if (lower.isEmpty()) {
+            return 0.0;
+        }
+        if (lower.size() == upper.size() + 1) {
+            return (double)lower.peek();
+        } else {
+            return (double)(lower.peek() + upper.peek()) / 2.0;
+        }
+    }
+
+    public static double[] medianSlidingWindow2(int[] nums, int k) {
+        System.out.println("\nStart function medianSlidingWindow(). K = " + k);
+        printArray(nums, "Nums:");
+        int len = nums.length;
+        if (k > len || len < 1) return new double[]{};
+
+        double[] res = new double[len - k + 1];
+        TreeMap<Long, Integer> upperhalf = new TreeMap<>((a, b) -> Long.compare(a, b));
+        TreeMap<Long, Integer> lowerhalf = new TreeMap<>((a, b) -> -Long.compare(a, b));
+        int end = 0, start = 0;
+        while (end < k) {
+            int val = nums[end];
+            addToMap2(lowerhalf, val);
+            end++;
+        }
+        rebalanceMaps2(upperhalf, lowerhalf);
+        for (; end < len; end++) {
+            res[start] = getMedian2(upperhalf, lowerhalf);
+            if (lowerhalf.containsKey((long)nums[start])) {
+                removeFromMap2(lowerhalf, nums[start]);
+            } else {
+                removeFromMap2(upperhalf, nums[start]);
+            }
+            start++;
+            if (!upperhalf.isEmpty() && nums[end] >= upperhalf.firstKey()) {
+                addToMap2(upperhalf, nums[end]);
+            } else {
+                addToMap2(lowerhalf, nums[end]);
+            }
+            rebalanceMaps2(upperhalf, lowerhalf);
+        }
+        res[start] = getMedian2(upperhalf, lowerhalf);
+        printArray(res, "Res:");
+        return res;
+    }
+    private static void addToMap2(TreeMap<Long, Integer> map, long val) {
+        if (map.containsKey(val)) {
+            map.put((long)val, map.get(val) + 1);
+        } else {
+            map.put((long)val, 1);
+        }
+    }
+    private static void removeFromMap2(TreeMap<Long, Integer> map, long val) {
+        if (map.containsKey(val)) {
+            map.put(val, map.get(val) - 1);
+        }
+        if (map.containsKey(val) && map.get(val) == 0) {
+            map.remove(val);
+        }
+    }
+    private static void rebalanceMaps2(TreeMap<Long, Integer> upper, TreeMap<Long, Integer> lower) {
+        int upperCount = 0;
+        int lowerCount = 0;
+        for (long k : upper.keySet()) upperCount += upper.get(k);
+        for (long k : lower.keySet()) lowerCount += lower.get(k);
+
+        while (upperCount > lowerCount) {
+            addToMap2(lower, upper.firstKey());
+            removeFromMap2(upper, upper.firstKey());
+            upperCount--;
+            lowerCount++;
+        }
+        while (lowerCount > upperCount + 1) {
+            addToMap2(upper, lower.firstKey());
+            removeFromMap2(lower, lower.firstKey());
+            upperCount++;
+            lowerCount--;
+        }
+    }
+    private static double getMedian2(TreeMap<Long, Integer> upper, TreeMap<Long, Integer> lower) {
+        if (lower.isEmpty()) {
+            return 0.0;
+        }
+        int upperCount = 0;
+        int lowerCount = 0;
+        for (long k : upper.keySet()) upperCount += upper.get(k);
+        for (long k : lower.keySet()) lowerCount += lower.get(k);
+
+        if (lowerCount == upperCount + 1) {
+            return (double)lower.firstKey();
+        } else {
+            return (double)(lower.firstKey() + upper.firstKey()) / 2.0;
+        }
+    }
+
+    /**
+     * Range Addition
+     * Assume you have an array of length n initialized with all 0's and are given k update operations.
+     * Each operation is represented as a triplet: [startIndex, endIndex, inc] which increments each element of subarray A[startIndex ... endIndex] (startIndex and endIndex inclusive) with inc.
+     * Return the modified array after all k operations were executed.
+     *         Example:
+     * Given:
+     * length = 5,
+     * updates = [
+     *         [1,  3,  2],
+     *         [2,  4,  3],
+     *         [0,  2, -2]
+     *         ]
+     * Output:
+     *         [-2, 0, 3, 5, 3]
+     * Explanation:
+     * Initial state:
+     *         [ 0, 0, 0, 0, 0 ]
+     * After applying operation [1, 3, 2]:
+     *         [ 0, 2, 2, 2, 0 ]
+     * After applying operation [2, 4, 3]:
+     *         [ 0, 2, 5, 5, 3 ]
+     * After applying operation [0, 2, -2]:
+     *         [-2, 0, 3, 5, 3 ]
+     * Hint:
+     *         1. Thinking of using advanced data structures? You are thinking it too complicated.
+     *         2. For each update operation, do you really need to update all elements between i and j?
+     *         3. Update only the first and end element is sufficient.
+     * The optimal time complexity is O(k + n) and uses O(1) extra space.
+     */
+    public static int[] getModifiedArray(int length, int[][] updates) {
+        System.out.println("\nStart function getModifiedArray().");
+        printTwoDimentinalArray(updates, "\tUpdates:");
+        int[] res = new int[length + 1];
+        for (int[] update : updates) {
+            res[update[0]] = update[2];
+            res[update[1] + 1] = -update[2];
+        }
+        for (int i = 1; i < length; i++) {
+            res[i] += res[i-1];
+        }
+        int[] finalRes = Arrays.copyOfRange(res, 0, length);
+        printArray(finalRes, "\tRes:");
+        return finalRes;
+    }
+
+    /**
+     * Optimal Account Balancing
+     * A group of friends went on holiday and sometimes lent each other money. For example, Alice paid for Bill's lunch for 10.ThenlaterChrisgaveAlice10.ThenlaterChrisgaveAlice5 for a taxi ride. We can model each transaction as a tuple (x, y, z) which means person x gave person y $z. Assuming Alice, Bill, and Chris are person 0, 1, and 2 respectively (0, 1, 2 are the person's ID), the transactions can be represented as [[0, 1, 10], [2, 0, 5]].
+     * Given a list of transactions between a group of people, return the minimum number of transactions required to settle the debt.
+     * Note:
+     *         1. A transaction will be given as a tuple (x, y, z). Note that x ≠ y and z > 0.
+     *         2. Person's IDs may not be linear, e.g. we could have the persons 0, 1, 2 or we could also have the persons 0, 2, 6.
+     *          
+     * Example 1:
+     * Input:
+     *         [[0,1,10], [2,0,5]]
+     * Output:
+     *         2
+     * Explanation:
+     * Person #0 gave person #1 $10.
+     *         Person #2 gave person #0 $5.
+     * Two transactions are needed. One way to settle the debt is person #1 pays person #0 and #2 $5 each.
+     *          
+     * Example 2:
+     * Input:
+     *         [[0,1,10], [1,0,1], [1,2,5], [2,0,5]]
+     * Output:
+     *         1
+     * Explanation:
+     * Person #0 gave person #1 $10.
+     *         Person #1 gave person #0 $1.
+     *         Person #1 gave person #2 $5.
+     *         Person #2 gave person #0 $5.
+     *         Therefore, person #1 only need to give person #0 $4, and all debt is settled.
+     */
+    public static int minTransfers(int[][] transactions) {
+        System.out.println("\nStart function minTransfers().");
+        printTwoDimentinalArray(transactions, "\tTransactions:");
+        HashMap<Integer, Integer> map = new HashMap<>();
+        for (int[] trans : transactions) {
+            int a = trans[0];
+            int b = trans[1];
+            int m = trans[2];
+            if (map.containsKey(a)) {
+                map.put(a, map.get(a) + m);
+            } else {
+                map.put(a, m);
+            }
+            if (map.containsKey(b)) {
+                map.put(b, map.get(b) - m);
+            } else {
+                map.put(b, -m);
+            }
+        }
+
+        TreeMap<Integer, Integer> negtives = new TreeMap<>((a, b) -> a - b);
+        TreeMap<Integer, Integer> postives = new TreeMap<>((a, b) -> b - a);
+
+        for (int v : map.values()) {
+            if (v > 0) {
+                incTreeMap(postives, v);
+            } else if (v < 0) {
+                incTreeMap(negtives, v);
+            }
+        }
+
+        int steps = 0;
+        while (!postives.isEmpty() && !negtives.isEmpty()) {
+            steps++;
+            int largest = postives.firstKey();
+            int smallest = negtives.firstKey();
+            if (negtives.containsKey(-largest)) {
+                decTreeMap(postives, largest);
+                decTreeMap(negtives, -largest);
+            } else if (postives.containsKey(-smallest)) {
+                decTreeMap(postives, -smallest);
+                decTreeMap(negtives, smallest);
+            } else {
+                int sum = largest + smallest;
+                decTreeMap(postives, largest);
+                decTreeMap(negtives, smallest);
+
+                if (sum > 0) {
+                    incTreeMap(postives, sum);
+                } else if (sum < 0) {
+                    incTreeMap(negtives, sum);
+                }
+            }
+        }
+
+        System.out.println("\tRes: " + steps);
+        return steps;
+    }
+    private static void incTreeMap(TreeMap<Integer, Integer> map, int key) {
+        if (map.containsKey(key)) {
+            map.put(key, map.get(key) + 1);
+        } else {
+            map.put(key, 1);
+        }
+    }
+    private static void decTreeMap(TreeMap<Integer, Integer> map, int key) {
+        if (map.containsKey(key)) {
+            map.put(key, map.get(key) - 1);
+            if (map.get(key) == 0) {
+                map.remove(key);
+            }
+        }
+    }
+
+    /**
+     * Russian Doll Envelopes
+     *
+     * You have a number of envelopes with widths and heights given as a pair of integers (w, h). One envelope can fit into another if and only if both the width and height of one envelope is greater than the width and height of the other envelope.
+     *
+     * What is the maximum number of envelopes can you Russian doll? (put one inside other)
+     *
+     * Example:
+     * Given envelopes = [[5,4],[6,4],[6,7],[2,3]], the maximum number of envelopes you can Russian doll is 3 ([2,3] => [5,4] => [6,7]).
+     */
+    public static int maxEnvelopes(int[][] envelopes) {
+        int len = envelopes.length;
+        int[] DP = new int[len];
+
+        Arrays.sort(envelopes, (a, b) -> a[0] - b[0]);
+        Arrays.fill(DP, 1);
+        int max = 1;
+        for (int i = 1; i < len; i++) {
+            for (int j = 0; j < i; j++) {
+                if (envelopes[i][0] > envelopes[j][0] && envelopes[i][1] > envelopes[j][1]) {
+                    DP[i] = Math.max(DP[i], DP[j] + 1);
+                }
+            }
+            max = Math.max(max, DP[i]);
+        }
+        return max;
+    }
+
+    /**
+     * Max Sum of Rectangle No Larger Than K
+     * Given a non-empty 2D matrix matrix and an integer k, find the max sum of a rectangle in the matrix such that its sum is no larger than k.
+     *         Example:
+     * Given matrix = [
+     *         [1,  0, 1],
+     *         [0, -2, 3]
+     *         ]
+     * k = 2
+     * The answer is 2. Because the sum of rectangle [[0, 1], [-2, 3]] is 2 and 2 is the max number no larger than k (k = 2).
+     * Note:
+     *         1. The rectangle inside the matrix must have an area > 0.
+     * What if the number of rows is much larger than the number of columns?
+     */
+    public int maxSumSubmatrix(int[][] matrix, int k) {
+        if (matrix == null) return 0;
+        int R = matrix.length;
+        if (R < 1) return 0;
+        int C = matrix[0].length;
+        if (C < 1) return 0;
+
+        int res = Integer.MIN_VALUE;
+        int[][] sum = new int[R][C];
+        for (int i = 0; i < R; i++) {
+            for (int j = 0; j < C; j++) {
+                sum[i][j] = matrix[i][j];
+                if (i > 0) {
+                    sum[i][j] += sum[i-1][j];
+                }
+                if (j > 0) {
+                    sum[i][j] += sum[i][j-1];
+                }
+                if (i > 0  && j > 0) {
+                    sum[i][j] -= sum[i-1][j-1];
+                }
+
+                for (int r = 0; r <= i; r++) {
+                    for (int c = 0; c <= j; c++) {
+                        int d = sum[i][j];
+                        if (r > 0) d -= sum[r-1][j];
+                        if (c > 0) d -= sum[i][c-1];
+                        if (r > 0 && c > 0) d += sum[r-1][c-1];
+                        if (d <= k) {
+                            res = Math.max(res, d);
+                        }
+                    }
+                }
+            }
+        }
+        return res;
+    }
+
+    /**
+     * Maximum Gap
+     * Given an unsorted array, find the maximum difference between the successive elements in its sorted form.
+     *
+     * Try to solve it in linear time/space.
+     *
+     *         Return 0 if the array contains less than 2 elements.
+     *
+     * You may assume all elements in the array are non-negative integers and fit in the 32-bit signed integer range.
+     *
+     * Bucket Sort
+     */
+    public static int maximumGap(int[] nums) {
+        int len = nums.length;
+        if (len < 2) return 0;
+
+        int max = Integer.MIN_VALUE;
+        int min = Integer.MAX_VALUE;
+        for (int n : nums) {
+            max = Math.max(max, n);
+            min = Math.min(min, n);
+        }
+
+        int size = (max - min)/len + 1;
+        int bucketSize = (max - min) / size + 1;
+        int[] bucketMin = new int[bucketSize];
+        int[] bucketMax = new int[bucketSize];
+        Arrays.fill(bucketMax, Integer.MIN_VALUE);
+        Arrays.fill(bucketMin, Integer.MAX_VALUE);
+        HashSet<Integer> nonEmptyBucket = new HashSet<>();
+
+        for (int n : nums) {
+            int index = (n-min)/size;
+            bucketMax[index] = Math.max(bucketMax[index], n);
+            bucketMin[index] = Math.min(bucketMin[index], n);
+            nonEmptyBucket.add(index);
+        }
+        int pre = 0;
+        int res = 0;
+        for (int i = 1; i < bucketSize; i++) {
+            if (nonEmptyBucket.contains(i)) {
+                res = Math.max(res, bucketMin[i] - bucketMax[pre]);
+                pre = i;
+            }
+        }
+        return res;
+    }
+
+    /**
+     * Shortest Word Distance 最短单词距离
+     *
+     * Given a list of words and two words word1 and word2, return the shortest distance between these two words in the list.
+     *
+     * For example,
+     * Assume that words = ["practice", "makes", "perfect", "coding", "makes"].
+     *
+     * Given word1 = “coding”, word2 = “practice”, return 3.
+     * Given word1 = "makes", word2 = "coding", return 1.
+     *
+     * Note:
+     * You may assume that word1 does not equal to word2, and word1 and word2 are both in the list.
+     */
+    public static int shortestDistance(String[] words, String word1, String word2) {
+        int idx1 = -1, idx2 = -1;
+        int res = Integer.MAX_VALUE;
+        for (int i = 0; i < words.length; i++) {
+            if (words[i].equals(word1)) {
+                idx1 = i;
+            }
+            if (words[i].equals(word2)) {
+                idx2 = i;
+            }
+            if (idx1 != -1 && idx2 != -1) {
+                res = Math.min(res, Math.abs(idx1 - idx2));
+            }
+        }
+        return res;
+    }
+
+    public static int shortestDistance2(String[] words, String word1, String word2) {
+        int idx = -1;
+        int res = Integer.MAX_VALUE;
+        for (int i = 0; i < words.length; i++) {
+            if (words[i].equals(word1) || words[i].equals(word2)) {
+                if (idx != -1 && !words[idx].equals(words[i])) {
+                    res = Math.min(res, Math.abs(i - idx));
+                }
+                idx = i;
+            }
+        }
+        return res;
+    }
+
+    /** Shortest Word Distance III 最短单词距离之三
+     *
+     * This is a follow up of Shortest Word Distance. The only difference is now word1 could be the same as word2.
+     *
+     * Given a list of words and two words word1 and word2, return the shortest distance between these two words in the list.
+     *
+     * word1 and word2 may be the same and they represent two individual words in the list.
+     *
+     * For example,
+     * Assume that words = ["practice", "makes", "perfect", "coding", "makes"].
+     *
+     * Given word1 = “makes”, word2 = “coding”, return 1.
+     * Given word1 = "makes", word2 = "makes", return 3.
+     *
+     * Note:
+     * You may assume word1 and word2 are both in the list.
+     */
+    public static int shortestWordDistanceIII(String[] words, String word1, String word2) {
+        int idx = -1;
+        int res = Integer.MAX_VALUE;
+        for (int i = 0; i < words.length; i++) {
+            if (words[i].equals(word1) || words[i].equals(word2)) {
+                if (idx != -1 && (word1.equals(word2) || !words[idx].equals(words[i]))) {
+                    res = Math.min(res, Math.abs(i - idx));
+                }
+                idx = i;
+            }
+        }
+        return res;
+    }
+
+    /**
+     * Meeting Rooms
+     *
+     * Given an array of meeting time intervals consisting of start and end times [[s1,e1],[s2,e2],...] (si < ei), determine if a person could attend all meetings.
+     *
+     * For example,
+     * Given [[0, 30],[5, 10],[15, 20]],
+     *         return false.
+     */
+    public boolean canAttendMeetings(Interval[] intervals) {
+        Arrays.sort(intervals, (a,b)-> a.start - b.start);
+        for (int i = 1; i < intervals.length; i++) {
+            if (intervals[i].start < intervals[i-1].end) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Meeting Rooms II 会议室之二
+     *
+     *
+     * Given an array of meeting time intervals consisting of start and end times [[s1,e1],[s2,e2],...] (si < ei), find the minimum number of conference rooms required.
+     *
+     * For example,
+     * Given [[0, 30],[5, 10],[15, 20]],
+     *         return 2.
+     */
+    public static int minMeetingRooms(int[][] intervals) {
+        System.out.println("\nStart function minMeetingRooms().");
+        printTwoDimentinalArray(intervals, "\tIntervals:");
+
+        Arrays.sort(intervals, (a, b) -> a[0] - b[0]);
+        PriorityQueue<Integer> Q = new PriorityQueue<>();
+
+        int max = Integer.MIN_VALUE;
+        for (int[] interval : intervals) {
+            int start = interval[0];
+            while (!Q.isEmpty() && Q.peek() <= start) {
+                Q.poll();
+            }
+            Q.add(interval[1]);
+
+            max = Math.max(max, Q.size());
+        }
+
+        System.out.println("\tMax = " + max);
+        return max;
+    }
+
+    public static int minMeetingRooms2(int[][] intervals) {
+        System.out.println("\nStart function minMeetingRooms2().");
+        printTwoDimentinalArray(intervals, "\tIntervals:");
+
+        TreeMap<Integer, Integer> map = new TreeMap<>();
+        for (int[] interval : intervals) {
+            int start = interval[0];
+            int end = interval[1];
+            if (map.containsKey(start)) {
+                map.put(start, map.get(start) + 1);
+            } else {
+                map.put(start, 1);
+            }
+            if (map.containsKey(end)) {
+                map.put(end, map.get(end) - 1);
+            } else {
+                map.put(end, -1);
+            }
+        }
+
+        int tmp = 0;
+        int max = Integer.MIN_VALUE;
+        for (Integer key : map.keySet()) {
+            tmp += map.get(key);
+            max = Math.max(max, tmp);
+        }
+
+        System.out.println("\tMax = " + max);
+        return max;
+    }
+
+    /**
+     * Sparse Matrix Multiplication
+     * Given two sparse matrices A and B, return the result of AB.
+     *
+     * You may assume that A's column number is equal to B's row number.
+     *         Example:
+     *
+     * A = [
+     *         [ 1, 0, 0],
+     *         [-1, 0, 3]
+     *     ]
+     *
+     * B = [
+     *         [ 7, 0, 0 ],
+     *         [ 0, 0, 0 ],
+     *         [ 0, 0, 1 ]
+     *     ]
+     *
+     *         |  1 0 0 |   | 7 0 0 |   |  7 0 0 |
+     * AB =    | -1 0 3 | x | 0 0 0 | = | -7 0 3 |
+     *         |  0 0 1 |
+     */
+    public static int[][] multiply(int[][] A, int[][] B) {
+        System.out.println("\nStart function multiply().");
+        printTwoDimentinalArray(A, "\tA:");
+        printTwoDimentinalArray(B, "\tB:");
+
+        int R1 = A.length;
+        int C1 = A[0].length;
+        int R2 = B.length;
+        int C2 = B[0].length;
+
+        assert C1 == R2;
+
+        int[][] res = new int[R1][C2];
+
+        for (int i = 0; i < R1; i++) {
+            for (int j = 0; j < C2; j++) {
+                int sum = 0;
+                for (int h = 0; h < C1; h++) {
+                    sum += A[i][h] * B[h][j];
+                }
+                res[i][j] = sum;
+            }
+        }
+        printTwoDimentinalArray(res, "\tRes:");
+        return res;
+    }
+    public static int[][] multiply2(int[][] A, int[][] B) {
+        System.out.println("\nStart function multiply().");
+        printTwoDimentinalArray(A, "\tA:");
+        printTwoDimentinalArray(B, "\tB:");
+
+        int R1 = A.length;
+        int C1 = A[0].length;
+        int R2 = B.length;
+        int C2 = B[0].length;
+
+        assert C1 == R2;
+
+        int[][] res = new int[R1][C2];
+
+        for (int i = 0; i < R1; i++) {
+            for (int h = 0; h < C1; h++) {
+                if (A[i][h] != 0) {
+                    for (int j = 0; j < C2; j++) {
+                        if (B[h][j] != 0) {
+                            res[i][j] += A[i][h] * B[h][j];
+                        }
+                    }
+                }
+            }
+        }
+        printTwoDimentinalArray(res, "\tRes:");
+        return res;
+    }
+
+    /**
+     * Missing Ranges
+     * Given a sorted integer array where the range of elements are in the inclusive range [lower, upper], return its missing ranges.
+     * For example, given [0, 1, 3, 50, 75], lower = 0 and upper = 99, return ["2", "4->49", "51->74", "76->99"].
+     */
+    public static List<String> findMissingRanges(int[] nums, int lower, int upper) {
+        System.out.println("\nStart function findMissingRanges().");
+        printArray(nums, "\tNum:");
+        System.out.println("\tLower = " + lower);
+        System.out.println("\tUpper = " + upper);
+
+        List<String> res = new ArrayList<>();
+        // LONG !!!
+        Long pre = (long)lower;
+        for (int n : nums) {
+            if (n >= lower && n <= upper) {
+                // LONG !!!
+                Long curEnd = (long)n - 1;
+
+                if (curEnd == pre) {
+                    res.add(curEnd + "");
+                } else if (curEnd > pre) {
+                    res.add(pre + "->" + curEnd);
+                }
+                pre = (long)n + 1;
+            }
+        }
+        if (pre < upper) {
+            res.add(pre + "->" + upper);
+        } else if (pre == upper) {
+            res.add(upper + "");
+        }
+
+        System.out.println("\tRes = " + res);
+        return res;
+    }
+
+    public static int minTotalDistance(int[][] grid) {
+        ArrayList<Integer> rows = new ArrayList<>();
+        ArrayList<Integer> cols = new ArrayList<>();
+        for (int i = 0; i < grid.length; ++i) {
+            for (int j = 0; j < grid[0].length; ++j) {
+                if (grid[i][j] == 1) {
+                    rows.add(i);
+                    cols.add(j);
+                }
+            }
+        }
+        Collections.sort(rows);
+        Collections.sort(cols);
+        int i = 0, j = rows.size() - 1;
+        int sum = 0;
+        while (i < j) {
+            sum += rows.get(j) - rows.get(i) + cols.get(j--) - cols.get(i++);
+        }
+        return sum;
+    }
+
+    /**
+     * Paint House
+     * There are a row of n houses, each house can be painted with one of the three colors: red, blue or green. The cost of painting each house with a certain color is different. You have to paint all the houses such that no two adjacent houses have the same color.
+     * The cost of painting each house with a certain color is represented by a n x 3 cost matrix. For example, costs[0][0] is the cost of painting house 0 with color red; costs[1][2] is the cost of painting house 1 with color green, and so on... Find the minimum cost to paint all houses.
+     * Note:
+     * All costs are positive integers.
+     */
+    public static int minCost(int[][] costs) {
+        if (costs == null) return 0;
+        int R = costs.length;
+        if (R < 1) return 0;
+        int C = costs[0].length;
+        assert C == 3;
+        int[][] DP = new int[R][3];
+        DP[0][0] = costs[0][0];
+        DP[0][1] = costs[0][1];
+        DP[0][2] = costs[0][2];
+
+        for (int i = 1; i < R; i++) {
+            DP[i][0] = Math.min(DP[i-1][1], DP[i-1][2]) + costs[i][0];
+            DP[i][1] = Math.min(DP[i-1][0], DP[i-1][2]) + costs[i][1];
+            DP[i][2] = Math.min(DP[i-1][0], DP[i-1][1]) + costs[i][2];
+        }
+
+        return Math.min(DP[R-1][0], Math.min(DP[R-1][1], DP[R-1][2]));
+    }
+
+    /**
+     * Paint House II
+     * There are a row of n houses, each house can be painted with one of the k colors. The cost of painting each house with a certain color is different. You have to paint all the houses such that no two adjacent houses have the same color.
+     * The cost of painting each house with a certain color is represented by a n x k cost matrix. For example, costs[0][0] is the cost of painting house 0 with color 0; costs[1][2] is the cost of painting house 1 with color 2, and so on... Find the minimum cost to paint all houses.
+     * Note:
+     * All costs are positive integers.
+     */
+    public static int minCostII(int[][] costs) {
+        System.out.println("\nStart function minCostII().");
+        printTwoDimentinalArray(costs, "\tCosts:");
+
+        if (costs == null) return 0;
+        int R = costs.length;
+        if (R < 1) return 0;
+        int C = costs[0].length;
+        if (C < 1) return 0;
+
+        long min1 = 0;
+        long min2 = 0;
+        int idx1 = -1;
+
+        for (int i = 0; i < R; i++) {
+            long last1 = min1;
+            long last2 = min2;
+            int lastIdx1 = idx1;
+            min1 = Integer.MAX_VALUE;
+            min2 = Integer.MAX_VALUE;
+
+            for (int j = 0; j < C; j++) {
+                long cost = costs[i][j] + ((lastIdx1 == j) ? last2 : last1);
+                if (cost < min1) {
+                    min2 = min1; // Attention!!!
+                    min1 = cost;
+                    idx1 = j;
+                } else if (cost < min2) {
+                    min2 = cost;
+                }
+            }
+        }
+
+        System.out.println("\tMinCost = " + min1);
+        return (int)min1;
+    }
+
+    /**
+     * Paint Fence
+     * There is a fence with n posts, each post can be painted with one of the k colors.
+     * You have to paint all the posts such that no more than two adjacent fence posts have the same color.
+     * Return the total number of ways you can paint the fence.
+     *         Note:
+     * n and k are non-negative integers.
+     */
+    public int numWays(int n, int k) {
+        if (n == 0) return 0;
+        int same = 0, diff = k, res = same + diff;
+        for (int i = 2; i <= n; i++) {
+            same = diff;
+            diff = res * (k - 1);
+            res = same + diff;
+        }
+        return res;
+    }
+
+//    public int depthSumReverse(List<NestedInteger> nestedList) {
+//        ArrayList<Integer> depthSum = new ArrayList<>();
+//        depthSumReverseDFS(nestedList, depthSum);
+//        int res = 0;
+//        for (int i = 0; i < depthSum.size(); i++) {
+//            res += (depthSum.size() - i) * depthSum.get(i);
+//        }
+//        return res;
+//    }
+//    private void depthSumReverseDFS(List<NestedInteger> nestedList, ArrayList<Integer> depthSum) {
+//        int sum = 0;
+//        List<NestedInteger> nextLevel = new ArrayList<>();
+//        for (NestedInteger nl : nestedList) {
+//            if (nl.isInteger()) sum += nl.getInteger();
+//            else nextLevel.addAll(nl.getList());
+//        }
+//        depthSum.add(sum);
+//        depthSumReverseDFS(nextLevel, depthSum);
+//    }
+//    // Another version
+//    public int depthSumReverse2(List<NestedInteger> nestedList) {
+//        HashMap<Integer, Integer> depthSum = new HashMap<>();
+//        for (NestedInteger nl : nestedList) {
+//            depthSumReverseDFS2(nl, depthSum, 0);
+//        }
+//        int res = 0;
+//        for (int i = 0; i < depthSum.size(); i++) {
+//            res += (depthSum.size() - i) * depthSum.get(i);
+//        }
+//        return res;
+//    }
+//    private void depthSumReverseDFS2(NestedInteger nl, HashMap<Integer, Integer> depthSum, int depth) {
+//        if (depth >= depthSum.size()) {
+//            depthSum.put(depth, 0);
+//        }
+//        if (nl.isInteger()) {
+//            depthSum.put(depth, depthSum.get(depth) + nl.getInteger());
+//        } else {
+//            for (NestedInteger n : nl.getList()) {
+//                depthSumReverseDFS2(n, depthSum, depth + 1);
+//            }
+//        }
+//    }
+
+//    public static int findMaximumXOR(int[] nums) {
+//        int len = nums.length;
+//        if (len <= 1) return 0;
+//        int max = Integer.MIN_VALUE;
+//        for (int i = 0; i < len - 1; i++) {
+//            for (int j = i + 1; j < len; j++) {
+//                int t = (nums[i] ^ nums[j]);
+//                max = Math.max(max, t);
+//            }
+//        }
+//        return max;
+//    }
 }
 
 //    /**

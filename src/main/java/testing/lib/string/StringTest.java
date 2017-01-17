@@ -968,6 +968,7 @@ public class StringTest {
      * Given s = "aabb", return ["abba", "baab"].
      * Given s = "abc", return [].
      */
+    // Passed
     public static void generatePalindromesDemo(String s) {
         System.out.println("\nStart function generatePalindromesDemo()");
         System.out.println("\ts  = " + s);
@@ -1340,6 +1341,101 @@ public class StringTest {
                 }
             }
         }
+    }
+
+    /**
+     * Concatenated Words
+     *
+     * Given a list of words (without duplicates), please write a program that returns all concatenated words in the given list of words.
+     *
+     * A concatenated word is defined as a string that is comprised entirely of at least two shorter words in the given array.
+     *
+     * Example:
+     * Input: ["cat","cats","catsdogcats","dog","dogcatsdog","hippopotamuses","rat","ratcatdogcat"]
+     *
+     * Output: ["catsdogcats","dogcatsdog","ratcatdogcat"]
+     *
+     * Explanation: "catsdogcats" can be concatenated by "cats", "dog" and "cats";
+ "d  *ogcatsdog" can be concatenated by "dog", "cats" and "dog";
+"ra  *tcatdogcat" can be concatenated by "rat", "cat", "dog" and "cat".
+     * Note:
+     * The number of elements of the given array will not exceed 10,000
+     * The length sum of elements in the given array will not exceed 600,000.
+     * All the input string will only include lower case letters.
+     * The returned elements order does not matter.
+     */
+    // This version timeouts
+    public static List<String> findAllConcatenatedWordsInADict(String[] words) {
+        System.out.println("\nStart function findAllConcatenatedWordsInADict()");
+        printArray(words, "\tWords:");
+        HashSet<String> dict = new HashSet<>();
+        for (String w : words) {
+            dict.add(w);
+        }
+        List<String> res = new ArrayList<>();
+        for (String word : words) {
+            if (word.isEmpty()) {
+                continue;
+            }
+            dict.remove(word);
+            int len = word.length();
+            boolean[] valid = new boolean[len+1];
+            valid[0] = true;
+            for (int i = 1; i <= len; i++) {
+                for (int j = 0; j < i; j++) {
+                    String sub = word.substring(j, i);
+                    if (dict.contains(sub) && valid[j]) {
+                        valid[i] = true;
+                        break;
+                    }
+                }
+            }
+            if (valid[len]) {
+                res.add(word);
+            }
+            dict.add(word);
+        }
+        for (String r : res) {
+            System.out.println("\t" + r);
+        }
+        return res;
+    }
+    // This version passed tests.
+    // Although the general idea is the same. This one is better in performance
+    public static List<String> findAllConcatenatedWordsInADict2(String[] words) {
+        System.out.println("\nStart function findAllConcatenatedWordsInADict()");
+        printArray(words, "\tWords:");
+        HashSet<String> dict = new HashSet<>();
+        for (String w : words) {
+            dict.add(w);
+        }
+        List<String> res = new ArrayList<>();
+        for (String word : words) {
+            if (word.isEmpty()) {
+                continue;
+            }
+            int len = word.length();
+            boolean[] valid = new boolean[len+1];
+            valid[0] = true;
+            for (int i = 0; i < len; i++) {
+                if (!valid[i]) {
+                    continue;
+                }
+                for (int j = i+1; j <= len; j++) {
+                    if (j-i < len && dict.contains(word.substring(i, j))) {
+                        valid[j] = true;
+                    }
+                }
+                if (valid[len]) {
+                    res.add(word);
+                    break;
+                }
+            }
+        }
+        for (String r : res) {
+            System.out.println("\t" + r);
+        }
+        return res;
     }
 
     /**
@@ -3646,7 +3742,39 @@ public class StringTest {
         System.out.println("\tresult = " + sb.deleteCharAt(sb.length() - 1).toString());
         return sb.deleteCharAt(sb.length() - 1).toString();
     }
-    
+    private static void reverseCharArray(char[] s, int low, int high) {
+        while (low < high) {
+            char temp = s[low];
+            s[low] = s[high];
+            s[high] = temp;
+            low++;
+            high--;
+        }
+    }
+    public static void reverseWords(char[] s) {
+        System.out.println("\nStart function reverseWords()");
+        System.out.println("\ts = " + new String(s));
+        int len = s.length;
+        int low = 0, high = len - 1;
+        reverseCharArray(s, low, high);
+        System.out.println("\ts = " + new String(s));
+
+        int start = 0, end = 0;
+        while (end < len) {
+            if (s[end] == ' ') {
+                if (start < end) {
+                    reverseCharArray(s, start, end - 1);
+                }
+                start = end + 1;
+            }
+            end++;
+        }
+        if (start < end) {
+            reverseCharArray(s, start, end - 1);
+        }
+        System.out.println("\ts = " + new String(s));
+    }
+
     public static String longestCommonSubstring(String S, String T) {
         System.out.println("\nStart function longestCommonSubstring()");
         System.out.println("\tS = " + S);
@@ -5194,7 +5322,8 @@ public class StringTest {
         Character c = pattern.charAt(i);
         for (int cut = j + 1; cut <= str.length(); cut++) {
             String s = str.substring(j, cut);
-            if (set.contains(s) && s.equals(c2s.get(c))) {
+            // if (set.contains(s) && s.equals(c2s.get(c))) {  // Both works
+            if (set.contains(s) && (c2s.containsKey(c) && s.equals(c2s.get(c)))) {
                 return wordPatternMatchHelper(pattern, str, c2s, set, i+1, cut);
             } else if (!set.contains(s) && !c2s.containsKey(c)) {
                 c2s.put(c, s);
@@ -6601,11 +6730,379 @@ public class StringTest {
         return sb.toString();
     }
 
+    /**
+     * Find All Anagrams in a String
+     *
+     * Given a string s and a non-empty string p, find all the start indices of p's anagrams in s.
+     * Strings consists of lowercase English letters only and the length of both strings s and p will not be larger than 20,100.
+     * The order of output does not matter.
+     *         Example 1:
+     * Input:
+     * s: "cbaebabacd" p: "abc"
+     * Output:
+     *         [0, 6]
+     * Explanation:
+     * The substring with start index = 0 is "cba", which is an anagram of "abc".
+     * The substring with start index = 6 is "bac", which is an anagram of "abc".
+     * Example 2:
+     * Input:
+     * s: "abab" p: "ab"
+     * Output:
+     *         [0, 1, 2]
+     * Explanation:
+     * The substring with start index = 0 is "ab", which is an anagram of "ab".
+     * The substring with start index = 1 is "ba", which is an anagram of "ab".
+     * The substring with start index = 2 is "ab", which is an anagram of "ab".
+     */
+    public static List<Integer> findAnagrams(String s, String p) {
+        System.out.println("\nStart function findAnagrams()");
+        System.out.println("\ts = " + s);
+        System.out.println("\tp = " + p);
+        List<Integer> res = new ArrayList<>();
+        HashMap<Character, Integer> P = new HashMap<>();
+        for (char c : p.toCharArray()) {
+            increaseFromMap(P, c);
+        }
+        int index = 0;
+        int start = 0;
+        char[] sChars = s.toCharArray();
+        HashMap<Character, Integer> S = new HashMap<>();
+        while (index < s.length()) {
+            char cur = sChars[index];
+            if (!P.containsKey(cur)) {
+                start = index + 1;
+                S.clear();
+            } else {
+                increaseFromMap(S, cur);
+
+                if (S.equals(P)) {
+                    res.add(start);
+                    decreaseFromMap(S, sChars[start]);
+                    start++;
+                } else if (S.get(cur) > P.get(cur)) {
+                    while (sChars[start] != cur) {
+                        decreaseFromMap(S, sChars[start]);
+                        start++;
+                    }
+                    decreaseFromMap(S, sChars[start]);
+                    start++;
+                }
+            }
+            index++;
+        }
+
+        System.out.println("\t" + res);
+        for (int i : res) {
+            System.out.println("\t" + s.substring(i, i + p.length()));
+        }
+        return res;
+    }
+    private static void increaseFromMap(HashMap<Character, Integer> map, Character c) {
+        if (map.containsKey(c)) {
+            map.put(c, map.get(c) + 1);
+        } else {
+            map.put(c, 1);
+        }
+    }
+    private static void decreaseFromMap(HashMap<Character, Integer> map, Character c) {
+        map.put(c, map.get(c) - 1);
+        if (map.get(c) == 0) {
+            map.remove(c);
+        }
+    }
+
+    /**
+     * Number of Segments in a String
+     * Count the number of segments in a string, where a segment is defined to be a contiguous sequence of non-space characters.
+     * Please note that the string does not contain any non-printable characters.
+     *         Example:
+     * Input: "Hello, my name is John"
+     * Output: 5
+     */
+    public static int countSegments(String s) {
+        System.out.println("\nStart function countSegments()");
+        System.out.println("\ts = " + s);
+
+        char[] chars = s.toCharArray();
+        int start = 0;
+        int index = 0;
+        int res = 0;
+        while (index < s.length()) {
+            if (chars[index] == ' ') {
+                if (start < index) {
+                    res++;
+                }
+                while (index < s.length() && chars[index] == ' ') {
+                    index++;
+                    start = index;
+                }
+            } else {
+                index++;
+            }
+        }
+        if (start < s.length()) {
+            res++;
+        }
+        System.out.println("\tNum of segments = " + res);
+        return res;
+    }
+
+    /**
+     * Unique Substrings in Wraparound String
+     * Consider the string s to be the infinite wraparound string of "abcdefghijklmnopqrstuvwxyz", so s will look like this: "...zabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcd....".
+     * Now we have another string p. Your job is to find out how many unique non-empty substrings of p are present in s. In particular, your input is the string p and you need to output the number of different non-empty substrings of p in the string s.
+     *         Note: p consists of only lowercase English letters and the size of p might be over 10000.
+     * Example 1:
+     * Input: "a"
+     * Output: 1
+     * Explanation: Only the substring "a" of string "a" is in the string s.
+     *         Example 2:
+     * Input: "cac"
+     * Output: 2
+     * Explanation: There are two substrings "a", "c" of string "cac" in the string s.
+     * Example 3:
+     * Input: "zab"
+     * Output: 6
+     * Explanation: There are six substrings "z", "a", "b", "za", "ab", "zab" of string "zab" in the string s.
+     */
+    public static int findSubstringInWraproundString(String p) {
+        Integer[] count = new Integer[26];
+
+        int len = 0;
+        for (int i = 0; i < p.length(); i++) {
+            if (i > 0 && (p.charAt(i) - p.charAt(i-1) == 1 || p.charAt(i-1) - p.charAt(i) == 25)) {
+                len++;
+            } else {
+                len = 1;
+            }
+            count[p.charAt(i) - 'a'] = Math.max(count[p.charAt(i) - 'a'], len);
+        }
+
+        int sum = 0;
+        for (int i : count) {
+            sum += i;
+        }
+        return sum;
+    }
 
 
+    /**
+     * Longest Absolute File Path
+     *
+     * Suppose we abstract our file system by a string in the following manner:
+     *
+     * The string "dir\n\tsubdir1\n\tsubdir2\n\t\tfile.ext" represents:
+     *
+     *      dir
+     *          subdir1
+     *          subdir2
+     *              file.ext
+     * The directory dir contains an empty sub-directory subdir1 and a sub-directory subdir2 containing a file file.ext.
+     *
+     * The string "dir\n\tsubdir1\n\t\tfile1.ext\n\t\tsubsubdir1\n\tsubdir2\n\t\tsubsubdir2\n\t\t\tfile2.ext" represents:
+     *
+     *      dir
+     *          subdir1
+     *              file1.ext
+     *              subsubdir1
+     *          subdir2
+     *              subsubdir2
+     *                  file2.ext
+     * The directory dir contains two sub-directories subdir1 and subdir2. subdir1 contains a file file1.ext and an empty second-level sub-directory subsubdir1. subdir2 contains a second-level sub-directory subsubdir2 containing a file file2.ext.
+     *
+     * We are interested in finding the longest (number of characters) absolute path to a file within our file system. For example, in the second example above, the longest absolute path is "dir/subdir2/subsubdir2/file2.ext", and its length is 32 (not including the double quotes).
+     *
+     * Given a string representing the file system in the above format, return the length of the longest absolute path to file in the abstracted file system. If there is no file in the system, return 0.
+     *
+     * Note:
+     * The name of a file contains at least a . and an extension.
+     * The name of a directory or sub-directory will not contain a ..
+     * Time complexity required: O(n) where n is the size of the input string.
+     *
+     * Notice that a/aa/aaa/file1.txt is not the longest file path, if there is another path aaaaaaaaaaaaaaaaaaaaa/sth.png.
+     */
+    public static int lengthLongestPath(String input) {
+        System.out.println("\nStart function lengthLongestPath()");
+        System.out.println("\tinput = " + input);
 
+        int res = 0;
+        Map<Integer, Integer> m = new HashMap<>();
+        m.put(0, 0);
+        for (String s : input.split("\n")) {
+            int level = s.lastIndexOf('\t') + 1;
+            int len = s.substring(level).length();
+            if (s.contains(".")) {
+                res = Math.max(res, m.get(level) + len);
+            } else {
+                m.put(level + 1, m.get(level) + len + 1);
+            }
+        }
+        return res;
+    }
+
+    /**
+     * Validate IP Address
+     * Write a function to check whether an input string is a valid IPv4 address or IPv6 address or neither.
+     *
+     * IPv4 addresses are canonically represented in dot-decimal notation, which consists of four decimal numbers, each ranging from 0 to 255, separated by dots ("."), e.g.,172.16.254.1;
+     *
+     * Besides, leading zeros in the IPv4 is invalid. For example, the address 172.16.254.01 is invalid.
+     *
+     * IPv6 addresses are represented as eight groups of four hexadecimal digits, each group representing 16 bits. The groups are separated by colons (":"). For example, the address 2001:0db8:85a3:0000:0000:8a2e:0370:7334 is a valid one. Also, we could omit some leading zeros among four hexadecimal digits and some low-case characters in the address to upper-case ones, so 2001:db8:85a3:0:0:8A2E:0370:7334 is also a valid IPv6 address(Omit leading zeros and using upper cases).
+     *
+     * However, we don't replace a consecutive group of zero value with a single empty group using two consecutive colons (::) to pursue simplicity. For example, 2001:0db8:85a3::8A2E:0370:7334 is an invalid IPv6 address.
+     *
+     * Besides, extra leading zeros in the IPv6 is also invalid. For example, the address 02001:0db8:85a3:0000:0000:8a2e:0370:7334 is invalid.
+     *
+     * Note: You may assume there is no extra space or special characters in the input string.
+     *
+     * Example 1:
+     * Input: "172.16.254.1"
+     * Output: "IPv4"
+     * Explanation: This is a valid IPv4 address, return "IPv4".
+     *
+     * Example 2:
+     * Input: "2001:0db8:85a3:0:0:8A2E:0370:7334"
+     * Output: "IPv6"
+     * Explanation: This is a valid IPv6 address, return "IPv6".
+     *
+     * Example 3:
+     * Input: "256.256.256.256"
+     * Output: "Neither"
+     * Explanation: This is neither a IPv4 address nor a IPv6 address.
+     */
+    public static void validIPAddressDemo(String IP) {
+        System.out.println("\nStart function validIPAddress()");
+        System.out.println("\tIP = " + IP);
+        System.out.println("\t" + validIPAddress(IP));
+    }
+    public static String validIPAddress(String IP) {
+        if (IP.indexOf('.') >= 0 && IP.indexOf(':') >= 0) {
+            return "Neither";
+        } else if (IP.indexOf('.') < 0 && IP.indexOf(':') < 0) {
+            return "Neither";
+        }
+        if (IP.indexOf('.') >= 0) {
+            if (IP.startsWith(".") || IP.endsWith(".")) {
+                return "Neither";
+            }
+            if (isValidIPv4(IP)) {
+                return "IPv4";
+            }
+        } else {
+            if (IP.startsWith(":") || IP.endsWith(":")) {
+                return "Neither";
+            }
+            if (isValidIPv6(IP)) {
+                return "IPv6";
+            }
+        }
+        return "Neither";
+    }
+    private static Boolean isValidIPv4(String ip) {
+        String[] vals = ip.split("\\.");
+        if (vals.length != 4) return false;
+        for (String val : vals) {
+            if (val.length() > 3 || val.length() < 1) {
+                return false;
+            }
+
+            int n = 0;
+            for (char c : val.toCharArray()) {
+                if (!Character.isDigit(c)) {
+                    return false;
+                }
+                n *= 10;
+                n += c - '0';
+            }
+            if (n > 255) {
+                return false;
+            }
+            if ((n != 0 && val.startsWith("0")) ||
+                (n == 0 && val.length() > 1)) {
+                return false;
+            }
+        }
+        return true;
+    }
+    private static Boolean isValidIPv6(String ip) {
+        String[] vals = ip.split(":");
+        if (vals.length != 8) return false;
+        for (String val : vals) {
+            if (val.length() > 4 || val.length() < 1) {
+                return false;
+            }
+
+            int n = 0;
+            for (char c : val.toLowerCase().toCharArray()) {
+                if (Character.isDigit(c)) {
+                    n *= 16;
+                    n += c - '0';
+                } else if (c == 'a' || c == 'b' || c == 'c' || c == 'd' || c == 'e' || c == 'f') {
+                    n *= 16;
+                    n += c - 'a' + 10;
+                } else {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Reconstruct Original Digits from English
+     * Given a non-empty string containing an out-of-order English representation of digits 0-9, output the digits in ascending order.
+     * Note:
+     *         1. Input contains only lowercase English letters.
+     *         2. Input is guaranteed to be valid and can be transformed to its original digits. That means invalid inputs such as "abc" or "zerone" are not permitted.
+     * 3. Input length is less than 50,000.
+     * Example 1:
+     * Input: "owoztneoer"
+     * Output: "012"
+     * Example 2:
+     * Input: "fviefuro"
+     * Output: "45"
+     */
+    public static String originalDigits(String s) {
+        System.out.println("\nStart function originalDigits2()");
+        System.out.println("\ts = " + s);
+        HashMap<Character, Integer> input = new HashMap<>();
+        HashMap<Integer, Integer> res = new HashMap<>();
+        for (int i = 0; i <= 9; i++) {
+            res.put(i, 0);
+        }
+        for (char c : s.toCharArray()) {
+            if (input.containsKey(c)) {
+                input.put(c, input.get(c) + 1);
+            } else {
+                input.put(c, 1);
+            }
+        }
+        int[] nums = new int[] {0, 2, 4, 6, 8, 3, 1, 5, 7, 9};
+        String[] words = new String[] {"zero", "two", "four", "six", "eight", "three", "one", "five", "seven", "nine"};
+        char[] chars = new char[]{'z', 'w', 'u', 'x', 'g', 'h', 'o', 'f', 's', 'i'};
+        for (int i = 0; i < 10; i++) {
+            char cur = chars[i];
+            if (input.containsKey(cur) && input.get(cur) > 0) {
+                int count = input.get(cur);
+                for (int j = 0; j < words[i].length(); j++) {
+                    input.put(words[i].charAt(j), input.get(words[i].charAt(j)) - count);
+                }
+                res.put(nums[i], res.get(nums[i]) + count);
+            }
+        }
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i <= 9; i++) {
+            int count = res.get(i);
+            while (count-- > 0) {
+                sb.append(i);
+            }
+        }
+        System.out.println("\tRes = " + sb.toString());
+        return sb.toString();
+    }
     public static String originalDigits2(String s) {
-        System.out.println("\nStart function originalDigits()");
+        System.out.println("\nStart function originalDigits2()");
         System.out.println("\ts = " + s);
         HashMap<Character, Integer> input = new HashMap<>();
         HashMap<Integer, Integer> res = new HashMap<>();
@@ -6735,4 +7232,613 @@ public class StringTest {
         }
         return false;
     }
+
+    /**
+     * Encode and Decode Strings
+     *
+     * Design an algorithm to encode a list of strings to a string. The encoded string is then sent over the network and is decoded back to the original list of strings.
+     *
+     * Machine 1 (sender) has the function:
+     *      string encode(vector<string> strs) {
+     *          // ... your code
+     *          return encoded_string;
+     *      }
+     * Machine 2 (receiver) has the function:
+     *      vector<string> decode(string s) {
+     *          //... your code
+     *          return strs;
+     *      }
+     * So Machine 1 does:
+     *      string encoded_string = encode(strs);
+     * and Machine 2 does:
+     *      vector<string> strs2 = decode(encoded_string);
+     *
+     * strs2 in Machine 2 should be the same as strs in Machine 1.
+     *
+     * Implement the encode and decode methods.
+     *
+     * Note:
+     *
+     * The string may contain any possible characters out of 256 valid ascii characters. Your algorithm should be generalized enough to work on any possible characters.
+     * Do not use class member/global/static variables to store states. Your encode and decode algorithms should be stateless.
+     * Do not rely on any library method such as eval or serialize methods. You should implement your own encode/decode algorithm.
+     */
+    public static void encodeDecodeStringsDemo(List<String> strs) {
+        System.out.println("\nStart function encodeDecodeStringsDemo()");
+        System.out.println("\tStrings: " + strs);
+
+        String encoded = encode(strs);
+        List<String> decoded = decode(encoded);
+
+        System.out.println("\tDecoded Strings: " + decoded);
+    }
+    // Encodes a list of strings to a single string.
+    public static String encode(List<String> strs) {
+        StringBuilder sb = new StringBuilder();
+        for (String str : strs) {
+            int len = str.length();
+            sb.append(len).append("/").append(str);
+        }
+        return sb.toString();
+    }
+    // Decodes a single string to a list of strings.
+    public static List<String> decode(String s) {
+        List<String> res = new ArrayList<>();
+        String t = s;
+        int index = t.indexOf('/');
+        while (index != -1) {
+            int len = Integer.parseInt(t.substring(0, index));
+            res.add(t.substring(index + 1, index + 1 + len));
+            t = t.substring(index + 1 + len);
+            index = t.indexOf('/');
+        }
+        return res;
+    }
+
+    /**
+     * Magical String
+     *
+     * A magical string S consists of only '1' and '2' and obeys the following rules:
+     *
+     * The string S is magical because concatenating the number of contiguous occurrences of characters '1' and '2' generates the string S itself.
+     *
+     * The first few elements of string S is the following: S = "1221121221221121122……"
+     *
+     * If we group the consecutive '1's and '2's in S, it will be:
+     *
+     *         1 22 11 2 1 22 1 22 11 2 11 22 ......
+     *
+     * and the occurrences of '1's or '2's in each group are:
+     *
+     *         1 2	2 1 1 2 1 2 2 1 2 2 ......
+     *
+     * You can see that the occurrence sequence above is the S itself.
+     *
+     * Given an integer N as input, return the number of '1's in the first N number in the magical string S.
+     *
+     *         Note: N will not exceed 100,000.
+     *
+     * Example 1:
+     * Input: 6
+     * Output: 3
+     * Explanation: The first 6 elements of magical string S is "12211" and it contains three 1's, so return 3.
+     */
+    public static int magicalString(int n) {
+        System.out.println("\nStart function magicalString(). n = " + n);
+        if (n < 1) return 0;
+        if (n <= 3) return 1;
+        ArrayList<Integer> tmp = new ArrayList<>();
+        tmp.add(1);
+        tmp.add(2);
+        tmp.add(2);
+        boolean fillOne = true;
+        int index = 2;
+        int cnt = 1;
+        while (tmp.size() < n) {
+            int tmpCnt = tmp.get(index);
+            int val = fillOne ? 1 : 2;
+            while (tmpCnt-- > 0) {
+                tmp.add(val);
+                if (fillOne) {
+                    cnt++;
+                }
+                if (tmp.size() == n) {
+                    break;
+                }
+            }
+            fillOne = !fillOne;
+            index++;
+        }
+        System.out.println("\tMagical string = " + tmp);
+        System.out.println("\tRes = " + cnt);
+        return cnt;
+    }
+
+    /**
+     * Valid Word Square
+     *
+     * Given a sequence of words, check whether it forms a valid word square.
+     * A sequence of words forms a valid word square if the kth row and column read the exact same string, where 0 ≤k < max(numRows, numColumns).
+     * Note:
+     *         1. The number of words given is at least 1 and does not exceed 500.
+     *         2. Word length will be at least 1 and does not exceed 500.
+     *         3. Each word contains only lowercase English alphabet a-z.
+     *  
+     * Example 1:
+     * Input:
+     *         [
+     *         "abcd",
+     *         "bnrt",
+     *         "crmy",
+     *         "dtye"
+     *         ]
+     * Output:
+     *         true
+     * Explanation:
+     * The first row and first column both read "abcd".
+     * The second row and second column both read "bnrt".
+     * The third row and third column both read "crmy".
+     * The fourth row and fourth column both read "dtye".
+     * Therefore, it is a valid word square.
+     *          
+     * Example 2:
+     * Input:
+     *         [
+     *         "abcd",
+     *         "bnrt",
+     *         "crm",
+     *         "dt"
+     *         ]
+     * Output:
+     *         true
+     * Explanation:
+     * The first row and first column both read "abcd".
+     * The second row and second column both read "bnrt".
+     * The third row and third column both read "crm".
+     * The fourth row and fourth column both read "dt".
+     * Therefore, it is a valid word square.
+     *          
+     * Example 3:
+     * Input:
+     *         [
+     *         "ball",
+     *         "area",
+     *         "read",
+     *         "lady"
+     *         ]
+     * Output:
+     *         false
+     * Explanation:
+     * The third row reads "read" while the third column reads "lead".
+     * Therefore, it is NOT a valid word square.
+     */
+    public static void validWordSquareDemo(List<String> words) {
+        System.out.println("\nStart function validWordSquare().");
+        for (String w : words) {
+            System.out.println("\t" + w);
+        }
+        System.out.println("\tValid = " + validWordSquare(words));
+    }
+    public static boolean validWordSquare(List<String> words) {
+        int len = words.size();
+        for (int i = 0; i < len; i++) {
+            String word = words.get(i);
+            for (int j = 0; j < word.length(); j++) {
+                if (j >= words.size()) {
+                    return false;
+                }
+                if (words.get(j).length() < i + 1) {
+                    return false;
+                }
+                if (words.get(j).charAt(i) != word.charAt(j)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Word Squares
+     *
+     * Given a set of words (without duplicates), find all word squares you can build from them.
+     * A sequence of words forms a valid word square if the kth row and column read the exact same string, where 0 ≤ k < max(numRows, numColumns).
+     * For example, the word sequence ["ball","area","lead","lady"] forms a word square because each word reads the same both horizontally and vertically.
+     * b a l l
+     * a r e a
+     * l e a d
+     * l a d y
+     * Note:
+     *         1. There are at least 1 and at most 1000 words.
+     * 2. All words will have the exact same length.
+     *         3. Word length is at least 1 and at most 5.
+     *         4. Each word contains only lowercase English alphabet a-z.
+     *  
+     * Example 1:
+     * Input:
+     *         ["area","lead","wall","lady","ball"]
+     * Output:
+     *         [
+     *         [ "wall",
+     *         "area",
+     *         "lead",
+     *         "lady"
+     *         ],
+     *         [ "ball",
+     *         "area",
+     *         "lead",
+     *         "lady"
+     *         ]
+     *         ]
+     * Explanation:
+     * The output consists of two word squares. The order of output does not matter (just the order of words in each word square matters).
+     *          
+     * Example 2:
+     * Input:
+     *         ["abat","baba","atan","atal"]
+     * Output:
+     *         [
+     *         [ "baba",
+     *         "abat",
+     *         "baba",
+     *         "atan"
+     *         ],
+     *         [ "baba",
+     *         "abat",
+     *         "baba",
+     *         "atal"
+     *         ]
+     *         ]
+     * Explanation:
+     * The output consists of two word squares. The order of output does not matter (just the order of words in each word square matters).
+     */
+    public static List<List<String>> wordSquares(String[] words) {
+        System.out.println("\nStart function wordSquares().");
+        System.out.println("\tInputs:");
+        for (String w : words) {
+            System.out.println("\t" + w);
+        }
+        Trie trie = new Trie();
+        for (String w : words) {
+            trie.insert(w);
+        }
+        ArrayList<List<String>> res = new ArrayList<>();
+        if (words.length == 0) {
+            return res;
+        }
+        int len = words[0].length();
+
+        HashSet<String> ws = new HashSet<>(Arrays.asList(words));
+        wordSquaresDFS(ws, trie, new ArrayList<>(), res, len, 0);
+        for (List<String> r : res) {
+            System.out.println();
+            for (String w : r) {
+                System.out.println("\t\t" + w);
+            }
+        }
+        return res;
+    }
+    private static void wordSquaresDFS(HashSet<String> words,  Trie trie, ArrayList<String> tmp, ArrayList<List<String>> res, int len, int level) {
+        if (len == level) {
+            res.add(new ArrayList<String>(tmp));
+            return;
+        }
+
+        if (tmp.isEmpty()) {
+            for (String word : words) {
+                tmp.add(word);
+                wordSquaresDFS(words, trie, tmp, res, len, 1);
+                tmp.remove(tmp.size() - 1);
+            }
+        } else {
+            for (String word : words) {
+                int j = 0;
+                for (; j < len; j++) {
+                    StringBuilder sb = new StringBuilder();
+                    for (int i = 0; i < tmp.size(); i++) {
+                        sb.append(tmp.get(i).charAt(j));
+                    }
+                    sb.append(word.charAt(j));
+                    if (!trie.startsWith(sb.toString())) {
+                        break;
+                    }
+                    if (j == tmp.size() && !word.startsWith(sb.toString())) {
+                        break;
+                    }
+                }
+                if (j == len) {
+                    tmp.add(word);
+                    wordSquaresDFS(words, trie, tmp, res, len, level + 1);
+                    tmp.remove(tmp.size() - 1);
+                }
+            }
+        }
+    }
+
+    /**
+     * Valid Word Abbreviation
+     * Given a non-empty string s and an abbreviation abbr, return whether the string matches with the given abbreviation.
+     * A string such as "word" contains only the following valid abbreviations:
+     *         ["word", "1ord", "w1rd", "wo1d", "wor1", "2rd", "w2d", "wo2", "1o1d", "1or1", "w1r1", "1o2", "2r1", "3d", "w3", "4"]
+     * Notice that only the above abbreviations are valid abbreviations of the string "word". Any other string is not a valid abbreviation of "word".
+     * Note:
+     * Assume s contains only lowercase letters and abbr contains only lowercase letters and digits.
+     * Example 1:
+     * Given s = "internationalization", abbr = "i12iz4n":
+     * Return true.
+     *          
+     * Example 2:
+     * Given s = "apple", abbr = "a2e":
+     * Return false.
+     */
+    public static void validWordAbbreviationDemo(String word, String abbr) {
+        System.out.println("\nStart function validWordAbbreviationDemo().");
+        System.out.println("\tWord: " + word);
+        System.out.println("\tAbbr: " + abbr);
+        System.out.println("\tValid: " + validWordAbbreviation(word, abbr));
+    }
+    public static boolean validWordAbbreviation(String word, String abbr) {
+        int iw = 0;
+        int ia = 0;
+        while (iw < word.length() && ia < abbr.length()) {
+            Character ca = abbr.charAt(ia);
+            if (Character.isDigit(ca)) {
+                if (ca == '0') {
+                    return false;
+                }
+                int cnt = 0;
+                while (ia < abbr.length() && Character.isDigit(abbr.charAt(ia))) {
+                    cnt *= 10;
+                    cnt += Integer.parseInt(abbr.charAt(ia) + "");
+                    ia++;
+                }
+                iw += cnt;
+            } else {
+                if (ca.equals(word.charAt(iw))) {
+                    iw++;
+                    ia++;
+                } else {
+                    return false;
+                }
+            }
+        }
+        return (iw == word.length()) && (ia == abbr.length());
+    }
+
+    /**
+     * Generalized Abbreviation
+     *
+     * Write a function to generate the generalized abbreviations of a word.
+     *
+     * Example:
+     *
+     * Given word = "word", return the following list (order does not matter):
+     *
+     *  ["word", "1ord", "w1rd", "wo1d", "wor1", "2rd", "w2d", "wo2", "1o1d", "1or1", "w1r1", "1o2", "2r1", "3d", "w3", "4"]
+     */
+    public static List<String> generateAbbreviations(String word) {
+        System.out.println("\nStart function generateAbbreviations().");
+        System.out.println("\tWord: " + word);
+        List<String> res = new ArrayList<>();
+        res.add(word);
+        generateAbbreviationsDFS(word, 0, res);
+        System.out.println("\tRes:" + res);
+        return res;
+    }
+    private static void generateAbbreviationsDFS(String word, int pos, List<String> res) {
+        for (int i = pos; i < word.length(); i++) {
+            for (int j = 1; i + j <= word.length(); j++) {
+                StringBuilder sb = new StringBuilder(word.substring(0, i));
+                sb.append(j + "").append(word.substring(i + j));
+                res.add(sb.toString());
+                generateAbbreviationsDFS(sb.toString(), i + 1 + (new StringBuilder(j)).length(), res);
+            }
+        }
+    }
+    // Passed
+    public static List<String> generateAbbreviations2(String word) {
+        System.out.println("\nStart function generateAbbreviations2().");
+        System.out.println("\tWord: " + word);
+        List<String> res = new ArrayList<>();
+        generateAbbreviationsDFS2(word, 0, 0, "", res);
+        System.out.println("\tRes: " + res);
+        return res;
+    }
+    private static void generateAbbreviationsDFS2(String word, int pos, int cnt, String tmp, List<String> res) {
+        if (pos == word.length()) {
+            if (cnt > 0) {
+                res.add(tmp + cnt);
+            } else {
+                res.add(tmp);
+            }
+        } else {
+            generateAbbreviationsDFS2(word, pos + 1, cnt + 1, tmp, res);
+            generateAbbreviationsDFS2(word, pos + 1, 0, tmp + (cnt > 0 ? cnt : "") + word.charAt(pos), res);
+        }
+    }
+    // Passed
+    public static List<String> generateAbbreviations3(String word) {
+        System.out.println("\nStart function generateAbbreviations3().");
+        System.out.println("\tWord: " + word);
+        List<String> res = new ArrayList<>();
+        for (int i = 0; i < Math.pow(2, word.length()); i++) {
+            StringBuilder sb = new StringBuilder();
+            int cnt = 0;
+            for (int j = 0; j < word.length(); j++) {
+                if (((i >> j) & 1) == 1) {
+                    cnt++;
+                } else {
+                    if (cnt > 0) {
+                        sb.append(cnt);
+                        cnt = 0;
+                    }
+                    sb.append(word.charAt(j));
+                }
+            }
+            if (cnt > 0) {
+                sb.append(cnt);
+            }
+            res.add(sb.toString());
+        }
+        System.out.println("\tRes: " + res);
+        return res;
+    }
+
+    /**
+     * License Key Formatting
+     * Now you are given a string S, which represents a software license key which we would like to format. The string S is composed of alphanumerical characters and dashes. The dashes split the alphanumerical characters within the string into groups. (i.e. if there are M dashes, the string is split into M+1 groups). The dashes in the given string are possibly misplaced.
+     * We want each group of characters to be of length K (except for possibly the first group, which could be shorter, but still must contain at least one character). To satisfy this requirement, we will reinsert dashes. Additionally, all the lower case letters in the string must be converted to upper case.
+     * So, you are given a non-empty string S, representing a license key to format, and an integer K. And you need to return the license key formatted according to the description above.
+     *         Example 1:
+     * Input: S = "2-4A0r7-4k", K = 4
+     * Output: "24A0-R74K"
+     * Explanation: The string S has been split into two parts, each part has 4 characters.
+     *         Example 2:
+     * Input: S = "2-4A0r7-4k", K = 3
+     * Output: "24-A0R-74K"
+     * Explanation: The string S has been split into three parts, each part has 3 characters except the first part as it could be shorter as said above.
+     *         Note:
+     *         1. The length of string S will not exceed 12,000, and K is a positive integer.
+     *         2. String S consists only of alphanumerical characters (a-z and/or A-Z and/or 0-9) and dashes(-).
+     * String S is non-empty.
+     */
+    public static void licenseKeyFormattingDemo(String S, int K) {
+        System.out.println("\nStart function licenseKeyFormattingDemo().");
+        System.out.println("\tS: " + S);
+        System.out.println("\tK: " + K);
+        String res = licenseKeyFormatting(S, K);
+        System.out.println("\tRes: " + res);
+    }
+    public static String licenseKeyFormatting(String S, int K) {
+        String[] strs = S.split("-");
+        StringBuilder sb = new StringBuilder();
+        for (String str : strs) {
+            sb.append(str);
+        }
+        String str = sb.toString().toUpperCase();
+        int len = str.length();
+        if (len <= K) {
+            return str;
+        }
+
+        StringBuilder res = new StringBuilder();
+        res.append(str.substring(0, len % K));
+        String tmp = str.substring(len % K);
+        while (!tmp.isEmpty()) {
+            if (res.length() > 0) {
+                res.append("-");
+            }
+            res.append(tmp.substring(0, K));
+            tmp = tmp.substring(K);
+        }
+        return res.toString();
+    }
+
+    /**
+     * One Edit Distance
+     * Given two strings S and T, determine if they are both one edit distance apart.
+     */
+    public static boolean isOneEditDistance(String s, String t) {
+        int lenS = s.length();
+        int lenT = t.length();
+        for (int i = 0; i < Math.min(s.length(), t.length()); i++) {
+            if (s.charAt(i) != t.charAt(i)) {
+                if (lenS == lenT) {
+                    return s.substring(i+1).equals(t.substring(i+1));
+                } else if (lenS > lenT) {
+                    return s.substring(i+1).equals(t.substring(i));
+                } else {
+                    return t.substring(i+1).equals(s.substring(i));
+                }
+            }
+        }
+        return Math.abs(lenS - lenT) == 1;
+    }
+
+    /**
+     * Longest Substring with At Most Two Distinct Characters
+     * Given a string, find the length of the longest substring T that contains at most 2 distinct characters.
+     * For example, Given s = “eceba”,
+     * T is "ece" which its length is 3.
+     */
+    public static int lengthOfLongestSubstringTwoDistinct(String s) {
+        System.out.println("\nStart function lengthOfLongestSubstringTwoDistinct().");
+        System.out.println("\tS: " + s);
+
+        HashMap<Character, Integer> map = new HashMap<>();
+        char[] chars = s.toCharArray();
+
+        int res = 0;
+        int start = 0, end = 0;
+        while (end < s.length()) {
+            addToMap(map, chars[end++]);
+            while (start < end && map.keySet().size() > 2) {
+                removeFromMap(map, chars[start++]);
+            }
+            res = Math.max(res, (end - start));
+        }
+
+        System.out.println("\tRes = " + res);
+        return res;
+    }
+    private static void addToMap(HashMap<Character, Integer> map, char c) {
+        if (map.containsKey(c)) {
+            map.put(c, map.get(c) + 1);
+        } else {
+            map.put(c, 1);
+        }
+    }
+    private static void removeFromMap(HashMap<Character, Integer> map, char c) {
+        if (map.containsKey(c)) {
+            map.put(c, map.get(c) - 1);
+            if (map.get(c) == 0) {
+                map.remove(c);
+            }
+        }
+    }
+
+    /**
+     * Longest Substring with At Most K Distinct Characters
+     * Given a string, find the length of the longest substring T that contains at most k distinct characters.
+     * For example, Given s = “eceba” and k = 2,
+     * T is "ece" which its length is 3.
+     */
+    public int lengthOfLongestSubstringKDistinct(String s, int k) {
+        HashMap<Character, Integer> map = new HashMap<>();
+        char[] chars = s.toCharArray();
+
+        int res = 0;
+        int start = 0, end = 0;
+        while (end < s.length()) {
+            addToMap(map, chars[end++]);
+            while (start < end && map.keySet().size() > k) {
+                removeFromMap(map, chars[start++]);
+            }
+            res = Math.max(res, (end - start));
+        }
+
+        return res;
+    }
+
+    /**
+     * Count The Repetitions
+     *
+     * Define S = [s,n] as the string S which consists of n connected strings s. For example, ["abc", 3] ="abcabcabc".
+     *
+     * On the other hand, we define that string s1 can be obtained from string s2 if we can remove some characters from s2 such that it becomes s1. For example, “abc” can be obtained from “abdbec” based on our definition, but it can not be obtained from “acbbe”.
+     *
+     * You are given two non-empty strings s1 and s2 (each at most 100 characters long) and two integers 0 ≤ n1 ≤ 106 and 1 ≤ n2 ≤ 106. Now consider the strings S1 and S2, where S1=[s1,n1] and S2=[s2,n2]. Find the maximum integer M such that [S2,M] can be obtained from S1.
+     *
+     *         Example:
+     *
+     * Input:
+     * s1="acb", n1=4
+     * s2="ab", n2=2
+     *
+     * Return:
+     *         2
+     */
+//    public static int getMaxRepetitions(String s1, int n1, String s2, int n2) {
+//
+//    }
 }

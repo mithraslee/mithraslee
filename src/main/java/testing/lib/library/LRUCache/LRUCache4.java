@@ -14,8 +14,8 @@ import java.util.*;
  */
 public class LRUCache4 extends LinkedHashMap<Integer, Integer> {
     public LRUCache4(int capacity) {
-        super(capacity, .75F, false);  // The insertion order
-        //super(capacity, .75F, true); // The access order
+        //super(capacity, .75F, false);  // The insertion order
+        super(capacity, .75F, true); // The access order
         this.capacity = capacity;
     }
     

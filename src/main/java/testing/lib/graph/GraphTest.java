@@ -7,6 +7,8 @@ import java.util.PriorityQueue;
 
 import javafx.scene.layout.Priority;
 import testing.lib.node.GraphNode;
+import static testing.lib.common.CommonUtils.printArray;
+import static testing.lib.common.CommonUtils.printTwoDimentinalArray;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -386,5 +388,213 @@ public class GraphTest <T extends Number> {
             findItineraryDFS(map, next, res);
         }
         res.addFirst(start);
+    }
+
+    /**
+     * Alien Dictionary
+     * There is a new alien language which uses the latin alphabet. However, the order among letters are unknown to you. You receive a list of words from the dictionary, where words are sorted lexicographically by the rules of this new language. Derive the order of letters in this language.
+     *         For example,
+     * Given the following words in dictionary,
+     *     [
+     *     "wrt",
+     *     "wrf",
+     *     "er",
+     *     "ett",
+     *     "rftt"
+     *     ]
+     * The correct order is: "wertf".
+     * Note:
+     *         1. You may assume all letters are in lowercase.
+     *         2. If the order is invalid, return an empty string.
+     *         3. There may be multiple valid order of letters, return any one of them is fine.
+     */
+    public static void alienOrderDemo(String[] words) {
+        System.out.println("\nStart function alienOrder()");
+        printArray(words, "\tWords");
+
+        System.out.println("\tRes = " + alienOrder(words));
+
+    }
+    public static String alienOrder(String[] words) {
+        HashMap<Character, HashSet<Character>> before = new HashMap<>();
+        HashMap<Character, HashSet<Character>> after = new HashMap<>();
+        HashSet<Character> chars = new HashSet<>();
+        findOrder(Arrays.asList(words), before, after, chars);
+
+        if (chars.size() == 1) {
+            return "" + chars.iterator().next();
+        }
+
+        HashSet<Character> noDeps = new HashSet<>();
+        for (Character c : chars) {
+            if (before.containsKey(c) && !after.containsKey(c)) {
+                noDeps.add(c);
+            }
+        }
+        if (noDeps.isEmpty()) {
+            return "";
+        }
+
+        HashSet<Character> handled = new HashSet<>();
+        StringBuilder sb = new StringBuilder();
+        while (!noDeps.isEmpty()) {
+            HashSet<Character> nextStep = new HashSet<>();
+            for (Character c : noDeps) {
+                if (!handled.contains(c)) {
+                    sb.append(c);
+                    handled.add(c);
+                    if (before.containsKey(c)) {
+                        for (Character d : before.get(c)) {
+                            removeFromMap(after, d, c);
+                            if (!after.containsKey(d)) {
+                                nextStep.add(d);
+                            }
+                        }
+                    }
+                }
+            }
+            noDeps.clear();
+            noDeps.addAll(nextStep);
+        }
+        if (!after.isEmpty()) {
+            return "";
+        }
+        for (Character c : chars) {
+            if (!handled.contains(c)) {
+                sb.append(c);
+            }
+        }
+
+//        HashSet<Character> handled = new HashSet<>();
+//        StringBuilder sb = new StringBuilder();
+//        while (!after.isEmpty()) {
+//            for (Character c : chars) {
+//                if (!handled.contains(c) && !after.containsKey(c)) {
+//                    sb.append(c);
+//                    handled.add(c);
+//                    if (before.containsKey(c)) {
+//                        for (Character d : before.get(c)) {
+//                            removeFromMap(after, d, c);
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//        for (Character c : chars) {
+//            if (!handled.contains(c)) {
+//                sb.append(c);
+//            }
+//        }
+        return sb.toString();
+    }
+    private static void findOrder(List<String> words, HashMap<Character, HashSet<Character>> before, HashMap<Character, HashSet<Character>> after, HashSet<Character> chars) {
+        if (words.isEmpty()) return;
+
+        List<String> nextLevel = new LinkedList<>();
+        Character pre = null;
+        for (String word : words) {
+            if (word.isEmpty()) continue;
+            Character c = word.charAt(0);
+            chars.add(c);
+            if (pre != null && pre != c) {
+                addToMap(before, pre, c);
+                addToMap(after, c, pre);
+                findOrder(nextLevel, before, after, chars);
+                nextLevel.clear();
+            }
+            pre = c;
+            nextLevel.add(word.substring(1));
+        }
+        findOrder(nextLevel, before, after, chars);
+    }
+    private static void addToMap(HashMap<Character, HashSet<Character>> before, Character key, Character value) {
+        if (before.containsKey(key)) {
+            before.get(key).add(value);
+        } else {
+            HashSet<Character> newSet = new HashSet<>();
+            newSet.add(value);
+            before.put(key, newSet);
+        }
+    }
+    private static void removeFromMap(HashMap<Character, HashSet<Character>> map, Character key, Character value) {
+        if (map.containsKey(key)) {
+            map.get(key).remove(value);
+            if (map.get(key).isEmpty()) {
+                map.remove(key);
+            }
+        }
+    }
+
+    public static void alienOrderDemo2(String[] words) {
+        System.out.println("\nStart function alienOrder()");
+        printArray(words, "\tWords");
+
+        System.out.println("\tRes = " + alienOrder2(words));
+
+    }
+    private static class Node {
+        public int degree;
+        public ArrayList<Integer> neighbour = new ArrayList<Integer>();
+        void Node() {
+            degree = 0;
+        }
+    }
+    public static String alienOrder2(String[] words) {
+        Node[] node = new Node[26];
+        boolean[] happen = new boolean[26];
+        for (int i = 0; i < 26; i++) {
+            node[i] = new Node();
+        }
+        //Build the Graph
+        for (int i = 0; i < words.length; i++) {
+            int startPoint = 0, endPoint = 0;
+            for (int j = 0; j < words[i].length(); j++) {
+                happen[charToInt(words[i].charAt(j))] = true;
+            }
+            if (i != words.length - 1) {
+                for (int j = 0; j < Math.min(words[i].length(), words[i + 1].length()); j++) {
+                    if (words[i].charAt(j) != words[i + 1].charAt(j)) {
+                        startPoint = charToInt(words[i].charAt(j));
+                        endPoint = charToInt(words[i + 1].charAt(j));
+                        break;
+                    }
+                }
+            }
+            if (startPoint != endPoint) {
+                node[startPoint].neighbour.add(endPoint);
+                node[endPoint].degree++;
+            }
+        }
+        //Topological Sort
+        Queue<Integer> queue = new LinkedList<Integer>();
+        String ans = "";
+        for (int i = 0; i < 26; i++) {
+            if (node[i].degree == 0 && happen[i]) {
+                queue.offer(i);
+                ans = ans + intToChar(i);
+            }
+        }
+        while (!queue.isEmpty()) {
+            int now = queue.poll();
+            for (int i : node[now].neighbour) {
+                node[i].degree--;
+                if (node[i].degree == 0) {
+                    queue.offer(i);
+                    ans = ans + intToChar(i);
+                }
+            }
+        }
+        for (int i = 0; i < 26; i++) {
+            if (node[i].degree != 0) {
+                return "";
+            }
+        }
+        return ans;
+    }
+    public static char intToChar(int i) {
+        return (char)('a' + i);
+    }
+    public static int charToInt(char ch) {
+        return ch - 'a';
     }
 }

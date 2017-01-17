@@ -67,5 +67,27 @@ public class TestGraph {
                 {"JFK","A"},{"JFK","C"},{"C","A"},{"A","B"},{"B","JFK"}
         });
 
+//        GraphTest.alienOrderDemo(new String[]{
+//                "wrt",
+//                "wrf",
+//                "er",
+//                "ett",
+//                "rftt"
+//        });
+
+//        GraphTest.alienOrderDemo2(new String[]{
+//                "wrtkj","wrt"
+//        });
+        GraphTest.alienOrderDemo2(new String[]{
+                "wrt", "wrtkj"
+        });
+        char[] buff;
+//        GraphTest.alienOrderDemo(new String[]{
+//                "zy","zx"
+//        });
+//
+//        GraphTest.alienOrderDemo(new String[]{
+//                "x","x"
+//        });
     }
 }

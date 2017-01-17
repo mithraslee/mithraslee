@@ -13,6 +13,7 @@ public class BIT2D {
         return x & -x;
     }
 
+    // 关键要记住BIT array的size需要比arr大1
     public BIT2D(int[][] matrix) {
         int r = matrix.length;
         if (r < 1) return;

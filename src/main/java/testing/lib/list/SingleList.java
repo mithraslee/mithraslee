@@ -68,6 +68,26 @@ public class SingleList<T extends Number> {
             pre.next = newNode;
         }
     }
+    public void insertSorted2 (T val) {
+        ListNode<T> newNode = new ListNode<T>(val);
+        ListNode<T> newHead = new ListNode<T>(val);
+        newHead.next = head;
+        ListNode<T> pre = newHead;
+        ListNode<T> cur = head;
+
+        while (cur != null) {
+            if (cur.compareTo(val) < 0) {
+                pre = cur;
+                cur = cur.next;
+            } else {
+                pre.next = newNode;
+                newNode.next = cur;
+                break;
+            }
+        }
+        pre.next = newNode;
+        head = newHead.next;
+    }
     public void insertRecursive (T val) {
         head = insertRecursiveHelper (head, val);
     }
@@ -91,6 +111,21 @@ public class SingleList<T extends Number> {
                 } else {
                     pre.next = cur.next;
                 }
+                return true;
+            } else {
+                pre = cur;
+                cur = cur.next;
+            }
+        }
+        return false;
+    }
+    public boolean delete2 (T val) {
+        ListNode<T> pre = new ListNode<>(val, head);
+        ListNode<T> cur = head;
+        while (cur != null) {
+            if (cur.compareTo(val) == 0) {
+                pre.next = cur.next;
+                head = pre.next;
                 return true;
             } else {
                 pre = cur;
@@ -157,7 +192,61 @@ public class SingleList<T extends Number> {
         n = pre;
         return n;        
     }
-    
+
+    /**
+     * Reverse Linked List II - Accepted
+     *  
+     * Reverse a linked list from position m to n. Do it in-place and in one-pass.
+     * For example:
+     * Given 1->2->3->4->5->NULL, m = 2 and n = 4,
+     * Return 1->4->3->2->5->NULL.
+     *
+     * Note:
+     * Given m, n satisfy the following condition:
+     *         1 ≤ m ≤ n ≤ length of list.
+     */
+    public void reverseBetween(int m, int n) {
+        if (head == null || m < 1 || n < 1 || m > n) {
+            return;
+        }
+
+        ListNode<T> dummy = new ListNode<>(head.getData());
+        dummy.next = head;
+        ListNode<T> pre = dummy;
+        ListNode<T> start = head;
+
+        while (m > 1 && start != null) {
+            pre = start;
+            start = start.next;
+            m--;
+            n--;
+        }
+        assert start != null;
+        ListNode<T> end = start;
+        while (n > 1 && end != null) {
+            end = end.next;
+            n--;
+        }
+        assert end != null;
+
+        ListNode<T> next = end.next;
+        end.next = null;
+        ListNode<T> tPre = null;
+        ListNode<T> cur = start;
+
+        while (cur != null) {
+            ListNode<T> tmp = cur.next;
+            cur.next = tPre;
+            tPre = cur;
+            cur = tmp;
+        }
+
+        pre.next = tPre;
+        start.next = next;
+
+        head = dummy.next;
+    }
+
     public void removeAnotherList (SingleList<T> sList) {
         ListNode<T> pre = null;
         ListNode<T> cur = head;
@@ -344,12 +433,43 @@ public class SingleList<T extends Number> {
             }
         }
     }
-    
+
+    /**
+     * Remove Duplicates from Sorted List II
+     *
+     * Given a sorted linked list, delete all nodes that have duplicate numbers, leaving only distinct numbers from the original list.
+     *         For example,
+     * Given 1->2->3->3->4->4->5, return 1->2->5.
+     * Given 1->1->1->2->3, return 2->3.
+     */
+    public static ListNodeInt deleteDuplicates(ListNodeInt head) {
+        ListNodeInt dummy = new ListNodeInt(0);
+        dummy.next = head;
+        ListNodeInt pre = dummy;
+        ListNodeInt cur = head;
+
+        while (cur != null) {
+            boolean delete = false;
+            while (cur.next != null && cur.val == cur.next.val) {
+                delete = true;
+                cur = cur.next;
+            }
+            if (delete) {
+                pre.next = cur.next;
+            } else {
+                pre = cur;
+            }
+            cur = pre.next;
+        }
+        return dummy.next;
+    }
+
     /* 12.6 You have two numbers represented by a linked list, where each node contains a single  digit. Write a function that adds the two numbers and returns the sum as a linked list.
     EXAMPLE:  
     input: (3 -> 1 -> 5), (5 -> 9 -> 2)
     output: 9 -> 0 -> 7 
     ### */
+    // 这种题只要小心别忘记carry就不会出问题
     public static SingleList<Integer> addLists (SingleList<Integer> sList1, SingleList<Integer> sList2) {
         Stack<Integer> s1 = new Stack<> ();
         Stack<Integer> s2 = new Stack<> ();
@@ -421,9 +541,6 @@ public class SingleList<T extends Number> {
         tempList.head = newHead;
         tempList.reverseRecursive();
         
-//        System.out.println("List1: " + sList);
-//        System.out.println("List2: " + tempList);
-        
         ListNode<Integer> cur2 = tempList.head;
         ListNode<Integer> cur1 = sList.head;
         
@@ -442,6 +559,46 @@ public class SingleList<T extends Number> {
         if (cur2 != null) 
             cur1.next = cur2;
         
+        return sList;
+    }
+    public static SingleList<Integer> ReOrderList2 (SingleList<Integer> sList) {
+        ListNode<Integer> oneStep = sList.head;
+        ListNode<Integer> twoStep = sList.head;
+        while (twoStep.next != null && twoStep.next.next != null) {
+            oneStep = oneStep.next;
+            twoStep = twoStep.next;
+            twoStep = twoStep.next;
+        }
+        if (oneStep == twoStep) {
+            return sList;
+        }
+        ListNode<Integer> newHead = oneStep.next;
+        oneStep.next = null;
+
+        ListNode<Integer> newPre = null;
+        ListNode<Integer> newCur = newHead;
+        while (newCur != null) {
+            ListNode<Integer> tmp = newCur.next;
+            newCur.next = newPre;
+            newPre = newCur;
+            newCur = tmp;
+        }
+
+        ListNode<Integer> cur1 = sList.head;
+        ListNode<Integer> cur2 = newPre;
+
+        while(cur1 != null && cur2 != null) {
+            ListNode<Integer> temp1 = cur1.next;
+            ListNode<Integer> temp2 = cur2.next;
+
+            cur1.next = cur2;
+            cur2.next = temp1;
+            cur1 = temp1;
+            cur2 = temp2;
+        }
+        if (cur2 != null) {
+            cur1.next = cur2;
+        }
         return sList;
     }
 
@@ -818,6 +975,36 @@ public class SingleList<T extends Number> {
         }
         return head;
     }
+    public ListNode oddEvenList2() {
+        if (head == null || head.next == null || head.next.next == null) {
+            return head;
+        }
+
+        ListNode preOdd = head;
+        ListNode headEven = head.next;
+        ListNode preEven = head.next;
+        ListNode cur = head.next.next;
+        preOdd.next = null;
+        preEven.next = null;
+
+        boolean odd = true;
+        while (cur != null) {
+            ListNode next = cur.next;
+            if (odd) {
+                preOdd.next = cur;
+                preOdd = cur;
+            } else {
+                preEven.next = cur;
+                preEven = cur;
+            }
+            cur.next = null;
+            cur = next;
+            odd = !odd;
+        }
+        preOdd.next = headEven;
+
+        return head;
+    }
 
     /**
      * Add Two Numbers II
@@ -862,5 +1049,77 @@ public class SingleList<T extends Number> {
             pre = newNode;
         }
         return tempHead.next;
+    }
+
+    /**
+     * Determine if a linked list contains a circle. If it does, return the start point for the circle
+     */
+    public static void circleStartDemo(ListNodeInt head, Integer r) {
+        System.out.println("\nStart function circleStartDemo()");
+        System.out.println("\tCircleStart = " + r);
+        ListNodeInt circleStart = circleStart(head);
+        System.out.println("\tStart of circle: " + circleStart.val);
+    }
+    public static ListNodeInt circleStart(ListNodeInt head) {
+        if (head == null) return null;
+        ListNodeInt slow = head;
+        ListNodeInt fast = head;
+        while (fast != null && fast.next != null) {
+            slow = slow.next;
+            fast = fast.next.next;
+            if (slow.val == fast.val) {
+                break;
+            }
+        }
+        if (slow.val != fast.val) {
+            return null;
+        } else {
+            ListNodeInt iter = head;
+            while (iter.val != slow.val) {
+                iter = iter.next;
+                slow = slow.next;
+            }
+            return iter;
+        }
+    }
+
+    /**
+     * Plus One Linked List
+     *
+     * Given a non-negative number represented as a singly linked list of digits, plus one to the number.
+     *
+     * The digits are stored such that the most significant digit is at the head of the list.
+     *
+     *         Example:
+     * Input:
+     *         1->2->3
+     *
+     * Output:
+     *         1->2->4
+     */
+    public static ListNodeInt plusOne(ListNodeInt head) {
+        ListNodeInt firstNotNine = null;
+        ListNodeInt cur = head;
+
+        while (cur != null) {
+            if (cur.val != 9) {
+                firstNotNine = cur;
+            }
+            cur = cur.next;
+        }
+
+        if (firstNotNine == null) {
+            ListNodeInt newHead = new ListNodeInt(0);
+            newHead.next = head;
+            head = newHead;
+            firstNotNine = newHead;
+        }
+        firstNotNine.val = firstNotNine.val + 1;
+        cur = firstNotNine.next;
+        while (cur != null) {
+            cur.val = 0;
+            cur = cur.next;
+        }
+        return head;
     }
 }

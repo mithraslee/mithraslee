@@ -26,8 +26,7 @@ public class TreeIterator <T extends Number> {
                 cur = preStack.pop();
             else
                 cur = null;
-        }
-        else {
+        } else {
             cur = leftMostLeaf(cur.right);
         }
         return res;

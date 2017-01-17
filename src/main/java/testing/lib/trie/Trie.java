@@ -25,7 +25,7 @@ public class Trie {
             cur = cur.children.get(c);
         }
         if (!cur.children.containsKey(null)) {
-            cur.children.put(null, null);
+            cur.children.put(null, new TrieNode());
         }
     }
 

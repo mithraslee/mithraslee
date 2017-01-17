@@ -65,8 +65,8 @@ public class TestTree {
 
         System.out.println("ti2 is BST: " + ti2.isBST());
         System.out.println("ti2mirror is BST: " + ti2mirror.isBST());
-        System.out.println("ti2 is BST: " + ti2.isBSTRecursive());
-        System.out.println("ti2mirror is BST: " + ti2mirror.isBSTRecursive());
+//        System.out.println("ti2 is BST: " + ti2.isBSTRecursive());
+//        System.out.println("ti2mirror is BST: " + ti2mirror.isBSTRecursive());
 
         System.out.println("Max depth of ti2 is " + ti2.maxDepth());
         System.out.println("Min depth of ti2 is " + ti2.minDepth());
@@ -224,5 +224,41 @@ public class TestTree {
         root6.right.right.left = new TreeNodeInt(5);
         root6.right.right.right = new TreeNodeInt(1);
         System.out.println(Tree.pathSum(root6, 22));
+
+        TreeNodeInt root7 = new TreeNodeInt(10);
+        root7.left = new TreeNodeInt(5);
+        root7.left.left = new TreeNodeInt(1);
+        root7.left.right = new TreeNodeInt(8);
+        root7.right = new TreeNodeInt(15);
+        root7.right.right = new TreeNodeInt(7);
+        root7.right.right.right = new TreeNodeInt(18);
+        root7.right.right.right.right = new TreeNodeInt(19);
+        root7.right.right.right.right.right = new TreeNodeInt(20);
+        Tree.largestBSTSubtree2(root7);
+
+        TreeNodeInt root7_2 = new TreeNodeInt(1);
+        root7_2.left = new TreeNodeInt(2);
+        Tree.largestBSTSubtree2(root7_2);
+
+        TreeNodeInt root8 = new TreeNodeInt(1);
+        root8.right = new TreeNodeInt(3);
+        root8.right.left = new TreeNodeInt(2);
+        root8.right.right = new TreeNodeInt(4);
+        root8.right.right.right = new TreeNodeInt(5);
+//        System.out.println(Tree.longestConsecutive(root8));
+
+        TreeNodeInt root8_2 = new TreeNodeInt(2);
+        root8_2.right = new TreeNodeInt(3);
+        root8_2.right.left = new TreeNodeInt(2);
+        root8_2.right.left.left = new TreeNodeInt(1);
+        System.out.println(Tree.longestConsecutive(root8_2));
+
+        TreeNodeInt root9 = new TreeNodeInt(5);
+        root9.left = new TreeNodeInt(1);
+        root9.left.left = new TreeNodeInt(5);
+        root9.left.right = new TreeNodeInt(5);
+        root9.right = new TreeNodeInt(5);
+        root9.right.right = new TreeNodeInt(5);
+        System.out.println(Tree.countUnivalSubtrees2(root9));
     }
 }
