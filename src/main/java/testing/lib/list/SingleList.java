@@ -1061,26 +1061,25 @@ public class SingleList<T extends Number> {
         System.out.println("\tStart of circle: " + circleStart.val);
     }
     public static ListNodeInt circleStart(ListNodeInt head) {
-        if (head == null) return null;
+        if (head == null || head.next == null) return null;
         ListNodeInt slow = head;
         ListNodeInt fast = head;
         while (fast != null && fast.next != null) {
             slow = slow.next;
             fast = fast.next.next;
-            if (slow.val == fast.val) {
+            if (slow == fast) {
                 break;
             }
         }
-        if (slow.val != fast.val) {
+        if (slow == null || fast == null || slow != fast) {
             return null;
-        } else {
-            ListNodeInt iter = head;
-            while (iter.val != slow.val) {
-                iter = iter.next;
-                slow = slow.next;
-            }
-            return iter;
         }
+        ListNodeInt iter = head;
+        while (iter != slow) {
+            iter = iter.next;
+            slow = slow.next;
+        }
+        return iter;
     }
 
     /**

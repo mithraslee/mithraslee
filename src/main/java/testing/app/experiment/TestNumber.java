@@ -191,6 +191,7 @@ public class TestNumber {
         NumberTest.findMaximumXOR(new int[]{3, 10, 5, 25, 2, 8});
 
         NumberTest.numbersByRecursion(2);
+        NumberTest.numbersByRecursion2(3);
 
         NumberTest.findComplement(5);
 
@@ -206,5 +207,14 @@ public class TestNumber {
         NumberTest.strobogrammaticInRange("100", "200");
 
         NumberTest.findCelebrityDemo(4);
+
+        NumberTest.getFactorsDemo(2);
+        NumberTest.getFactorsDemo(3);
+        NumberTest.getFactorsDemo(4);
+        NumberTest.getFactorsDemo(8);
+        NumberTest.getFactorsDemo(12);
+        NumberTest.getFactorsDemo(32);
+        NumberTest.getFactorsDemo(37);
+
     }
 }

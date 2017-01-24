@@ -4,8 +4,10 @@
  */
 package testing.lib.number;
 
+import java.awt.*;
 import java.util.*;
 import java.lang.*;
+import java.util.List;
 
 import static testing.lib.common.CommonUtils.printArray;
 import static testing.lib.common.CommonUtils.printTwoDimentinalArray;
@@ -361,17 +363,17 @@ public class NumberTest {
             System.out.println("\tres = " + 1.0);
             return 1.0;
         }
-        
+
         boolean lowerThanOne = false;
         if (n <= 1.0) {
             lowerThanOne = true;
             n *= (1.0/precision_unit);
         }
-        
+
         Double low = 1.0;
         Double high = n;
         Double mid = 0.0;
-        
+
         while (low < high) {
             mid = (low + high)/2.0;
 //            System.out.println("mid = " + mid + "; low = " + low + "; high = " + high);
@@ -798,7 +800,17 @@ public class NumberTest {
         }
         return sb.toString();
     }
-    
+
+    /**
+     * Number Refactor Combinations
+     * Refactor an Integer to all possible combinations, for instance:
+     *         24=2*2*2*3
+     *           =2*2*6
+     *         =2*3*4
+     *           =2*12
+     *           =3*8
+     *           =4*6
+     */
     public static List<List<Integer>> factorCombination(int n) {
         System.out.println("\nStart function factorCombination()");
         System.out.println("\tn = " + n);
@@ -821,6 +833,74 @@ public class NumberTest {
             tmp.addLast(i);
             factorCombinationDFS(n/i, i, tmp, res);
             tmp.removeLast();
+        }
+    }
+
+    /**
+     * Factor Combinations
+     * Numbers can be regarded as product of its factors. For example,
+     * 8 =  * 2 x 2 x 2;
+     *   =  * 2 x 4.
+     * Write a function that takes an integer n and return all possible combinations of its factors.
+     * Note: 
+     *         1. You may assume that n is always positive.
+     *         2. Factors should be greater than 1 and less than n.
+     *         Examples: 
+     * input: 1
+     * output: 
+     *         []
+     * input: 37
+     * output: 
+     *         []
+     * input: 12
+     * output:
+     *         [
+     *         [2, 6],
+     *         [2, 2, 3],
+     *         [3, 4]
+     *         ]
+     */
+    public static void getFactorsDemo(int n) {
+        System.out.println("\nStart function getFactorsDemo(). n = " + n);
+        List<List<Integer>> res = getFactors(n);
+        for (List<Integer> list : res) {
+            System.out.println("\t" + list);
+        }
+    }
+    public static List<List<Integer>> getFactors(int n) {
+        List<List<Integer>> res = new ArrayList<>();
+        if (n <= 2) return res;
+
+        getFactorsDFS(n, 2, new LinkedList<Integer>(), res);
+
+        return res;
+    }
+    // This version accepted
+    private static void getFactorsDFS(int n, int cur, LinkedList<Integer> tmp, List<List<Integer>> res) {
+        if (n == 1 && tmp.size() > 1) {
+            res.add(new LinkedList<>(tmp));
+        } else {
+            for (int i = cur; i <= n; i++) {
+                if (n % i != 0) continue;
+                if (n == i && tmp.isEmpty()) continue;
+                tmp.add(i);
+                getFactorsDFS(n/i, i, tmp, res);
+                tmp.removeLast();
+            }
+        }
+    }
+    // This version timed out
+    private static void getFactorsDFS2(int n, int cur, LinkedList<Integer> tmp, List<List<Integer>> res) {
+        if (n == 1 && tmp.size() > 1) {
+            res.add(new LinkedList<>(tmp));
+            //} else if (cur <= (int)Math.ceil((double)n/2)) {
+        } else if (cur <= n) {
+            getFactorsDFS(n, cur + 1, tmp, res);
+            if (n % cur == 0) {
+                tmp.add(cur);
+                getFactorsDFS(n/cur, cur, tmp, res);
+                tmp.removeLast();
+            }
         }
     }
 
@@ -2383,6 +2463,21 @@ public class NumberTest {
         System.out.println("\tRes = " + list);
         return list;
     }
+    public static List<Integer> numbersByRecursion2(int n) {
+        System.out.println("\nStart function numbersByRecursion2(). n = " + n);
+        if (n <= 1) return new ArrayList<>(Arrays.asList(new Integer[]{1,2,3,4,5,6,7,8,9}));
+        ArrayList<Integer> last = (ArrayList<Integer>)numbersByRecursion2(n-1);
+//        ArrayList<Integer> list = new ArrayList(last);
+
+        for (int i = (int)Math.pow(10, n - 2) - 1; i < (int)Math.pow(10, n - 1) - 1; i++) {
+            for (int j = 0; j < 10; j++) {
+                last.add(last.get(i) * 10 + j);
+            }
+        }
+
+        System.out.println("\tRes = " + last);
+        return last;
+    }
 
     /**
      * Number Complement
@@ -2589,4 +2684,5 @@ public class NumberTest {
         }
         return -1;
     }
+
 }

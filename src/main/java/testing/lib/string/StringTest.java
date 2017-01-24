@@ -1021,6 +1021,65 @@ public class StringTest {
     }
 
     /**
+     * Palindrome Pairs
+     * Given a list of unique words, find all pairs of distinct indices (i, j) in the given list, so that the concatenation of the two words, i.e. words[i] + words[j] is a palindrome.
+     *         Example 1:
+     * Given words = ["bat", "tab", "cat"]
+     * Return [[0, 1], [1, 0]]
+     * The palindromes are ["battab", "tabbat"]
+     * Example 2:
+     * Given words = ["abcd", "dcba", "lls", "s", "sssll"]
+     * Return [[0, 1], [1, 0], [3, 2], [2, 4]]
+     * The palindromes are ["dcbaabcd", "abcddcba", "slls", "llssssll"]
+     */
+    public static void palindromePairsDemo(String[] words) {
+        System.out.println("\nStart function palindromePairsDemo()");
+        printArray(words, "\tWords: ");
+        System.out.println("\tRes: " + palindromePairs(words));
+    }
+    public static List<List<Integer>> palindromePairs(String[] words) {
+        List<List<Integer>> res = new ArrayList<>();
+        int len = words.length;
+        if (len < 2) return res;
+        HashMap<String, Integer> map = new HashMap<>();
+        HashSet<Integer> tmp = new HashSet<>();
+        for (int i = 0; i < len; i++) {
+            map.put(words[i], i);
+            tmp.add(words[i].length());
+        }
+        ArrayList<Integer> lens = new ArrayList<>(tmp);
+        Collections.sort(lens);
+
+        for (int i = 0; i < len; i++) {
+            String str = words[i];
+            int tlen = str.length();
+            String rStr = reverse(str);
+            if (map.containsKey(rStr) && map.get(rStr) != i) {
+                res.add(new ArrayList<>(Arrays.asList(new Integer[]{i, map.get(rStr)})));
+            }
+            int idx = Collections.binarySearch(lens, tlen);
+            for (int j = 0; j < idx; j++) {
+                int dlen = lens.get(j);
+                if (isPalindrome(rStr, 0, tlen - dlen - 1) && map.containsKey(rStr.substring(tlen - dlen))) {
+                    res.add(new ArrayList<>(Arrays.asList(new Integer[]{i, map.get(rStr.substring(tlen - dlen))})));
+                }
+                if (isPalindrome(rStr, dlen, tlen - 1) && map.containsKey(rStr  .substring(0, dlen))) {
+                    res.add(new ArrayList<>(Arrays.asList(new Integer[]{map.get(rStr.substring(0, dlen)), i})));
+                }
+            }
+        }
+        return res;
+    }
+    private static boolean isPalindrome(String str, int left, int right) {
+        while (left < right) {
+            if (str.charAt(left++) != str.charAt(right--)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * DP Problem
      */
     public static boolean isShuffled (String x, String y, String z) {
@@ -1457,6 +1516,36 @@ public class StringTest {
         
         ArrayList<ArrayList<String>> arr = new ArrayList<> ();
         
+        for (int j = 0; j < len; j++) {
+            arr.add(new ArrayList<String> ());
+            for (int i = 0; i <= j; i++) {
+                if (i > 0 && arr.get(i - 1).isEmpty()) continue;
+                String str = s.substring(i, j+1);
+                if (isPalindrome(str)) {
+                    if (i == 0) {
+                        arr.get(j).add(str);
+                    } else {
+                        for (String temp : arr.get(i - 1)) {
+                            arr.get(j).add(temp + "," + str);
+                        }
+                    }
+                }
+            }
+        }
+
+        for (ArrayList<String> list : arr)
+            System.out.println("\t" + list);
+        return arr.get(len - 1);
+    }
+    public static ArrayList<String> PalindromePartitioning2 (String s) {
+        System.out.println("\nStart function PalindromePartitioning()");
+        System.out.println("\ts  = " + s);
+        if (s == null || s.length() <= 0)
+            return new ArrayList<>();
+        int len = s.length();
+
+        ArrayList<ArrayList<String>> arr = new ArrayList<> ();
+
         for (int j = 0; j < len; j++) {
             arr.add(new ArrayList<String> ());
             for (int i = 0; i <= j; i++) {
@@ -3929,6 +4018,27 @@ public class StringTest {
         int intervalCount = wordCount - 1;
         int totalSpaces = maxWidth - tmpLen;
         int [] spaceWidths = new int [intervalCount];
+        int idx = 0;
+        while (totalSpaces-- > 0) {
+            spaceWidths[(idx++) % intervalCount]++;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(words[start]);
+        for (int i = 0; i < intervalCount; i++) {
+            for (int j = 0; j < spaceWidths[i]; j++)
+                sb.append(" ");
+            sb.append(words[start + i + 1]);
+        }
+        return sb.toString();
+    }
+    private static String genString2(String[] words, int start, int end, int tmpLen, int maxWidth) {
+        int wordCount = end - start + 1;
+        if (wordCount == 1) return words[start];
+
+        int intervalCount = wordCount - 1;
+        int totalSpaces = maxWidth - tmpLen;
+        int [] spaceWidths = new int [intervalCount];
         for (int i = 0; i < intervalCount; i++) {
             spaceWidths[i] = totalSpaces/intervalCount + (i < totalSpaces%intervalCount ? 1 : 0);
         }
@@ -5885,7 +5995,7 @@ public class StringTest {
      *    Return "acdb"
      */
     public static String removeDuplicateLetters(String s) {
-        System.out.println("\nStart function isAdditiveNumber()");
+        System.out.println("\nStart function removeDuplicateLetters()");
         System.out.println("\ts: " + s);
         int len = s.length();
         if (len < 2) return s;
@@ -5912,12 +6022,37 @@ public class StringTest {
                 sb.deleteCharAt(sb.length() - 1);
             }
             sb.append(c);
+            System.out.println("\tsb = " + sb.toString());
             visited.add(c);
         }
         System.out.println("\tres: " + sb.deleteCharAt(0).toString());
         return sb.deleteCharAt(0).toString();
     }
 
+    /**
+     * Verify Preorder Serialization of a Binary Tree
+     * One way to serialize a binary tree is to use pre-order traversal. When we encounter a non-null node, we record the node's value. If it is a null node, we record using a sentinel value such as #.
+     *              _9_
+     *             /   \
+     *            3     2
+     *           / \   / \
+     *          4   1  #  6
+     *         / \ / \   / \
+     *         # # # #   # #
+     * For example, the above binary tree can be serialized to the string "9,3,4,#,#,1,#,#,2,#,6,#,#", where # represents a null node.
+     * Given a string of comma separated values, verify whether it is a correct preorder traversal serialization of a binary tree. Find an algorithm without reconstructing the tree.
+     * Each comma separated value in the string must be either an integer or a character '#' representing null pointer.
+     * You may assume that the input format is always valid, for example it could never contain two consecutive commas such as "1,,3".
+     * Example 1:
+     *         "9,3,4,#,#,1,#,#,2,#,6,#,#"
+     * Return true
+     * Example 2:
+     *         "1,#"
+     * Return false
+     * Example 3:
+     *         "9,#,#,1"
+     * Return false
+     */
     public static void isValidSerializationDemo(String preorder) {
         System.out.println("\nStart function isAdditiveNumber()");
         System.out.println("\tpreorder: " + preorder);
@@ -5937,33 +6072,23 @@ public class StringTest {
         }
         return count != 0 ? false : elements[elements.length - 1].equals("#");
     }
-    //    public static boolean isValidSerialization(String preorder) {
-//        if (preorder.charAt(0) == '#') return false;
-//        LinkedList<String> stack = new LinkedList<>();
-//        int count = 0;
-//        String[] elements = preorder.split(",");
-//        for (String s : elements) {
-//            if (!s.equals("#")) {
-//                stack.addFirst(s);
-//            } else {
-//                count++;
-//                if (count % 2 == 0) {
-//                    if (stack.isEmpty()) {
-//                        return false;
-//                    }
-//                    stack.removeFirst();
-//                    if (!stack.isEmpty()) {
-//                        stack.removeFirst();
-//                    }
-//                }
-//            }
-//        }
-//        return stack.isEmpty();
-//    }
+    public static boolean isValidSerialization2(String preorder) {
+        String[] nodes = preorder.split(",");
+        int diff = 1;
+        for (String node : nodes){
+            if (--diff < 0) {
+                return false;
+            }
+            if (!node.equals("#")) {
+                diff += 2;
+            }
+        }
+        return diff == 0;
+    }
 
     /**
      * Remove K Digits
-     * Given a non-negative integer num represented as a string, remove k digits from the number so that the new number is the smallest possible.
+     * Given a non-negative integer num represented as a string, remove k digits from the numb--er so that the new number is the smallest possible.
      *         Note:
      *         • The length of num is less than 10002 and will be ≥ k.
   *	• The given num does not contain any leading zero.
@@ -6223,19 +6348,46 @@ public class StringTest {
         System.out.println("\tFirst Uniq Char's index = " + firstUniqChar(s));
     }
     public static int firstUniqChar(String s) {
-        LinkedHashMap<Character, Integer> once = new LinkedHashMap<>(s.length(), .75F, false);
+        LinkedHashSet<Character> once = new LinkedHashSet<>();
         HashSet<Character> multiple = new HashSet<>();
 
         char[] chars = s.toCharArray();
         for (int i = 0; i < s.length(); i++) {
             char c = chars[i];
             if (!multiple.contains(c)) {
-                if (once.containsKey(c)) {
+                if (once.contains(c)) {
                     once.remove(c);
                     multiple.add(c);
                 } else {
-                    once.put(c, i);
+                    once.add(c);
                 }
+            }
+        }
+        Iterator<Character> iter = once.iterator();
+        if (iter.hasNext()) {
+            return iter.next();
+        } else {
+            return -1;
+        }
+    }
+    public static void firstUniqCharDemo2(String s) {
+        System.out.println("\nStart function firstUniqCharDemo()");
+        System.out.println("\tstr = " + s);
+        System.out.println("\tFirst Uniq Char's index = " + firstUniqChar2(s));
+    }
+    public static int firstUniqChar2(String s) {
+        LinkedHashMap<Character, Integer> once = new LinkedHashMap<>(s.length(), .75F, false);
+        HashSet<Character> S = new HashSet<>();
+
+        char[] chars = s.toCharArray();
+        for (int i = 0; i < s.length(); i++) {
+            char c = chars[i];
+
+            if (!S.contains(c)) {
+                once.put(c, 1);
+                S.add(c);
+            } else {
+                once.remove(c);
             }
         }
         Iterator iter = once.entrySet().iterator();
@@ -6937,6 +7089,27 @@ public class StringTest {
                 m.put(level + 1, m.get(level) + len + 1);
             }
         }
+        System.out.println("\tRes = " + res);
+        return res;
+    }
+    public static int lengthLongestPath2(String input) {
+        System.out.println("\nStart function lengthLongestPath2()");
+        System.out.println("\tinput = " + input);
+
+        int res = 0;
+        Map<Integer, Integer> m = new HashMap<>();
+//        m.put(0, 0);
+        for (String s : input.split("\n")) {
+            int level = s.lastIndexOf('\t') + 1;
+            int len = s.substring(level).length();
+            int lastLen = m.containsKey(level - 1) ? m.get(level - 1) : 0;
+            if (s.contains(".")) {
+                res = Math.max(res, lastLen + len);
+            } else {
+                m.put(level, lastLen + len + 1);
+            }
+        }
+        System.out.println("\tRes = " + res);
         return res;
     }
 
@@ -7026,6 +7199,22 @@ public class StringTest {
         return true;
     }
     private static Boolean isValidIPv6(String ip) {
+        String[] vals = ip.split(":");
+        if (vals.length != 8) return false;
+        for (String val : vals) {
+            if (val.length() > 4 || val.length() < 1) {
+                return false;
+            }
+
+            for (char c : val.toLowerCase().toCharArray()) {
+                if (!(Character.isDigit(c) || (c == 'a' || c == 'b' || c == 'c' || c == 'd' || c == 'e' || c == 'f'))) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    private static Boolean isValidIPv6_2(String ip) {
         String[] vals = ip.split(":");
         if (vals.length != 8) return false;
         for (String val : vals) {
@@ -7520,7 +7709,7 @@ public class StringTest {
     }
     private static void wordSquaresDFS(HashSet<String> words,  Trie trie, ArrayList<String> tmp, ArrayList<List<String>> res, int len, int level) {
         if (len == level) {
-            res.add(new ArrayList<String>(tmp));
+            res.add(new ArrayList<>(tmp));
             return;
         }
 
@@ -7549,6 +7738,70 @@ public class StringTest {
                 if (j == len) {
                     tmp.add(word);
                     wordSquaresDFS(words, trie, tmp, res, len, level + 1);
+                    tmp.remove(tmp.size() - 1);
+                }
+            }
+        }
+    }
+
+    public static List<List<String>> wordSquares2(String[] words) {
+        System.out.println("\nStart function wordSquares2().");
+        System.out.println("\tInputs:");
+        for (String w : words) {
+            System.out.println("\t" + w);
+        }
+        Trie trie = new Trie();
+        for (String w : words) {
+            trie.insert(w);
+        }
+        ArrayList<List<String>> res = new ArrayList<>();
+        if (words.length == 0) {
+            return res;
+        }
+        int len = words[0].length();
+
+        HashSet<String> ws = new HashSet<>(Arrays.asList(words));
+        wordSquaresDFS2(ws, trie, new ArrayList<StringBuilder>(), new ArrayList<>(), res, len, 0);
+        for (List<String> r : res) {
+            System.out.println();
+            for (String w : r) {
+                System.out.println("\t\t" + w);
+            }
+        }
+        return res;
+    }
+    private static void wordSquaresDFS2(HashSet<String> words,  Trie trie, ArrayList<StringBuilder> sbs, ArrayList<String> tmp, ArrayList<List<String>> res, int len, int level) {
+        if (len == level) {
+            res.add(new ArrayList<>(tmp));
+            return;
+        }
+
+        if (tmp.isEmpty()) {
+            for (String word : words) {
+                tmp.add(word);
+                for (Character c : word.toCharArray()) {
+                    sbs.add(new StringBuilder().append(c));
+                }
+                wordSquaresDFS2(words, trie, sbs, tmp, res, len, 1);
+                tmp.remove(tmp.size() - 1);
+            }
+        } else {
+            for (String word : words) {
+                int j = 0;
+                ArrayList<StringBuilder> newSbs = (ArrayList<StringBuilder>)sbs.clone();
+                for (; j < len; j++) {
+                    newSbs.set(j, newSbs.get(j).append(word.charAt(j)));
+
+                    if (!trie.startsWith(newSbs.get(j).toString())) {
+                        break;
+                    }
+                    if (j == tmp.size() && !word.startsWith(newSbs.get(j).toString())) {
+                        break;
+                    }
+                }
+                if (j == len) {
+                    tmp.add(word);
+                    wordSquaresDFS2(words, trie, newSbs, tmp, res, len, level + 1);
                     tmp.remove(tmp.size() - 1);
                 }
             }
@@ -7682,6 +7935,55 @@ public class StringTest {
         }
         System.out.println("\tRes: " + res);
         return res;
+    }
+
+    public static void minAbbreviationDemo(String target, String[] dictionary) {
+        System.out.println("\nStart function minAbbreviation().");
+        System.out.println("\tWord: " + target);
+        printArray(dictionary, "\tDict:");
+        System.out.println("\tRes: " + minAbbreviation(target, dictionary));
+    }
+    public static String minAbbreviation(String target, String[] dictionary) {
+
+        // Why this does not work with generateAbbreviations4? The returned P.Q is not sorted by str length
+//        PriorityQueue<String> Q = new PriorityQueue<>((a, b) -> a.length() - b.length());
+        List<String> r = generateAbbreviations2(target);
+        Collections.sort(r, (a, b) -> a.length() - b.length());
+//        for (String rx : r) {
+//            Q.add(rx);
+//        }
+//        Iterator<String> iter = Q.iterator();
+
+        Iterator<String> iter = r.iterator();
+        while (iter.hasNext()) {
+            String cur = iter.next();
+            boolean valid = true;
+            for (String d : dictionary) {
+                if (validWordAbbreviation(d, cur)) {
+                    valid = false;
+                    break;
+                }
+            }
+            if (valid) return cur;
+        }
+        return null;
+    }
+    private static PriorityQueue<String> generateAbbreviations4(String word) {
+        PriorityQueue<String> res = new PriorityQueue<>((a, b) -> a.length() - b.length());
+        generateAbbreviationsDFS4(word, 0, 0, "", res);
+        return res;
+    }
+    private static void generateAbbreviationsDFS4(String target, int cur, int cnt, String tmp, PriorityQueue<String> res) {
+        if (cur == target.length()) {
+            if (cnt > 0) {
+                res.add(tmp + cnt);
+            } else {
+                res.add(tmp);
+            }
+        } else {
+            generateAbbreviationsDFS4(target, cur + 1, cnt + 1, tmp, res);
+            generateAbbreviationsDFS4(target, cur + 1, 0, tmp + (cur > 0 ? cnt : "") + target.charAt(cur), res);
+        }
     }
 
     /**
@@ -7819,6 +8121,348 @@ public class StringTest {
 
         return res;
     }
+
+    /**
+     * Group Shifted Strings
+     * Given a string, we can "shift" each of its letter to its successive letter, for example: "abc" -> "bcd". We can keep "shifting" which forms the sequence:
+     *         "abc" -> "bcd" -> ... -> "xyz"
+     * Given a list of strings which contains only lowercase alphabets, group all strings that belong to the same shifting sequence.
+     * For example, given: ["abc", "bcd", "acef", "xyz", "az", "ba", "a", "z"], 
+     * A solution is:
+     *         [
+     *         ["abc","bcd","xyz"],
+     *         ["az","ba"],
+     *         ["acef"],
+     *         ["a","z"]
+     *         ]
+     */
+    public List<List<String>> groupStrings(String[] strings) {
+        HashMap<String, ArrayList<String>> map = new HashMap<>();
+        for (String s : strings) {
+            char[] chars = s.toCharArray();
+            StringBuilder sb = new StringBuilder();
+            for (char c : chars) {
+                sb.append((c - chars[0] + 26) % 26).append(",");
+            }
+            String id = sb.toString();
+            if (map.containsKey(id)) {
+                map.get(id).add(s);
+            } else {
+                ArrayList<String> newList = new ArrayList<>();
+                newList.add(s);
+                map.put(id, newList);
+            }
+        }
+        List<List<String>> res = new ArrayList<>(map.values());
+        return res;
+    }
+
+    /**
+     * Sentence Screen Fitting
+     * Given a rows x cols screen and a sentence represented by a list of non-empty words, find how many timesthe given sentence can be fitted on the screen.
+     *         Note:
+     *         1. A word cannot be split into two lines.
+     *         2. The order of words in the sentence must remain unchanged.
+     *         3. Two consecutive words in a line must be separated by a single space.
+     * 4. Total words in the sentence won't exceed 100.
+     *         5. Length of each word is greater than 0 and won't exceed 10.
+     *         6. 1 ≤ rows, cols ≤ 20,000.
+     * Example 1:
+     * Input:
+     * rows = 2, cols = 8, sentence = ["hello", "world"]
+     * Output:
+     *         1
+     * Explanation:
+     * hello---
+     * world---
+     * The character '-' signifies an empty space on the screen.
+     *         Example 2:
+     * Input:
+     * rows = 3, cols = 6, sentence = ["a", "bcd", "e"]
+     * Output:
+     *         2
+     * Explanation:
+     * a-bcd-
+     * e-a---
+     * bcd-e-
+     * The character '-' signifies an empty space on the screen.
+     *         Example 3:
+     * Input:
+     * rows = 4, cols = 5, sentence = ["I", "had", "apple", "pie"]
+     * Output:
+     *         1
+     * Explanation:
+     * I-had
+     *         apple
+     * pie-I
+     * had--
+     * The character '-' signifies an empty space on the screen.
+     */
+    public static int wordsTyping(String[] sentence, int rows, int cols) {
+        System.out.println("\nStart function wordsTyping().");
+        printArray(sentence, "\tSentences:");
+        System.out.println("\tRows: " + rows);
+        System.out.println("\tCols: " + cols);
+
+        if (rows < 1 || cols < 1) return 0;
+        int len = sentence.length;
+        int i = 0;
+        int rIdx = 0;
+        int cIdx = 0;
+        int cnt = -1;
+        while (true) {
+            int idx = i % len;
+            if (idx == 0) cnt++;
+            String str = sentence[idx];
+            if (str.length() > cols) {
+                break;
+            }
+            if (cIdx + str.length() > cols) {
+                rIdx++;
+                cIdx = str.length() + 1;
+                if (idx == 0) {
+                    cnt *= rows/rIdx;
+                    rIdx = rows - rows%(rIdx);
+                }
+            } else {
+                cIdx += str.length() + 1;
+            }
+            if (rIdx == rows) {
+                break;
+            }
+            i++;
+        }
+
+        System.out.println("\tRes = " + cnt);
+        return cnt;
+    }
+
+    /**
+     * Ternary Expression Parser
+     * Given a string representing arbitrarily nested ternary expressions, calculate the result of the expression. You can always assume that the given expression is valid and only consists of digits 0-9, ?, :, T and F (T and Frepresent True and False respectively).
+     * Note:
+     *  1. The length of the given string is ≤ 10000.
+     *  2. Each number will contain only one digit.
+     *  3. The conditional expressions group right-to-left (as usual in most languages).
+     *  4. The condition will always be either T or F. That is, the condition will never be a digit.
+     *  5. The result of the expression will always evaluate to either a digit 0-9, T or F.
+     *         Example 1:
+     * Input: "T?2:3"
+     * Output: "2"
+     * Explanation: If true, then result is 2; otherwise result is 3.
+     * Example 2:
+     * Input: "F?1:T?4:5"
+     * Output: "4"
+     * Explanation: The conditional expressions group right-to-left. Using parenthesis, it is read/evaluated as:
+     *         "(F ? 1 : (T ? 4 : 5))"                   "(F ? 1 : (T ? 4 : 5))"
+     *         -> "(F ? 1 : 4)"                 or       -> "(T ? 4 : 5)"
+     *         -> "4"                                    -> "4"
+     * Example 3:
+     * Input: "T?T?F:5:3"
+     * Output: "F"
+     * Explanation: The conditional expressions group right-to-left. Using parenthesis, it is read/evaluated as:
+     *         "(T ? (T ? F : 5) : 3)"                   "(T ? (T ? F : 5) : 3)"
+     *         -> "(T ? F : 3)"                 or       -> "(T ? F : 5)"
+     *         -> "F"                                    -> "F"
+     */
+    public static void parseTernaryDemo(String expression) {
+        System.out.println("\nStart function parseTernaryDemo().");
+        System.out.println("\tExpression: " + expression);
+        System.out.println("\tRes: " + parseTernary(expression));
+    }
+    public static String parseTernary(String expression) {
+        if (expression.length() == 1) {
+            return expression;
+        }
+        if (expression.charAt(0) == 'T') {
+            String nextTernary = getNextTernary(expression.substring(2));
+            return parseTernary(nextTernary);
+        } else {
+            String nextTernary = getNextTernary(expression.substring(2));
+            nextTernary = getNextTernary(expression.substring(2 + nextTernary.length() + 1));
+            return parseTernary(nextTernary);
+        }
+    }
+    private static String getNextTernary(String str) {
+        int questionCnt = 0;
+        int comaCnt = 0;
+        int idx = 0;
+        while (idx < str.length()) {
+            if (str.charAt(idx) == '?') {
+                questionCnt++;
+            } else if (str.charAt(idx) == ':') {
+                comaCnt++;
+                if (comaCnt == questionCnt + 1) {
+                    return str.substring(0, idx);
+                }
+            }
+            idx++;
+        }
+        return str;
+    }
+
+    /**
+     * Rearrange String k Distance Apart
+     * Given a non-empty string str and an integer k, rearrange the string such that the same characters are at least distance k from each other.
+     * All input strings are given in lowercase letters. If it is not possible to rearrange the string, return an empty string "".
+     * Example 1:
+     * str = "aabbcc", k = 3
+     * Result: "abcabc"
+     * The same letters are at least distance 3 from each other.
+     *         Example 2:
+     * str = "aaabc", k = 3
+     * Answer: ""
+     * It is not possible to rearrange the string.
+     * Example 3:
+     * str = "aaadbbcc", k = 2
+     * Answer: "abacabcd"
+     * Another possible answer is: "abcabcda"
+     * The same letters are at least distance 2 from each other.
+     */
+    public static void rearrangeStringDemo(String str, int k) {
+        System.out.println("\nStart function rearrangeStringDemo().");
+        System.out.println("\tStr: " + str);
+        System.out.println("\tK: " + k);
+
+//        rearrangeString(str, k);
+        rearrangeString2(str, k);
+    }
+    public static String rearrangeString(String str, int k) {
+        HashMap<Character, Integer> cnt = new HashMap<>();
+        HashMap<Character, LinkedList<Integer>> pos = new HashMap<>();
+        HashSet<Character> keys = new HashSet<>();
+
+        for (char c : str.toCharArray()) {
+            addToMap(cnt, c);
+            keys.add(c);
+        }
+        ArrayList<String> res = new ArrayList<>();
+        rearrangeStringDFS(k, cnt, pos, keys, "", 0, res);
+
+        System.out.println("\tRes: " + res);
+        if (res.isEmpty()) return "";
+        return res.get(0);
+    }
+    public static void rearrangeStringDFS(int k, HashMap<Character, Integer> cnt, HashMap<Character, LinkedList<Integer>> pos, HashSet<Character> keys, String tmp, int idx, ArrayList<String> res) {
+        if (!res.isEmpty()) {
+            return;
+        }
+        if (cnt.isEmpty()) {
+            res.add(tmp);
+            return;
+        }
+
+        for (Character c : keys) {
+            if (cnt.containsKey(c) && (!pos.containsKey(c) || (pos.containsKey(c) && idx - pos.get(c).getLast() >= k))) {
+                removeFromMap(cnt, c);
+                addToMapList(pos, c, idx);
+                rearrangeStringDFS(k, cnt, pos, keys, tmp + c, idx + 1, res);
+                if (!res.isEmpty()) return;
+                removeFromMapList(pos, c);
+                addToMap(cnt, c);
+            }
+        }
+    }
+    public static String rearrangeString2(String str, int k) {
+        HashMap<Character, Integer> cnt = new HashMap<>();
+        HashMap<Character, LinkedList<Integer>> pos = new HashMap<>();
+
+        for (char c : str.toCharArray()) {
+            addToMap(cnt, c);
+        }
+        ArrayList<String> res = new ArrayList<>();
+        rearrangeStringDFS2(str.length(), k, cnt, pos, "", 0, res);
+
+        System.out.println("\tRes: " + res);
+        if (res.isEmpty()) return "";
+        return res.get(0);
+    }
+    public static void rearrangeStringDFS2(int len, int k, HashMap<Character, Integer> cnt, HashMap<Character, LinkedList<Integer>> pos, String tmp, int idx, ArrayList<String> res) {
+        if (!res.isEmpty()) {
+            return;
+        }
+        if (len == idx) {
+            res.add(tmp);
+            return;
+        }
+
+        for (Character c : cnt.keySet()) {
+            if (cnt.get(c) > 0 && (!pos.containsKey(c) || (pos.containsKey(c) && !pos.get(c).isEmpty() && idx - pos.get(c).getLast() >= k))) {
+                removeFromMap2(cnt, c);
+                addToMapList(pos, c, idx);
+                rearrangeStringDFS2(len, k, cnt, pos, tmp + c, idx + 1, res);
+                if (!res.isEmpty()) return;
+                removeFromMapList2(pos, c);
+                addToMap(cnt, c);
+            }
+        }
+    }
+    private static void addToMap(HashMap<Character, Integer> map, Character c) {
+        if (map.containsKey(c)) {
+            map.put(c, map.get(c) + 1);
+        } else {
+            map.put(c, 1);
+        }
+    }
+    private static void removeFromMap(HashMap<Character, Integer> map, Character c) {
+        if (map.containsKey(c)) {
+            map.put(c, map.get(c) - 1);
+            if (map.get(c) == 0) {
+                map.remove(c);
+            }
+        }
+    }
+    private static void removeFromMap2(HashMap<Character, Integer> map, Character c) {
+        if (map.containsKey(c)) {
+            map.put(c, map.get(c) - 1);
+        }
+    }
+    private static void addToMapList(HashMap<Character, LinkedList<Integer>> map, Character c, Integer i) {
+        if (!map.containsKey(c)) {
+            LinkedList<Integer> t = new LinkedList<>();
+            map.put(c, t);
+        }
+        map.get(c).add(i);
+    }
+    private static void removeFromMapList(HashMap<Character, LinkedList<Integer>> map, Character c) {
+        if (map.containsKey(c)) {
+            if (!map.get(c).isEmpty()) {
+                map.get(c).removeLast();
+            }
+            if (map.get(c).isEmpty()) {
+                map.remove(c);
+            }
+        }
+    }
+    private static void removeFromMapList2(HashMap<Character, LinkedList<Integer>> map, Character c) {
+        if (map.containsKey(c)) {
+            if (!map.get(c).isEmpty()) {
+                map.get(c).removeLast();
+            }
+        }
+    }
+
+//    /**
+//     * Longest Common Prefix
+//     *
+//     * Write a function to find the longest common prefix string amongst an array of strings.
+//     */
+//    public static String longestCommonPrefix(String[] strs) {
+//        Trie trie = new Trie();
+//        String minStr = "";
+//        int minLen = Integer.MAX_VALUE;
+//        for (String s : strs) {
+//            if (s.length() < minLen) {
+//                minLen = s.length();
+//                minStr = s;
+//            }
+//            trie.insert(s);
+//        }
+//        for (int cut = minLen; cut > 0; cut--) {
+//            String prefix = minStr.substring(0, cut);
+//            for ()
+//        }
+//    }
 
     /**
      * Count The Repetitions

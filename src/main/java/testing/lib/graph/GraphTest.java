@@ -4,9 +4,13 @@ import java.util.Comparator;
 import java.util.*;
 import java.util.Iterator;
 import java.util.PriorityQueue;
+//import java.util.stream.Sink;
 
 import javafx.scene.layout.Priority;
+import testing.lib.array.ArrayTest;
 import testing.lib.node.GraphNode;
+import testing.lib.node.NestedListNode;
+
 import static testing.lib.common.CommonUtils.printArray;
 import static testing.lib.common.CommonUtils.printTwoDimentinalArray;
 
@@ -159,7 +163,7 @@ public class GraphTest <T extends Number> {
         else return true;
     }
 
-    public int[] findOrder(int numCourses, int[][] prerequisites) {
+    public static int[] findOrder(int numCourses, int[][] prerequisites) {
         if (numCourses <= 1) return new int[]{0};
         int R = prerequisites.length;
         if (R == 0) {
@@ -222,6 +226,50 @@ public class GraphTest <T extends Number> {
         for(int n : schedule) {
             order[i++] = n;
         }
+        return order;
+    }
+
+    public static int[] findOrder2(int numCourses, int[][] prerequisites) {
+        if (numCourses <= 1) return new int[]{0};
+        int R = prerequisites.length;
+        if (R == 0) {
+            int[] order = new int[numCourses];
+            for(int i = 0; i < numCourses; i++)
+                order[i] = i;
+            return order;
+        }
+        HashMap<Integer, HashSet<Integer>> S2D = new HashMap<>();
+        HashMap<Integer, HashSet<Integer>> D2S = new HashMap<>();
+
+        for (int[] pre : prerequisites) {
+            int D = pre[0];
+            int S = pre[1];
+            addToMap(S, D, S2D);
+            addToMap(D, S, D2S);
+        }
+        Queue<Integer> Q = new LinkedList<>();
+        for (int i = 0; i < numCourses; i++) {
+            if (!D2S.containsKey(i)) {
+                Q.add(i);
+            }
+        }
+
+        int[] order = new int[numCourses];
+        int idx = 0;
+        while (!Q.isEmpty()) {
+            int cur = Q.poll();
+            order[idx++] = cur;
+            if (S2D.containsKey(cur)) {
+                for (int d : S2D.get(cur)) {
+                    removeFromMap(d, cur, D2S);
+                    if (D2S.get(d).isEmpty()) {
+                        D2S.remove(d);
+                        Q.add(d);
+                    }
+                }
+            }
+        }
+        if (!D2S.isEmpty()) return new int[]{};
         return order;
     }
 
@@ -408,12 +456,12 @@ public class GraphTest <T extends Number> {
      *         2. If the order is invalid, return an empty string.
      *         3. There may be multiple valid order of letters, return any one of them is fine.
      */
+    // Topology sort
     public static void alienOrderDemo(String[] words) {
-        System.out.println("\nStart function alienOrder()");
+        System.out.println("\nStart function alienOrderDemo()");
         printArray(words, "\tWords");
 
         System.out.println("\tRes = " + alienOrder(words));
-
     }
     public static String alienOrder(String[] words) {
         HashMap<Character, HashSet<Character>> before = new HashMap<>();
@@ -526,11 +574,10 @@ public class GraphTest <T extends Number> {
     }
 
     public static void alienOrderDemo2(String[] words) {
-        System.out.println("\nStart function alienOrder()");
+        System.out.println("\nStart function alienOrderDemo2()");
         printArray(words, "\tWords");
 
         System.out.println("\tRes = " + alienOrder2(words));
-
     }
     private static class Node {
         public int degree;
@@ -596,5 +643,694 @@ public class GraphTest <T extends Number> {
     }
     public static int charToInt(char ch) {
         return ch - 'a';
+    }
+
+    public static void alienOrderDemo3(String[] words) {
+        System.out.println("\nStart function alienOrderDemo3()");
+        printArray(words, "\tWords");
+
+        System.out.println("\tRes = " + alienOrder3(words));
+    }
+    public static String alienOrder3(String[] words) {
+        HashMap<Character, HashSet<Character>> S2D = new HashMap<>();
+        HashMap<Character, HashSet<Character>> D2S = new HashMap<>();
+        HashSet<Character> set = new HashSet<>();
+
+        for (int i = 0; i < words.length; i++) {
+            for (int j = 0; j < words[i].length(); j++) {
+                set.add(words[i].charAt(j));
+            }
+            Character S = 0, D = 0;
+            if (i != words.length - 1) {
+                for (int j = 0; j < Math.min(words[i].length(), words[i + 1].length()); j++) {
+                    if (words[i].charAt(j) != words[i + 1].charAt(j)) {
+                        S = words[i].charAt(j);
+                        D = words[i + 1].charAt(j);
+                        break;
+                    }
+                }
+            }
+            if (S != D) {
+                addToMap(S, D, S2D);
+                addToMap(D, S, D2S);
+            }
+        }
+
+        Queue<Character> Q = new LinkedList<>();
+        for (Character c : set) {
+            if (!D2S.containsKey(c) || D2S.get(c).isEmpty()) {
+                Q.add(c);
+            }
+        }
+        StringBuilder sb = new StringBuilder();
+        while (!Q.isEmpty()) {
+            Character cur = Q.poll();
+            if (D2S.containsKey(cur)) {
+                D2S.remove(cur);
+            }
+            sb.append(cur);
+            if (S2D.containsKey(cur)) {
+                for (Character d : S2D.get(cur)) {
+                    removeFromMap(d, cur, D2S);
+                    if (D2S.get(d).isEmpty()) {
+//                        D2S.remove(d);
+                        Q.add(d);
+                    }
+                }
+            }
+        }
+        if (!D2S.isEmpty()) {
+            return "";
+        }
+        return sb.toString();
+    }
+    private static void addToMap(Character k, Character v, HashMap<Character, HashSet<Character>> map) {
+        if (map.containsKey(k) && v != null) {
+            map.get(k).add(v);
+        } else if (!map.containsKey(k)) {
+            HashSet<Character> set = new HashSet<>();
+            if (v != null) {
+                set.add(v);
+            }
+            map.put(k, set);
+        }
+    }
+    private static void removeFromMap(Character k, Character v, HashMap<Character, HashSet<Character>> map) {
+        if (map.containsKey(k) && map.get(k).contains(v)) {
+            map.get(k).remove(v);
+        }
+    }
+
+    /**
+     * given a tree:
+     *
+     *               n
+     *               |
+     *       n - n - n - n - n
+     *       |               |
+     *     n - n         n ----- n
+     *     |   |         |       |
+     * n - n   n - n     n   n - n - n
+     * .   .   .   .     .   .   .   .
+     * .   .   .   .     .   .   .   .
+     * .   .   .   .     .   .   .   .
+     *
+     *
+     * the tree is n-airy and acyclic.
+     *
+     * a NestedListNode (n) is defined as:
+     *
+     * --------------------------------------------------------------------
+     *
+     * import java.util.LinkedList;
+     *
+     * public class NestedListNode extends LinkedList<NestedListNode> {
+     *     private String value = "";
+     *
+     *     public NestedListNode(String value) {
+     *         this.value = value;
+     *     }
+     *
+     *     public String getValue() { return this.value; }
+     * }
+     *
+     * --------------------------------------------------------------------
+     * Example ordering of Depth First Walk:
+     *
+     *                 1
+     *                 |
+     *         2 - 9 - 10 - 11 - 12
+     *         |                  |
+     *       3 - 6           13 ----- 15
+     *       |   |           |         |
+     *   4 - 5   7 - 8       14   16 - 17 - 18
+     *
+     * --------------------------------------------------------------------
+     *
+     * Please provide a:
+     * Depth First Walk Function - recursive
+     * Depth First Walk Function - non-recursive
+     * Breadth First Walk Function
+     *
+     * Let's discuss access efficiency
+     *
+     * No need for ceremony, classes, etc.
+     */
+    public void nestedListDFS(NestedListNode root) {
+        if (root == null) {
+            return;
+        }
+        System.out.println(root.getValue());
+
+        Iterator<NestedListNode> iter = root.iterator();
+        while (iter.hasNext()) {
+            nestedListDFS(iter.next());
+        }
+    }
+
+    public void nestedListDFSIterative(NestedListNode root) {
+        if (root == null) {
+            return;
+        }
+        System.out.println(root.getValue());
+
+        Stack<Iterator<NestedListNode>> S = new Stack<>();
+        Iterator<NestedListNode> iter = root.iterator();
+        while (true) {
+            while (iter.hasNext()) {
+                NestedListNode temp = iter.next();
+                System.out.println(temp.getValue());
+                S.push(iter);
+                iter = temp.iterator();
+            }
+            if (S.isEmpty()) {
+                break;
+            } else {
+                iter = S.pop();
+            }
+        }
+    }
+
+    public void nestedListBFS(NestedListNode root) {
+        if (root == null) {
+            return;
+        }
+
+        Queue<NestedListNode> Q = new LinkedList<>();
+        Q.add(root);
+
+        while (!Q.isEmpty()) {
+            NestedListNode cur = Q.poll();
+            System.out.println(cur.getValue());
+
+            Iterator<NestedListNode> iter = cur.iterator();
+            while (iter.hasNext()) {
+                Q.add(iter.next());
+            }
+        }
+    }
+
+    /**
+     * Number of Connected Components in an Undirected Graph
+     * Given n nodes labeled from 0 to n - 1 and a list of undirected edges (each edge is a pair of nodes), write a function to find the number of connected components in an undirected graph.
+     * Example 1:
+     *         0          3
+     *         |          |
+     *         1 --- 2    4
+     * Given n = 5 and edges = [[0, 1], [1, 2], [3, 4]], return 2.
+     * Example 2:
+     *         0           4
+     *         |           |
+     *         1 --- 2 --- 3
+     * Given n = 5 and edges = [[0, 1], [1, 2], [2, 3], [3, 4]], return 1.
+     * Note:
+     * You can assume that no duplicate edges will appear in edges. Since all edges are undirected, [0, 1] is the same as [1, 0] and thus will not appear together in edges.
+     */
+    public static int countComponents(int n, int[][] edges) {
+        System.out.println("\nStart function countComponents()");
+        System.out.println("\tN = " + n);
+        printTwoDimentinalArray(edges, "\tEdges:");
+
+        HashMap<Integer, HashSet<Integer>> G = new HashMap<>();
+        HashSet<Integer> notHandled = new HashSet<>();
+        for (int i = 0; i < n; i++) {
+            G.put(i, new HashSet<>());
+            notHandled.add(i);
+        }
+        for (int[] edge : edges) {
+            G.get(edge[0]).add(edge[1]);
+            G.get(edge[1]).add(edge[0]);
+        }
+
+        int cnt = 0;
+        for (int i = 0; i < n; i++) {
+            if (notHandled.contains(i)) {
+                Queue<Integer> Q = new LinkedList<>();
+                Q.add(i);
+                notHandled.remove(i);
+
+                while(!Q.isEmpty()) {
+                    int cur = Q.poll();
+                    notHandled.remove(cur);
+                    for (int nb : G.get(cur)) {
+                        if (notHandled.contains(nb)) {
+                            Q.add(nb);
+                            notHandled.remove(nb);
+                        }
+                    }
+                }
+                cnt++;
+            }
+        }
+
+        System.out.println("\tCnt = " + cnt);
+        return cnt;
+    }
+
+    public static boolean validTree(int n, int[][] edges) {
+        System.out.println("\nStart function validTree()");
+        System.out.println("\tN = " + n);
+        printTwoDimentinalArray(edges, "\tEdges:");
+
+        HashMap<Integer, HashSet<Integer>> G = new HashMap<>();
+        HashSet<Integer> notHandled = new HashSet<>();
+        HashSet<String> es = new HashSet<>();
+        for (int i = 0; i < n; i++) {
+            G.put(i, new HashSet<>());
+            notHandled.add(i);
+        }
+        for (int[] edge : edges) {
+            G.get(edge[0]).add(edge[1]);
+            G.get(edge[1]).add(edge[0]);
+            es.add(edge[0] < edge[1] ? edge[0] + ":" + edge[1] : edge[1] + ":" + edge[0]);
+        }
+
+        for (int i = 0; i < n; i++) {
+            if (notHandled.contains(i)) {
+                Queue<Integer> Q = new LinkedList<>();
+                Q.add(i);
+                notHandled.remove(i);
+
+                while(!Q.isEmpty()) {
+                    int cur = Q.poll();
+                    for (int nb : G.get(cur)) {
+                        if (notHandled.contains(nb)) {
+                            Q.add(nb);
+                            notHandled.remove(nb);
+                            String e = cur < nb ? cur + ":" + nb : nb + ":" + cur;
+                            es.remove(e);
+                        }
+                    }
+                }
+            }
+        }
+
+        System.out.println("\tCnt = " + es.isEmpty());
+        return es.isEmpty();
+    }
+    public static boolean validTree2(int n, int[][] edges) {
+        System.out.println("\nStart function validTree()");
+        System.out.println("\tN = " + n);
+        printTwoDimentinalArray(edges, "\tEdges:");
+
+        HashMap<Integer, HashSet<Integer>> G = new HashMap<>();
+        HashSet<Integer> notHandled = new HashSet<>();
+        HashSet<String> es = new HashSet<>();
+        for (int i = 0; i < n; i++) {
+            G.put(i, new HashSet<>());
+            notHandled.add(i);
+        }
+        for (int[] edge : edges) {
+            G.get(edge[0]).add(edge[1]);
+            G.get(edge[1]).add(edge[0]);
+            es.add(edge[0] < edge[1] ? edge[0] + ":" + edge[1] : edge[1] + ":" + edge[0]);
+        }
+
+        Queue<Integer> Q = new LinkedList<>();
+        Q.add(0);
+        notHandled.remove(0);
+
+        while(!Q.isEmpty()) {
+            int cur = Q.poll();
+            for (int nb : G.get(cur)) {
+                if (notHandled.contains(nb)) {
+                    Q.add(nb);
+                    notHandled.remove(nb);
+                    String e = cur < nb ? cur + ":" + nb : nb + ":" + cur;
+                    es.remove(e);
+                }
+            }
+        }
+//        for (int i = 0; i < n; i++) {
+//            if (notHandled.contains(i)) {
+//                Queue<Integer> Q = new LinkedList<>();
+//                Q.add(i);
+//                notHandled.remove(i);
+//
+//                while(!Q.isEmpty()) {
+//                    int cur = Q.poll();
+//                    for (int nb : G.get(cur)) {
+//                        if (notHandled.contains(nb)) {
+//                            Q.add(nb);
+//                            notHandled.remove(nb);
+//                            String e = cur < nb ? cur + ":" + nb : nb + ":" + cur;
+//                            es.remove(e);
+//                        }
+//                    }
+//                }
+//            }
+//        }
+
+        System.out.println("\tCnt = " + es.isEmpty());
+        return es.isEmpty() && notHandled.isEmpty();
+    }
+
+    /**
+     * Sequence Reconstruction
+     * Check whether the original sequence org can be uniquely reconstructed from the sequences in seqs. The org sequence is a permutation of the integers from 1 to n, with 1 ≤ n ≤ 104. Reconstruction means building a shortest common supersequence of the sequences in seqs (i.e., a shortest sequence so that all sequences in seqs are subsequences of it). Determine whether there is only one sequence that can be reconstructed from seqs and it is the org sequence.
+     *
+     *         Example 1:
+     *
+     * Input:
+     * org: [1,2,3], seqs: [[1,2],[1,3]]
+     *
+     * Output:
+     *         false
+     *
+     * Explanation:
+     *         [1,2,3] is not the only one sequence that can be reconstructed, because [1,3,2] is also a valid sequence that can be reconstructed.
+     *         Example 2:
+     *
+     * Input:
+     * org: [1,2,3], seqs: [[1,2]]
+     *
+     * Output:
+     *         false
+     *
+     * Explanation:
+     * The reconstructed sequence can only be [1,2].
+     * Example 3:
+     *
+     * Input:
+     * org: [1,2,3], seqs: [[1,2],[1,3],[2,3]]
+     *
+     * Output:
+     *         true
+     *
+     * Explanation:
+     * The sequences [1,2], [1,3], and [2,3] can uniquely reconstruct the original sequence [1,2,3].
+     * Example 4:
+     *
+     * Input:
+     * org: [4,1,5,2,6,3], seqs: [[5,2,6,3],[4,1,5,2]]
+     *
+     * Output:
+     *         true
+     * UPDATE (2017/1/8):
+     * The seqs parameter had been changed to a list of list of strings (instead of a 2d array of strings). Please reload the code definition to get the latest changes.
+     */
+    // Topology sort
+    public static void sequenceReconstructionDemo(int[] org, List<List<Integer>> seqs) {
+        System.out.println("\nStart function sequenceReconstructionDemo()");
+        for (List<Integer> l : seqs) {
+            System.out.println("\t" + l);
+        }
+        printArray(org, "\tOrg:");
+        System.out.println("\tRes: " + sequenceReconstruction2(org, seqs));
+    }
+    public static boolean sequenceReconstruction(int[] org, List<List<Integer>> seqs) {
+        HashMap<Integer, HashSet<Integer>> depends = new HashMap<>();
+        HashMap<Integer, HashSet<Integer>> points = new HashMap<>();
+        for (List<Integer> list : seqs) {
+            if (list.isEmpty()) continue;
+            addToMap(list.get(0), null, depends);
+            for (int i = 1; i < list.size(); i++) {
+                int pre = list.get(i-1);
+                int cur = list.get(i);
+
+                addToMap(cur, pre, depends);
+                addToMap(pre, cur, points);
+            }
+        }
+        List<Integer> tmp = new LinkedList<>();
+        while (!depends.isEmpty()) {
+            List<Integer> next = new LinkedList<>();
+            for (int k : depends.keySet()) {
+                if (depends.get(k).isEmpty()) {
+                    next.add(k);
+                    if (next.size() > 1) {
+                        return false;
+                    }
+                }
+            }
+            if (next.isEmpty()) {
+                return org.length == 0;
+            }
+
+            int cur = next.get(0);
+            System.out.println("\tcur = " + cur);
+            tmp.add(cur);
+            depends.remove(cur);
+            if (points.containsKey(cur) && !points.get(cur).isEmpty()) {
+                for (int v : points.get(cur)) {
+                    removeFromMap(v, cur, depends);
+                }
+            }
+        }
+        System.out.println("\tTmp: " + tmp);
+        if (tmp.size() != org.length) {
+            return false;
+        }
+        for (int i = 0; i < tmp.size(); i++) {
+            if (tmp.get(i) != org[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+    private static void addToMap(Integer k, Integer v, HashMap<Integer, HashSet<Integer>> map) {
+        if (map.containsKey(k) && v != null) {
+            map.get(k).add(v);
+        } else if (!map.containsKey(k)) {
+            HashSet<Integer> set = new HashSet<>();
+            if (v != null) {
+                set.add(v);
+            }
+            map.put(k, set);
+        }
+    }
+    private static void removeFromMap(Integer k, Integer v, HashMap<Integer, HashSet<Integer>> map) {
+        if (map.containsKey(k) && map.get(k).contains(v)) {
+            map.get(k).remove(v);
+        }
+    }
+
+    private static void incMap(Integer k, HashMap<Integer, Integer> map) {
+        if (map.containsKey(k)) {
+            map.put(k, map.get(k) + 1);
+        } else {
+            map.put(k, 1);
+        }
+    }
+    private static void decMap(Integer k, HashMap<Integer, Integer> map) {
+        if (map.containsKey(k)) {
+            map.put(k, map.get(k) - 1);
+        }
+    }
+    // Passed
+    // Queue才是王道!!!
+    public static boolean sequenceReconstruction2(int[] org, List<List<Integer>> seqs) {
+        HashMap<Integer, HashSet<Integer>> depends = new HashMap<>();
+        HashMap<Integer, HashSet<Integer>> points = new HashMap<>();
+        for (List<Integer> list : seqs) {
+            if (list.isEmpty()) continue;
+            addToMap(list.get(0), null, depends);
+            for (int i = 1; i < list.size(); i++) {
+                int pre = list.get(i-1);
+                int cur = list.get(i);
+
+                addToMap(cur, pre, depends);
+                addToMap(pre, cur, points);
+            }
+        }
+        Queue<Integer> Q = new LinkedList<>();
+        for (int k : depends.keySet()) {
+            if (depends.get(k).isEmpty()) {
+                Q.add(k);
+            }
+        }
+        int idx = 0;
+        while (!Q.isEmpty()) {
+            if (Q.size() > 1) {
+                return false;
+            }
+
+            int n = Q.poll();
+            if (idx >= org.length || n != org[idx]) {
+                return false;
+            }
+
+//            depends.remove(n);
+            if (points.containsKey(n) && !points.get(n).isEmpty()) {
+                for (int v : points.get(n)) {
+                    removeFromMap(v, n, depends);
+                    if (depends.get(v).isEmpty()) {
+                        Q.offer(v);
+                    }
+                }
+            }
+            idx++;
+        }
+//        return idx == org.length && depends.isEmpty();
+        return idx == org.length && idx == depends.size();
+    }
+    // Timed out
+    public static boolean sequenceReconstruction3(int[] org, List<List<Integer>> seqs) {
+        HashMap<Integer, HashSet<Integer>> depends = new HashMap<>();
+        HashMap<Integer, HashSet<Integer>> points = new HashMap<>();
+        HashMap<Integer, Integer> inorder = new HashMap<>();
+        for (List<Integer> list : seqs) {
+            if (list.isEmpty()) continue;
+            addToMap(list.get(0), null, depends);
+            for (int i = 1; i < list.size(); i++) {
+                int pre = list.get(i-1);
+                int cur = list.get(i);
+
+                addToMap(cur, pre, depends);
+                addToMap(pre, cur, points);
+            }
+        }
+        List<Integer> tmp = new LinkedList<>();
+        List<Integer> cur = new LinkedList<>();
+        for(int k : depends.keySet()) {
+            int cnt = depends.get(k).size();
+            inorder.put(k, cnt);
+            if (cnt == 0) {
+                cur.add(k);
+            }
+        }
+        while (!cur.isEmpty()) {
+            List<Integer> next = new LinkedList<>();
+
+            if (cur.size() > 1) {
+                return false;
+            }
+
+            int n = cur.get(0);
+            tmp.add(n);
+            if (n != org[tmp.size() - 1]) {
+                return false;
+            }
+
+            inorder.remove(n);
+            if (points.containsKey(n) && !points.get(n).isEmpty()) {
+                for (int v : points.get(n)) {
+                    decMap(v, inorder);
+                    if (inorder.get(v) == 0) {
+                        next.add(v);
+                    }
+                }
+            }
+            cur.clear();
+            cur.addAll(next);
+        }
+        System.out.println("\tTmp: " + tmp);
+        if (tmp.size() != org.length) {
+            return false;
+        }
+        for (int i = 0; i < tmp.size(); i++) {
+            if (tmp.get(i) != org[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Evaluate Division
+     * Equations are given in the format A / B = k, where A and B are variables represented as strings, and k is a real number (floating point number). Given some queries, return the answers. If the answer does not exist, return -1.0.
+     * Example:
+     * Given a / b = 2.0, b / c = 3.0. 
+     * queries are: a / c = ?, b / a = ?, a / e = ?, a / a = ?, x / x = ? . 
+     *         return [6.0, 0.5, -1.0, 1.0, -1.0 ].
+     * The input is: vector<pair<string, string>> equations, vector<double>& values, vector<pair<string, string>> queries , where equations.size() == values.size(), and the values are positive. This represents the equations. Return vector<double>.
+     * According to the example above:
+     * equations = [ ["a", "b"], ["b", "c"] ],
+     * values = [2.0, 3.0],
+     * queries = [ ["a", "c"], ["b", "a"], ["a", "e"], ["a", "a"], ["x", "x"] ].
+     * The input is always valid. You may assume that evaluating the queries will result in no division by zero and there is no contradiction.
+     */
+    public static double[] calcEquation(String[][] equations, double[] values, String[][] queries) {
+        System.out.println("\nStart function calcEquation()");
+        for (int i = 0; i < values.length; i++) {
+            System.out.println("\t" + equations[i][0] + " / " + equations[i][1] + " = " + values[i]);
+        }
+        HashMap<String, Double> map = new HashMap<>();
+        HashMap<String, HashSet<String>> Dd2Dv = new HashMap<>();
+
+        for (int i = 0; i < equations.length; i++) {
+            String dd = equations[i][0];
+            String dv = equations[i][1];
+            map.put(dd+"/"+dv, values[i]);
+            map.put(dv+"/"+dd, 1.0/values[i]);
+            if (!Dd2Dv.containsKey(dd)) {
+                HashSet<String> newSet = new HashSet<>();
+                newSet.add(dv);
+                Dd2Dv.put(dd, newSet);
+            } else {
+                Dd2Dv.get(dd).add(dv);
+            }
+            if (!Dd2Dv.containsKey(dv)) {
+                HashSet<String> newSet = new HashSet<>();
+                newSet.add(dd);
+                Dd2Dv.put(dv, newSet);
+            } else {
+                Dd2Dv.get(dv).add(dd);
+            }
+        }
+
+        double[] res = new double[queries.length];
+        Arrays.fill(res, -1.0);
+        for (int i = 0; i < queries.length; i++) {
+            String dd = queries[i][0];
+            String dv = queries[i][1];
+            String exp = dd+"/"+dv;
+            if (map.containsKey(exp)) {
+                res[i] = map.get(exp);
+            } else {
+                if (!Dd2Dv.containsKey(dd)) {
+                    continue;
+                } else if (dd.equals(dv)) {
+                    res[i] = 1.0;
+                } else {
+                    res[i] = getPath(map, Dd2Dv, dd, dv);
+                }
+            }
+        }
+        System.out.println("\tResults:");
+        for (int i = 0; i < queries.length; i++) {
+            System.out.println("\t" + queries[i][0] + " / " + queries[i][1] + " = " + res[i]);
+        }
+        return res;
+    }
+    private static double getPath(HashMap<String, Double> map, HashMap<String, HashSet<String>> Dd2Dv, String start, String end) {
+        Queue<LinkedList<String>> Q = new LinkedList<>();
+        HashSet<String> visited = new HashSet<>();
+        LinkedList<String> list = new LinkedList<>();
+        list.add(start);
+        Q.add(list);
+        while(!Q.isEmpty()) {
+            int size = Q.size();
+            while (size-- > 0) {
+                LinkedList<String> tmpList = Q.poll();
+                if (tmpList.getLast().equals(end)) {
+                    return getValFromPath(map, tmpList);
+                } else {
+                    visited.add(tmpList.getLast());
+                    for (String divisor : Dd2Dv.get(tmpList.getLast())) {
+                        if (!visited.contains(divisor)) {
+                            LinkedList<String> tmpList2 = new LinkedList<>(tmpList);
+                            tmpList2.add(divisor);
+                            Q.add(tmpList2);
+                        }
+                    }
+                }
+            }
+        }
+        return -1.0;
+    }
+    private static double getValFromPath(HashMap<String, Double> map, LinkedList<String> tmpList) {
+        double res = 1.0;
+        String dd = null;
+        for (String str : tmpList) {
+            if (dd == null) {
+                dd = str;
+            } else {
+                String exp = dd + "/" + str;
+                res *= map.get(exp);
+                dd = str;
+            }
+        }
+        return res;
     }
 }

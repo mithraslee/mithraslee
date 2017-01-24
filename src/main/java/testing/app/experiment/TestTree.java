@@ -260,5 +260,17 @@ public class TestTree {
         root9.right = new TreeNodeInt(5);
         root9.right.right = new TreeNodeInt(5);
         System.out.println(Tree.countUnivalSubtrees2(root9));
+
+        System.out.println();
+        System.out.println("Test verifyPreorder");
+        List<Integer> preorder = ti2.preorder();
+        int[] preorderArr = new int[preorder.size()];
+        int idx = 0;
+        for (int i : preorder) {
+            preorderArr[idx++] = i;
+        }
+        System.out.println("\t" + Tree.verifyPreorder(preorderArr));
+        System.out.println("\t" + Tree.verifyPreorder(new int[]{2, 1, 3}));
+        System.out.println("\t" + Tree.verifyPreorder(new int[]{3, 1, 2}));
     }
 }

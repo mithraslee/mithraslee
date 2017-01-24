@@ -1169,6 +1169,24 @@ public class Tree <T extends Number> {
         return new Sum(node.val + leftVal.noCurrent + rightVal.noCurrent,
                 Math.max(leftVal.withCurrent, leftVal.noCurrent) + Math.max(rightVal.withCurrent, rightVal.noCurrent));
     }
+    public static int rob2(TreeNodeInt root) {
+        if (root == null) return 0;
+
+        int[] res = robHelper2(root);
+
+        return Math.max(res[0], res[1]);
+    }
+
+    private static int[] robHelper2(TreeNodeInt node) {
+        if (node == null) return new int[]{0, 0};
+        if (node.left == null && node.right == null) return new int[]{node.val, 0};
+
+        int[] leftVal = robHelper2(node.left);
+        int[] rightVal = robHelper2(node.right);
+
+        return new int[]{node.val + leftVal[1] + rightVal[1],
+                Math.max(leftVal[0], leftVal[1]) + Math.max(rightVal[0], rightVal[1])};
+    }
 
     /**
      * Binary Tree Paths
@@ -2095,5 +2113,35 @@ public class Tree <T extends Number> {
             res.add(p.getValue());
         }
         return res;
+    }
+
+    /**
+     * Verify Preorder Sequence in Binary Search Tree
+     * Given an array of numbers, verify whether it is the correct preorder traversal sequence of a binary search tree.
+     * You may assume each number in the sequence is unique.
+     * Follow up:
+     * Could you do it using only constant space complexity?
+     */
+    public static boolean verifyPreorder(int[] preorder) {
+        int len = preorder.length;
+        if (len <= 2) return true;
+
+        return verifyPreorder(preorder, 0, len - 1);
+    }
+    private static boolean verifyPreorder(int[] preorder, int left, int right) {
+        if (right - left + 1 <= 2) return true;
+        if (left > right) return true;
+        int first = preorder[left];
+
+        int cut = left + 1;
+        while (cut <= right && preorder[cut] < first) {
+            cut++;
+        }
+        for (int i = cut; i <= right; i++) {
+            if (preorder[i] <= first) {
+                return false;
+            }
+        }
+        return verifyPreorder(preorder, left + 1, cut - 1) && verifyPreorder(preorder, cut, right);
     }
 }

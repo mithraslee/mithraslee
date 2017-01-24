@@ -7781,6 +7781,68 @@ public class ArrayTest <T extends Number> {
         }
     }
 
+    public static List<Integer> numIslands2(int m, int n, int[][] positions) {
+        System.out.println("\nStart function numIslands2()");
+        System.out.println("\tm = " + m + "; n = " + n);
+        printTwoDimentinalArray(positions, "\tPositions");
+
+        HashMap<Integer, HashSet<Point>> id2ps = new HashMap<>();
+        HashMap<Point, Integer> p2id = new HashMap<>();
+        HashSet<Point> used = new HashSet<>();
+
+        int[][] dirs = new int[][]{
+                {-1, 0},{1, 0},{0, -1},{0, 1}
+        };
+
+        int id = 0;
+        List<Integer> res = new ArrayList<>();
+        for (int[] p : positions) {
+            if (p[0] >= 0 && p[0] < m && p[1] >= 0 && p[1] < n) {
+                Point newP = new Point(p[0], p[1]);
+                if (!used.contains(newP)) {
+                    HashSet<Integer> neighborIds = new HashSet<>();
+                    for (int[] dir : dirs) {
+                        int x = newP.i + dir[0];
+                        int y = newP.j + dir[1];
+                        if (x >= 0 && x < m && y >= 0 && y < n) {
+                            Point np = new Point(x, y);
+                            if (p2id.containsKey(np)) {
+                                neighborIds.add(p2id.get(np));
+                            }
+                        }
+                    }
+                    if (neighborIds.size() == 1) {
+                        int nid = neighborIds.iterator().next();
+                        p2id.put(newP, nid);
+                        id2ps.get(nid).add(newP);
+                    } else {
+                        p2id.put(newP, id);
+                        HashSet<Point> newSet = new HashSet<>();
+                        newSet.add(newP);
+                        for (int nid : neighborIds) {
+                            for (Point np : id2ps.get(nid)) {
+                                p2id.put(np, id);
+                                newSet.add(np);
+                            }
+                            id2ps.remove(nid);
+                        }
+                        id2ps.put(id, newSet);
+                        id++;
+                    }
+                    used.add(newP);
+                }
+//                HashSet<Integer> tmp = new HashSet<>();
+//                for (int v : p2id.values()) {
+//                    tmp.add(v);
+//                }
+//                res.add(tmp.size());
+                res.add(id2ps.size());
+            }
+        }
+        System.out.println("\tRes = " + res);
+        return res;
+    }
+
     /**
      * Trapping Rain Water II
      * Given an m x n matrix of positive integers representing the height of each unit cell in a 2D elevation map, compute the volume of water it is able to trap after raining.
@@ -9191,6 +9253,7 @@ public class ArrayTest <T extends Number> {
      *         Person #2 gave person #0 $5.
      *         Therefore, person #1 only need to give person #0 $4, and all debt is settled.
      */
+    // This version is WRONG!!!
     public static int minTransfers(int[][] transactions) {
         System.out.println("\nStart function minTransfers().");
         printTwoDimentinalArray(transactions, "\tTransactions:");
@@ -9264,6 +9327,77 @@ public class ArrayTest <T extends Number> {
             }
         }
     }
+    public static int minTransfers2(int[][] transactions) {
+        System.out.println("\nStart function minTransfers2().");
+        printTwoDimentinalArray(transactions, "\tTransactions:");
+        HashMap<Integer, Integer> map = new HashMap<>();
+        for (int[] trans : transactions) {
+            int a = trans[0];
+            int b = trans[1];
+            int m = trans[2];
+            if (map.containsKey(a)) {
+                map.put(a, map.get(a) + m);
+            } else {
+                map.put(a, m);
+            }
+            if (map.containsKey(b)) {
+                map.put(b, map.get(b) - m);
+            } else {
+                map.put(b, -m);
+            }
+        }
+
+        ArrayList<Integer> nums = new ArrayList<>(map.values());
+
+        int res = minTransfersDFS(nums, 0, 0);
+        System.out.println("\tRes: " + res);
+        return res;
+    }
+    private static int minTransfersDFS(ArrayList<Integer> nums, int cur, int steps) {
+        int minSteps = Integer.MAX_VALUE;
+        while (cur < nums.size() && nums.get(cur) == 0) ++cur;
+        for (int i = cur + 1; i < nums.size(); i++) {
+            if (nums.get(cur) * nums.get(i) < 0) {
+                nums.set(i, nums.get(i) + nums.get(cur));
+                minSteps = Math.min(minSteps, minTransfersDFS(nums, cur + 1, steps + 1));
+                nums.set(i, nums.get(i) - nums.get(cur));
+            }
+        }
+        return minSteps == Integer.MAX_VALUE ? steps : minSteps;
+    }
+//    private static int minTransfersDFS(ArrayList<Integer> nums, int cur, int steps) {
+//        boolean valid = true;
+//
+//        int minSteps = Integer.MAX_VALUE;
+//        while (cur < nums.size() && nums.get(cur) == 0) ++cur;
+//        for (int i = cur; i < nums.size() - 1; i++) {
+//            if (nums.get(i) != 0) {
+//                valid = false;
+//                for (int j = i + 1; j < nums.size(); j++) {
+//                    int tmp = nums.get(j);
+//                    nums.set(i, nums.get(i) + tmp);
+//                    nums.set(j, 0);
+//                    int tmpSteps;
+////                    if (nums.get(i) == 0) {
+//                    tmpSteps = minTransfersDFS(nums, i + 1, steps + 1);
+////                    } else {
+////                        tmpSteps = minTransfersDFS(nums, i, steps + 1);
+////                    }
+//                    minSteps = Math.min(minSteps, tmpSteps);
+//                    nums.set(j, tmp);
+//                    nums.set(i, nums.get(i) - tmp);
+//                    if (minSteps == steps + 1) {
+//                        return minSteps;
+//                    }
+//                }
+//            }
+//        }
+//        if (valid) {
+//            return steps;
+//        } else {
+//            return minSteps;
+//        }
+//    }
 
     /**
      * Russian Doll Envelopes
@@ -9765,7 +9899,9 @@ public class ArrayTest <T extends Number> {
      *         Note:
      * n and k are non-negative integers.
      */
-    public int numWays(int n, int k) {
+    public static int numWays(int n, int k) {
+        System.out.println("\nStart function numWays().");
+        System.out.println("\tN = " + n + "; k = " + k);
         if (n == 0) return 0;
         int same = 0, diff = k, res = same + diff;
         for (int i = 2; i <= n; i++) {
@@ -9773,7 +9909,696 @@ public class ArrayTest <T extends Number> {
             diff = res * (k - 1);
             res = same + diff;
         }
+        System.out.println("\tRes = " + res);
         return res;
+    }
+    public static int numWays2(int n, int k) {
+        System.out.println("\nStart function numWays2().");
+        System.out.println("\tN = " + n + "; k = " + k);
+        if (n == 0) return 0;
+        int[] DP = new int[n];
+        DP[0] = k;
+        for (int i = 1; i < n; i++) {
+            DP[i] = DP[i-1] + DP[i-1] * (k-1);
+        }
+        System.out.println("\tRes = " + DP[n-1]);
+        return DP[n-1];
+    }
+
+    /**
+     * Walls and Gates
+     * You are given a m x n 2D grid initialized with these three possible values.
+     *  1. -1  - A wall or an obstacle.
+     *  2. 0   - A gate.
+     *  3. INF - Infinity means an empty room. We use the value 231 - 1 = 2147483647 to represent INF as you may assume that the distance to a gate is less than 2147483647.
+     * Fill each empty room with the distance to its nearest gate. If it is impossible to reach a gate, it should be filled with INF.
+     * For example, given the 2D grid:
+     * INF  -1  0  INF
+     * INF INF INF  -1
+     * INF  -1 INF  -1
+     *         0  -1 INF INF
+     * After running your function, the 2D grid should be:
+     *         3  -1   0   1
+     *         2   2   1  -1
+     *         1  -1   2  -1
+     *         0  -1   3   4
+     */
+    public static void wallsAndGates(int[][] rooms) {
+        System.out.println("\nStart function wallsAndGates()");
+        printTwoDimentinalArray(rooms, "\tRooms:");
+        int R = rooms.length;
+        if (R < 1) return;
+        int C = rooms[0].length;
+        if (C < 1) return;
+
+        int[][] dirs = new int[][]{
+                {-1, 0}, {1, 0}, {0, -1}, {0, 1}
+        };
+
+        Queue<Integer[]> Q = new LinkedList<>();
+        for (int i = 0; i < R; i++) {
+            for (int j = 0; j < C; j++) {
+                if (rooms[i][j] == 0) {
+                    Q.add(new Integer[]{i, j});
+                }
+            }
+        }
+
+        while (!Q.isEmpty()) {
+            Integer[] cur = Q.poll();
+            int val = rooms[cur[0]][cur[1]];
+            for (int[] dir : dirs) {
+                int x = cur[0] + dir[0];
+                int y = cur[1] + dir[1];
+                if (x >= 0 && x < R && y >= 0 && y < C && rooms[x][y] == Integer.MAX_VALUE) {
+                    rooms[x][y] = val + 1;
+                    Q.add(new Integer[]{x, y});
+                }
+            }
+        }
+        printTwoDimentinalArray(rooms, "\tRooms:");
+    }
+
+    /**
+     * Shortest Distance from All Buildings
+     * You want to build a house on an empty land which reaches all buildings in the shortest amount of distance. You can only move up, down, left and right. You are given a 2D grid of values 0, 1 or 2, where:
+     *         • Each 0 marks an empty land which you can pass by freely.
+     *         • Each 1 marks a building which you cannot pass through.
+     *         • Each 2 marks an obstacle which you cannot pass through.
+     * For example, given three buildings at (0,0), (0,4), (2,2), and an obstacle at (0,2):
+     *         1 - 0 - 2 - 0 - 1
+     *         |   |   |   |   |
+     *         0 - 0 - 0 - 0 - 0
+     *         |   |   |   |   |
+     *         0 - 0 - 1 - 0 - 0
+     * The point (1,2) is an ideal empty land to build a house, as the total travel distance of 3+3+1=7 is minimal. So return 7.
+     * Note:
+     * There will be at least one building. If it is not possible to build such house according to the above rules, return -1.
+     */
+    public static void shortestDistanceDemo(int[][] grid) {
+        System.out.println("\nStart function shortestDistanceDemo()");
+        printTwoDimentinalArray(grid, "\tGrid:");
+        System.out.println("\tRes = " + shortestDistance(grid));
+    }
+    public static int shortestDistance(int[][] grid) {
+        int R = grid.length;
+        if (R < 1) return -1;
+        int C = grid[0].length;
+        if (C < 1) return -1;
+
+//        int[][] sum = copyOfArray(grid);
+        int[][] sum = new int[R][C];
+        int[][] dirs = new int[][]{
+                {-1, 0},{1, 0},{0, -1},{0, 1}
+        };
+
+        int val = 0;
+        for (int i = 0; i < R; i++) {
+            for (int j = 0; j < C; j++) {
+                if (grid[i][j] == 1) {
+//                    int[][] dist = copyOfArray(grid);
+                    int[][] dist = new int[R][C];
+
+                    Queue<int[]> Q = new LinkedList<>();
+                    Q.add(new int[]{i, j});
+                    while (!Q.isEmpty()) {
+                        int[] cur = Q.poll();
+                        for (int[] dir : dirs) {
+                            int x = cur[0] + dir[0];
+                            int y = cur[1] + dir[1];
+                            if (x >= 0 && x < R && y >= 0 && y < C && grid[x][y] == val) {
+                                grid[x][y]--;
+                                dist[x][y] = dist[cur[0]][cur[1]] + 1;
+//                                sum[x][y] += dist[x][y] - 1;
+                                sum[x][y] += dist[x][y];
+                                Q.add(new int[]{x, y});
+                            }
+                        }
+                    }
+                    val--;
+                }
+            }
+        }
+        int res = Integer.MAX_VALUE;
+        for (int i = 0; i < R; i++) {
+            for (int j = 0; j < C; j++) {
+                if (grid[i][j] == val) {
+                    res = Math.min(res, sum[i][j]);
+                }
+            }
+        }
+        return res == Integer.MAX_VALUE ? -1 : res;
+    }
+    public static int[][] copyOfArray(int[][] arr) {
+        int R = arr.length;
+        int C = arr[0].length;
+
+        int[][] copy = new int[R][C];
+        for (int i = 0; i < R; i++) {
+            for (int j = 0; j < C; j++) {
+                copy[i][j] = arr[i][j];
+            }
+        }
+        return copy;
+    }
+
+
+    /**
+     * Bomb Enemy
+     * Given a 2D grid, each cell is either a wall 'W', an enemy 'E' or empty '0' (the number zero), return the maximum enemies you can kill using one bomb.
+     * The bomb kills all the enemies in the same row and column from the planted point until it hits the wall since the wall is too strong to be destroyed.
+     * Note that you can only put the bomb at an empty cell.
+     * Example:
+     * For the given grid
+0 E  * 0 0
+     * E 0 W E
+0 E  * 0 0
+     *         return 3. (Placing a bomb at (1,1) kills 3 enemies)
+     */
+    public int maxKilledEnemies(char[][] grid) {
+        int R = grid.length;
+        if (R < 1) return 0;
+        int C = grid[0].length;
+        if (C < 1) return 0;
+
+        int res = 0;
+        int rowCnt = 0;
+        int[] colCnt = new int[C];
+        for (int i = 0; i < R; i++) {
+            for (int j = 0; j < C; j++) {
+                if (j == 0 || grid[i][j-1] == 'W') {
+                    rowCnt = 0;
+                    for (int k = j; k < C && grid[i][k] != 'W'; k++) {
+                        if (grid[i][k] == 'E') {
+                            rowCnt++;
+                        }
+                    }
+                }
+
+                if (i == 0 || grid[i-1][j] == 'W') {
+                    colCnt[j] = 0;
+                    for (int k = i; k < R && grid[k][j] != 'W'; k++) {
+                        if (grid[k][j] == 'E') {
+                            colCnt[j]++;
+                        }
+                    }
+                }
+
+                if (grid[i][j] == '0') {
+                    res = Math.max(res, rowCnt + colCnt[j]);
+                }
+            }
+        }
+        return res;
+    }
+    public int maxKilledEnemies2(char[][] grid) {
+        int R = grid.length;
+        if (R < 1) return 0;
+        int C = grid[0].length;
+        if (C < 1) return 0;
+
+        int[][] l2r = new int[R][C];
+        int[][] r2l = new int[R][C];
+        int[][] t2d = new int[R][C];
+        int[][] d2t = new int[R][C];
+
+        for (int i = 0; i < R; i++) {
+            l2r[i][0] = grid[i][0] == 'E' ? 1 : 0;
+            for (int j = 1; j < C; j++) {
+                if (grid[i][j] == 'W') {
+                    l2r[i][j] = 0;
+                    continue;
+                }
+                l2r[i][j] = l2r[i][j-1];
+                if (grid[i][j] == 'E') {
+                    l2r[i][j]++;
+                }
+            }
+        }
+        for (int i = 0; i < R; i++) {
+            r2l[i][C-1] = grid[i][C-1] == 'E' ? 1 : 0;
+            for (int j = C-2; j >= 0; j--) {
+                if (grid[i][j] == 'W') {
+                    r2l[i][j] = 0;
+                    continue;
+                }
+                r2l[i][j] = r2l[i][j+1];
+                if (grid[i][j] == 'E') {
+                    r2l[i][j]++;
+                }
+            }
+        }
+        for (int j = 0; j < C; j++) {
+            t2d[0][j] = grid[0][j] == 'E' ? 1 : 0;
+            for (int i = 1; i < R; i++) {
+                if (grid[i][j] == 'W') {
+                    t2d[i][j] = 0;
+                    continue;
+                }
+                t2d[i][j] = t2d[i-1][j];
+                if (grid[i][j] == 'E') {
+                    t2d[i][j]++;
+                }
+            }
+        }
+        for (int j = 0; j < C; j++) {
+            d2t[R-1][j] = grid[R-1][j] == 'E' ? 1 : 0;
+            for (int i = R-2; i >= 0; i--) {
+                if (grid[i][j] == 'W') {
+                    d2t[i][j] = 0;
+                    continue;
+                }
+                d2t[i][j] = d2t[i+1][j];
+                if (grid[i][j] == 'E') {
+                    d2t[i][j]++;
+                }
+            }
+        }
+
+        int res = 0;
+        for (int i = 0; i < R; i++) {
+            for (int j = 0; j < C; j++) {
+                if (grid[i][j] == '0') {
+                    res = Math.max(res, l2r[i][j] + r2l[i][j] + t2d[i][j] + d2t[i][j]);
+                }
+            }
+        }
+        return res;
+    }
+
+    /**
+     * Max Consecutive Ones II
+     * Given a binary array, find the maximum number of consecutive 1s in this array if you can flip at most one 0.
+     * Example 1:
+     * Input: [1,0,1,1,0]
+     * Output: 4
+     * Explanation: Flip the first zero will get the the maximum number of consecutive 1s.
+     * After flipping, the maximum number of consecutive 1s is 4.
+     * Note:
+     *         • The input array will only contain 0 and 1.
+     *         • The length of input array is a positive integer and will not exceed 10,000
+     * Follow up:
+     * What if the input numbers come in one by one as an infinite stream? In other words, you can't store all numbers coming from the stream as it's too large to hold in memory. Could you solve it efficiently?
+     */
+    public int findMaxConsecutiveOnes(int[] nums) {
+        int len = nums.length;
+         if (len < 1) return 0;
+
+        int res = 0;
+        for (int i = 0, start = 0, pre = -1; i < len; i++) {
+            if (nums[i] == 0) {
+                if (pre == -1) {
+                    pre = i;
+                } else {
+                    start = pre + 1;
+                    pre = i;
+                }
+            }
+            res = Math.max(res, (i - start + 1));
+        }
+        return res;
+    }
+
+    public static int[] sortTransformedArray(int[] nums, int a, int b, int c) {
+        int len = nums.length;
+        int[] res = new int[len];
+
+        int idx = a >= 0 ? len - 1 : 0;
+        int i = 0, j = len - 1;
+        while (i <= j) {
+            if (a >= 0) {
+                res[idx--] = cal(nums[i], a, b, c) >= cal(nums[j], a, b, c) ? cal(nums[i++], a, b, c) : cal(nums[j--], a, b, c);
+            } else {
+                res[idx++] = cal(nums[i], a, b, c) >= cal(nums[j], a, b, c) ? cal(nums[j--], a, b, c) : cal(nums[i++], a, b, c);
+            }
+        }
+        return res;
+    }
+    private static int cal(int x, int a, int b, int c) {
+        return a * x * x + b * x + c;
+    }
+
+    /**
+     * Android Unlock Patterns
+     * Given an Android 3x3 key lock screen and two integers m and n, where 1 ≤ m ≤ n ≤ 9, count the total number of unlock patterns of the Android lock screen, which consist of minimum of m keys and maximum n keys.
+     *         Rules for a valid pattern:
+     *         1. Each pattern must connect at least m keys and at most n keys.
+     *         2. All the keys must be distinct.
+     *         3. If the line connecting two consecutive keys in the pattern passes through any other keys, the other keys must have previously selected in the pattern. No jumps through non selected key is allowed.
+     *         4. The order of keys used matters.
+     *
+     * Explanation:
+     *         | 1 | 2 | 3 |
+     *         | 4 | 5 | 6 |
+     *         | 7 | 8 | 9 |
+     * Invalid move: 4 - 1 - 3 - 6 
+     * Line 1 - 3 passes through key 2 which had not been selected in the pattern.
+     * Invalid move: 4 - 1 - 9 - 2
+     * Line 1 - 9 passes through key 5 which had not been selected in the pattern.
+     * Valid move: 2 - 4 - 1 - 3 - 6
+     * Line 1 - 3 is valid because it passes through key 2, which had been selected in the pattern
+     * Valid move: 6 - 5 - 4 - 1 - 9 - 2
+     * Line 1 - 9 is valid because it passes through key 5, which had been selected in the pattern.
+     *         Example:
+     * Given m = 1, n = 1, return 9.
+     */
+    public static int numberOfPatterns(int m, int n) {
+        System.out.println("\nStart function numberOfPatterns()");
+        System.out.println("\tM = " + m + "; N = " + n);
+
+        if (m < 1 || n < 1 || m > 9 || n > 9 || m > n) {
+            return 0;
+        }
+
+        ArrayList<LinkedList<Integer>> res = new ArrayList<>();
+        for (int i = 1; i <= 9; i++) {
+            LinkedList<Integer> tmp = new LinkedList<>();
+            HashSet<Integer> used = new HashSet<>();
+            used.add(i);
+            tmp.add(i);
+            numberOfPatternsDFS(tmp, used, m , n, res);
+            tmp.removeLast();
+            used.remove(i);
+        }
+
+        for (List<Integer> r : res) {
+            System.out.println("\t" + r);
+        }
+        System.out.println("\tRes = " + res.size());
+        return res.size();
+    }
+    private static void numberOfPatternsDFS(LinkedList<Integer> tmp, HashSet<Integer> used, int m, int n, ArrayList<LinkedList<Integer>> res) {
+        int len = tmp.size();
+        if (len >= m && len <= n) {
+            res.add(new LinkedList<>(tmp));
+        }
+        if (len >= n) {
+            return;
+        }
+        int last = tmp.getLast();
+        for (int i = 1; i <= 9; i++) {
+            if (used.contains(i)) {
+                continue;
+            }
+            int pi = (last-1) / 3;
+            int pj = (last-1) % 3;
+            int ci = (i-1) / 3;
+            int cj = (i-1) % 3;
+            int mid = (i + last)/2;
+            if (Math.abs(pi - ci)%2 == 0 && Math.abs(pj - cj)%2 == 0 && !used.contains(mid)) {
+                continue;
+            }
+            tmp.add(i);
+            used.add(i);
+            numberOfPatternsDFS(tmp, used, m , n, res);
+            used.remove(i);
+            tmp.removeLast();
+        }
+    }
+    public static int numberOfPatterns2(int m, int n) {
+        System.out.println("\nStart function numberOfPatterns()");
+        System.out.println("\tM = " + m + "; N = " + n);
+
+        if (m < 1 || n < 1 || m > 9 || n > 9 || m > n) {
+            return 0;
+        }
+
+        int[] nums = new int[]{1,2};
+        ArrayList<LinkedList<Integer>> res = new ArrayList<>();
+        for (int i : nums) {
+            LinkedList<Integer> tmp = new LinkedList<>();
+            HashSet<Integer> used = new HashSet<>();
+            used.add(i);
+            tmp.add(i);
+            numberOfPatternsDFS(tmp, used, m , n, res);
+            tmp.removeLast();
+            used.remove(i);
+        }
+        int cnt = res.size() * 4;
+        res.clear();
+        LinkedList<Integer> tmp = new LinkedList<>();
+        HashSet<Integer> used = new HashSet<>();
+        used.add(5);
+        tmp.add(5);
+        numberOfPatternsDFS(tmp, used, m , n, res);
+        tmp.removeLast();
+        used.remove(5);
+
+        cnt += res.size();
+//        for (List<Integer> r : res) {
+//            System.out.println("\t" + r);
+//        }
+        System.out.println("\tRes = " + cnt);
+        return cnt;
+    }
+
+
+    public static void isReflectedDemo(int[][] points) {
+        System.out.println("\nStart function numberOfPatterns()");
+        printTwoDimentinalArray(points, "\tPoints:");
+        System.out.println("\tRes: " + isReflected(points));
+    }
+    public static boolean isReflected(int[][] points) {
+        int len = points.length;
+        if (len < 2) return true;
+
+        double min = Double.MAX_EXPONENT;
+        double max = Double.MIN_EXPONENT;
+        HashMap<Double, Double> map = new HashMap<>();
+        for (int[] p : points) {
+            map.put((double)p[0], (double)p[1]);
+            min = Math.min(min, (double)p[0]);
+            max = Math.max(max, (double)p[0]);
+        }
+        double mid = (min + max) / 2.0;
+
+        for (Map.Entry<Double, Double> entry : map.entrySet()) {
+            double x = entry.getKey();
+            double y = entry.getValue();
+            double nx = 2*mid - x;
+            if (!map.containsKey(nx) || map.get(nx) != y) {
+                return false;
+            }
+        }
+        return true;
+    }
+    // This version is wrong for [[1,2],[2,2],[1,4],[2,4]]
+    public static boolean isReflected2(int[][] points) {
+        int len = points.length;
+        if (len < 2) return true;
+
+        Arrays.sort(points, (a, b) -> a[0] - b[0]);
+
+        ArrayList<int[]> arr = new ArrayList<>();
+        for (int i = 0; i < len; i++) {
+            if (i == 0) {
+                arr.add(points[i]);
+            } else if (points[i][0] != points[i-1][0] || points[i][1] != points[i-1][1]) {
+                arr.add(points[i]);
+            }
+        }
+
+        double mid = ((double)points[0][0] + (double)points[arr.size() - 1][0])/2;
+        int i = 0, j = arr.size() - 1;
+        while (i <= j) {
+            double tmp = ((double)arr.get(i)[0] + (double)arr.get(j)[0])/2;
+            if (arr.get(i)[1] != arr.get(j)[1] ||
+                    tmp != mid) {
+                return false;
+            }
+            i++;
+            j--;
+        }
+        return true;
+    }
+
+
+//    def isConvex(self, points):
+//            """
+//            :type points: List[List[int]]
+//            :rtype: bool
+//    """
+//    def crossProduct(p0, p1, p2):
+//    x0, y0 = p0
+//    x1, y1 = p1
+//    x2, y2 = p2
+//    return (x2 - x0) * (y1 - y0) - (x1 - x0) * (y2 - y0)
+//
+//    size = len(points)
+//    last = 0
+//            for x in range(size):
+//    p0, p1, p2 = points[x], points[(x + 1) % size], points[(x + 2) % size]
+//    p = crossProduct(p0, p1, p2)
+//    if p * last < 0:
+//            return False
+//            last = p
+//    return True
+
+    public static boolean isConvex(List<List<Integer>> points) {
+        int len = points.size();
+        int last = 0;
+
+        for (int i = 0; i < len; i++) {
+            int p = crossProduct(points.get(i), points.get((i+1)%len), points.get((i+2)%len));
+            if (p * last < 0) {
+                return false;
+            }
+            last = p;
+        }
+        return true;
+    }
+    private static int crossProduct(List<Integer> p0, List<Integer> p1, List<Integer> p2) {
+       return (p2.get(0) - p0.get(0) * (p1.get(1) - p0.get(1)) - (p1.get(0) - p0.get(0)) * (p2.get(1) - p0.get(1)));
+    }
+
+    /**
+     * Count of Range Sum
+     * Given an integer array nums, return the number of range sums that lie in [lower, upper] inclusive.
+     * Range sum S(i, j) is defined as the sum of the elements in nums between indices i and j (i ≤ j), inclusive.
+     *         Note:
+     * A naive algorithm of O(n2) is trivial. You MUST do better than that.
+     *         Example:
+     * Given nums = [-2, 5, -1], lower = -2, upper = 2,
+     * Return 3.
+     * The three ranges are : [0, 0], [2, 2], [0, 2] and their respective sums are: -2, -1, 2.
+     * Credits:
+     * Special thanks to @dietpepsi for adding this problem and creating all test cases.
+     */
+    public static void countRangeSumDemo(int[] nums, int lower, int upper) {
+        System.out.println("\nStart function countRangeSumDemo()");
+        printArray(nums, "\tNums:");
+        System.out.println("\tLower = " + lower);
+        System.out.println("\tUpper = " + upper);
+        System.out.println("\tRes = " + countRangeSum(nums, lower, upper));
+    }
+    public static int countRangeSum(int[] nums, int lower, int upper) {
+        int len = nums.length;
+        if(len <= 0) {
+            return 0;
+        }
+        long[] sum = new long[len];
+        sum[0] = nums[0];
+        for (int i = 1; i < len; i++) {
+            sum[i] += nums[i] + sum[i-1];
+        }
+
+        return countRangeSumHelper(nums, sum, lower, upper, 0, len - 1);
+    }
+    private static int countRangeSumHelper(int[] nums, long[] sum, int lower, int upper, int left, int right) {
+        if (left == right) {
+            if (nums[left] >= lower && nums[left] <= upper) {
+                return 1;
+            }
+            return 0;
+        }
+        int mid = (left + right)/2;
+        int total = 0;
+        for (int i = left; i <= mid; i++) {
+            for (int j = mid + 1; j <= right; j++) {
+                long tmp = sum[j] - sum[i] + nums[i];
+                if (tmp >= lower && tmp <= upper) {
+                    total++;
+                }
+            }
+        }
+        return total + countRangeSumHelper(nums, sum, lower, upper, left, mid) + countRangeSumHelper(nums, sum, lower, upper, mid + 1, right);
+    }
+
+    /**
+     * Perfect Rectangle
+     * Given N axis-aligned rectangles where N > 0, determine if they all together form an exact cover of a rectangular region.
+     * Each rectangle is represented as a bottom-left point and a top-right point. For example, a unit square is represented as [1,1,2,2]. (coordinate of bottom-left point is (1, 1) and top-right point is (2, 2)).
+     *
+     * Example 1:
+     * rectangles = [
+     *         [1,1,3,3],
+     *         [3,1,4,2],
+     *         [3,2,4,4],
+     *         [1,3,2,4],
+     *         [2,3,3,4]
+     *         ]
+     * Return true. All 5 rectangles together form an exact cover of a rectangular region.
+     *
+     * Example 2:
+     * rectangles = [
+     *         [1,1,2,3],
+     *         [1,3,2,4],
+     *         [3,1,4,2],
+     *         [3,2,4,4]
+     *         ]
+     * Return false. Because there is a gap between the two rectangular regions.
+     *
+     * Example 3:
+     * rectangles = [
+     *         [1,1,3,3],
+     *         [3,1,4,2],
+     *         [1,3,2,4],
+     *         [3,2,4,4]
+     *         ]
+     * Return false. Because there is a gap in the top center.
+     *
+     *         Example 4:
+     * rectangles = [
+     *         [1,1,3,3],
+     *         [3,1,4,2],
+     *         [1,3,2,4],
+     *         [2,2,4,4]
+     *         ]
+     * Return false. Because two of the rectangles overlap with each other.
+     */
+    public static void isRectangleCoverDemo(int[][] rectangles) {
+        System.out.println("\nStart function isRectangleCoverDemo()");
+        printTwoDimentinalArray(rectangles, "\tRectangles:");
+        System.out.println("\tRes = " + isRectangleCover(rectangles));
+    }
+    public static boolean isRectangleCover(int[][] rectangles) {
+        HashSet<String> S = new HashSet<>();
+        int minX = Integer.MAX_VALUE;
+        int minY = Integer.MAX_VALUE;
+        int maxX = Integer.MIN_VALUE;
+        int maxY = Integer.MIN_VALUE;
+        int area = 0;
+        for (int[] rec : rectangles) {
+            minX = Math.min(minX, rec[0]);
+            minY = Math.min(minY, rec[1]);
+            maxX = Math.max(maxX, rec[2]);
+            maxY = Math.max(maxY, rec[3]);
+            area += (rec[2] - rec[0]) * (rec[3] - rec[1]);
+            String s1 = rec[0] + ":" + rec[1];
+            String s2 = rec[0] + ":" + rec[3];
+            String s3 = rec[2] + ":" + rec[3];
+            String s4 = rec[2] + ":" + rec[1];
+
+            if (S.contains(s1)) {
+                S.remove(s1);
+            } else {
+                S.add(s1);
+            }
+            if (S.contains(s2)) {
+                S.remove(s2);
+            } else {
+                S.add(s2);
+            }
+            if (S.contains(s3)) {
+                S.remove(s3);
+            } else {
+                S.add(s3);
+            }
+            if (S.contains(s4)) {
+                S.remove(s4);
+            } else {
+                S.add(s4);
+            }
+        }
+        String s1 = minX + ":" + minY;
+        String s2 = minX + ":" + maxY;
+        String s3 = maxX + ":" + maxY;
+        String s4 = maxX + ":" + minY;
+        if (!S.contains(s1) || !S.contains(s2) || !S.contains(s3) || !S.contains(s4) || S.size() != 4) {
+            return false;
+        }
+
+        return area == (maxX - minX) * (maxY - minY);
     }
 
 //    public int depthSumReverse(List<NestedInteger> nestedList) {

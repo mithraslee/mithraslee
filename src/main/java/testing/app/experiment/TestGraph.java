@@ -3,10 +3,9 @@ package testing.app.experiment;
 import testing.lib.graph.GraphTest;
 import testing.lib.node.GraphNode;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
+
+import static testing.lib.common.CommonUtils.printArray;
 
 /**
  * Created by yun.li on 9/30/16.
@@ -59,6 +58,12 @@ public class TestGraph {
         boolean schedulable = GraphTest.canFinish(3, edges);
         System.out.println(schedulable);
 
+        int[][] prerequisites = new int[][]{{1,0}};
+        int[] order1 = GraphTest.findOrder(2, prerequisites);
+        int[] order2 = GraphTest.findOrder2(2, prerequisites);
+        printArray(order1, "\tOrder1:");
+        printArray(order2, "\tOrder2:");
+
         GraphTest.findItinerary(new String[][]{
                 {"JFK","SFO"},{"JFK","ATL"},{"SFO","ATL"},{"ATL","JFK"},{"ATL","SFO"}
         });
@@ -75,19 +80,101 @@ public class TestGraph {
 //                "rftt"
 //        });
 
-//        GraphTest.alienOrderDemo2(new String[]{
-//                "wrtkj","wrt"
-//        });
+        GraphTest.alienOrderDemo(new String[]{
+                "zy","zx"
+        });
+        GraphTest.alienOrderDemo2(new String[]{
+                "zy","zx"
+        });
+        GraphTest.alienOrderDemo3(new String[]{
+                "zy","zx"
+        });
+
+        GraphTest.alienOrderDemo(new String[]{
+                "wrtkj","wrt"
+        });
+        GraphTest.alienOrderDemo2(new String[]{
+                "wrtkj","wrt"
+        });
+        GraphTest.alienOrderDemo3(new String[]{
+                "wrtkj","wrt"
+        });
+
+        GraphTest.alienOrderDemo(new String[]{
+                "wrt", "wrtkj"
+        });
         GraphTest.alienOrderDemo2(new String[]{
                 "wrt", "wrtkj"
         });
-        char[] buff;
-//        GraphTest.alienOrderDemo(new String[]{
-//                "zy","zx"
-//        });
+        GraphTest.alienOrderDemo3(new String[]{
+                "wrt", "wrtkj"
+        });
+
+        GraphTest.alienOrderDemo(new String[]{
+                "x","x"
+        });
+        GraphTest.alienOrderDemo2(new String[]{
+                "x","x"
+        });
+        GraphTest.alienOrderDemo3(new String[]{
+                "x","x"
+        });
+
+
+
+
+        GraphTest.countComponents(5, new int[][]{
+                {0, 1}, {1, 2}, {3, 4}
+        });
+        GraphTest.countComponents(5, new int[][]{
+                {0, 1}, {1, 2}, {2, 3}, {3, 4}
+        });
+
+        GraphTest.validTree2(5, new int[][]{
+                {0, 1}, {0, 2}, {0, 3}, {1, 4}
+        });
+        GraphTest.validTree2(5, new int[][]{
+                {0, 1}, {1, 2}, {2, 3}, {1, 3}, {1, 4}
+        });
+        GraphTest.validTree2(4, new int[][]{
+                {0, 1}, {2, 3}
+        });
+
+
+        ArrayList<Integer> l1 = new ArrayList<>(Arrays.asList(new Integer[]{5,2,6,3}));
+        ArrayList<Integer> l2 = new ArrayList<>(Arrays.asList(new Integer[]{4,1,5,2}));
+        List<List<Integer>> seqs1 = new ArrayList<>();
+        seqs1.add(l1);
+        seqs1.add(l2);
+        GraphTest.sequenceReconstructionDemo(new int[]{4,1,5,2,6,3}, seqs1);
+
+//        ArrayList<Integer> l3 = new ArrayList<>(Arrays.asList(new Integer[]{1,2}));
+//        ArrayList<Integer> l4 = new ArrayList<>(Arrays.asList(new Integer[]{1,3}));
+//        ArrayList<Integer> l5 = new ArrayList<>(Arrays.asList(new Integer[]{2,3}));
+//        List<List<Integer>> seqs2 = new ArrayList<>();
+//        seqs2.add(l3);
+//        seqs2.add(l4);
+//        seqs2.add(l5);
+//        GraphTest.sequenceReconstructionDemo(new int[]{1,2,3}, seqs2);
 //
-//        GraphTest.alienOrderDemo(new String[]{
-//                "x","x"
-//        });
+//        List<List<Integer>> seqs3 = new ArrayList<>();
+//        seqs3.add(l3);
+//        GraphTest.sequenceReconstructionDemo(new int[]{1,2,3}, seqs3);
+//
+//        List<List<Integer>> seqs4 = new ArrayList<>();
+//        seqs4.add(l3);
+//        seqs4.add(l4);
+//        GraphTest.sequenceReconstructionDemo(new int[]{1,2,3}, seqs4);
+//
+//        List<List<Integer>> seqs5 = new ArrayList<>();
+//        GraphTest.sequenceReconstructionDemo(new int[]{1,2,3}, seqs5);
+//        GraphTest.sequenceReconstructionDemo(new int[]{}, seqs5);
+
+//        GraphTest.sequenceReconstructionDemo(new int[]{4,1,5,2,6,3}, new ArrayList<>(
+//                Arrays.asList(new List<Integer>[]{
+//                        new ArrayList<>(Arrays.asList(new Integer[]{5,2,6,3})),
+//                        new ArrayList<>(Arrays.asList(new Integer[]{5,2,6,3}))
+//                })
+//        ));
     }
 }

@@ -336,5 +336,46 @@ public class TestLibrary {
         System.out.println("\t" + ma.next(10));   // (1 + 10) / 2
         System.out.println("\t" + ma.next(3));     // (1 + 10 + 3) / 3
         System.out.println("\t" + ma.next(5));     // (10 + 3 + 5) / 3
+
+        System.out.println();
+        System.out.println("Test Codec:");
+        Codec codec = new Codec();
+        String encoded = codec.encode(new ArrayList<>(Arrays.asList(new String[]{"a", "bc", "def"})));
+        System.out.println("\tEncoded: " + encoded);
+        List<String> decoded = codec.decode(encoded);
+        System.out.println("\t" + decoded);
+
+        encoded = codec.encode(new ArrayList<>(Arrays.asList(new String[]{"", "a", "", "bc", "def", ""})));
+        System.out.println("\tEncoded: " + encoded);
+        decoded = codec.decode(encoded);
+        System.out.println("\t" + decoded);
+
+        encoded = codec.encode(new ArrayList<>(Arrays.asList(new String[]{"0", "a", "", "bc", "def", ""})));
+        System.out.println("\tEncoded: " + encoded);
+        decoded = codec.decode(encoded);
+        System.out.println("\t" + decoded);
+
+        System.out.println();
+        System.out.println("Test SnakeGame:");
+        SnakeGame sg = new SnakeGame(3, 2, new int[][]{
+                {1,2}, {0,1}
+        });
+        System.out.println("\t" + sg.move("R"));
+        System.out.println("\t" + sg.move("D"));
+        System.out.println("\t" + sg.move("R"));
+        System.out.println("\t" + sg.move("U"));
+        System.out.println("\t" + sg.move("L"));
+        System.out.println("\t" + sg.move("U"));
+
+        System.out.println();
+        System.out.println("Test TicTacToe:");
+        TicTacToe ttt = new TicTacToe(3);
+        System.out.println("\t" + ttt.move(0,0,1));
+        System.out.println("\t" + ttt.move(0,2,2));
+        System.out.println("\t" + ttt.move(2,2,1));
+        System.out.println("\t" + ttt.move(1,1,2));
+        System.out.println("\t" + ttt.move(2,0,1));
+        System.out.println("\t" + ttt.move(1,0,2));
+        System.out.println("\t" + ttt.move(2,1,1));
     }
 }

@@ -247,7 +247,9 @@ public class Search {
     /**
      * Lower Bound & Upper Bound
      *
-     * 定义 lower bound 为在给定升序数组中大于等于目标值的最小索引，upper bound 则为小于等于目标值的最大索引，下面上代码和测试用例。
+     * 定义：
+     * lower bound：为在给定升序数组中大于等于目标值的最小索引
+     * upper bound：为在给定升序数组中小于等于目标值的最大索引
      */
     public static int lowerBound(int[] nums, int target) {
         if (nums == null || nums.length == 0) return -1;
@@ -431,5 +433,95 @@ public class Search {
         } else {
             return A[low];
         }
+    }
+
+    public static int sqrt(int x) {
+        long start = 1, end = x;
+        while (start + 1 < end) {
+            long mid = start + (end - start) / 2;
+            if (mid * mid == x) {
+                return (int)mid;
+            } else if (mid * mid < x) {
+                start = mid;
+            } else {
+                end = mid;
+            }
+        }
+
+        if (end * end <= x) {
+            return (int) end;
+        }
+        return (int) start;
+    }
+    public static Double sqrt (Double n) {
+        System.out.println("\nStart function sqrt()");
+        System.out.println("\tn = " + n);
+        Double precision_unit = 0.000001;
+//        System.out.println("n = " + n);
+        if (n < 0.0) {
+            System.out.println("\tres = " + -1.0);
+            return -1.0;
+        } else if (n <= precision_unit) {
+            System.out.println("\tres = " + precision_unit);
+            return 0.001;
+        } else if (n == 1.0) {
+            System.out.println("\tres = " + 1.0);
+            return 1.0;
+        }
+
+        boolean lowerThanOne = false;
+        if (n <= 1.0) {
+            lowerThanOne = true;
+            n *= (1.0/precision_unit);
+        }
+
+        Double low = 1.0;
+        Double high = n;
+        Double mid = 0.0;
+
+        while (low < high) {
+            mid = (low + high)/2.0;
+//            System.out.println("mid = " + mid + "; low = " + low + "; high = " + high);
+            if (Math.abs((mid * mid) - n) <= precision_unit) {
+                break;
+            } else if ((mid * mid) > n) {
+                high = mid;
+            } else {
+                low = mid;
+            }
+        }
+        if (lowerThanOne) {
+            mid /= 1000;
+        }
+        System.out.println("\tres = " + mid);
+        return mid;
+    }
+
+    /**
+     * Find Peak Element - Accepted
+     *
+     * A peak element is an element that is greater than its neighbors.
+     * Given an input array where num[i] ≠ num[i+1], find a peak element and return its index.
+     * The array may contain multiple peaks, in that case return the index to any one of the peaks is fine.
+     * You may imagine that num[-1] = num[n] = -∞.
+     * For example, in array [1, 2, 3, 1], 3 is a peak element and your function should return the index number 2.
+     */
+    public static int findPeakElement(int[] nums) {
+        if (nums == null || nums.length < 1) return -1;
+        if (nums.length == 1) return 0;
+        int begin = 0;
+        int end = nums.length - 1;
+
+        while (begin + 1 < end) {
+            int mid = begin + (end - begin)/2;
+            if (nums[mid] < nums[mid + 1]) {
+                begin = mid;
+            } else if (nums[mid] < nums[mid - 1]) {
+                end = mid;
+            } else {
+                return mid;
+            }
+        }
+        return nums[begin] > nums[end] ? begin : end;
     }
 }
