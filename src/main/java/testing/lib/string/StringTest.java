@@ -5,6 +5,7 @@
 package testing.lib.string;
 
 import testing.lib.common.CommonUtils;
+import testing.lib.node.TrieNode3;
 import testing.lib.trie.*;
 import testing.lib.common.CommonUtils.*;
 
@@ -768,6 +769,34 @@ public class StringTest {
         return s.substring(start, start + maxL);
     }
 
+    public static int longestPalindromeSubseq(String s) {
+        System.out.println("\nStart function longestPalindromeSubseq()");
+        System.out.println("\ts  = " + s);
+
+        if (s == null) return 0;
+        int len = s.length();
+        if (len <= 1) return 1;
+
+        int[][] DP = new int[len][len];
+        int maxL = 0;
+        for (int i = len - 1; i >= 0; i--) {
+            for (int j = i; j < len; j++) {
+                if (s.charAt(i) == s.charAt(j)) {
+                    if (j - i + 1 <= 2) {
+                        DP[i][j] = j - i + 1;
+                    } else {
+                        DP[i][j] = DP[i+1][j-1] + 2;
+                    }
+                } else {
+                    DP[i][j] = Math.max(DP[i+1][j], DP[i][j-1]);
+                }
+                maxL = Math.max(maxL, DP[i][j]);
+            }
+        }
+        System.out.println("\tRes = " + maxL);
+        return maxL;
+    }
+
     /**
      * Shortest Palindrome   Add to List QuestionEditorial Solution  My Submissions
      * Total Accepted: 31802
@@ -1462,7 +1491,7 @@ public class StringTest {
     // This version passed tests.
     // Although the general idea is the same. This one is better in performance
     public static List<String> findAllConcatenatedWordsInADict2(String[] words) {
-        System.out.println("\nStart function findAllConcatenatedWordsInADict()");
+        System.out.println("\nStart function findAllConcatenatedWordsInADict2()");
         printArray(words, "\tWords:");
         HashSet<String> dict = new HashSet<>();
         for (String w : words) {
@@ -1490,6 +1519,44 @@ public class StringTest {
                     break;
                 }
             }
+        }
+        for (String r : res) {
+            System.out.println("\t" + r);
+        }
+        return res;
+    }
+    public static List<String> findAllConcatenatedWordsInADict3(String[] words) {
+        System.out.println("\nStart function findAllConcatenatedWordsInADict3()");
+        printArray(words, "\tWords:");
+        HashSet<String> dict = new HashSet<>();
+        for (String w : words) {
+            dict.add(w);
+        }
+        List<String> res = new ArrayList<>();
+        for (String word : words) {
+            if (word.isEmpty()) {
+                continue;
+            }
+            dict.remove(word);
+
+            int len = word.length();
+            boolean[] valid = new boolean[len+1];
+            valid[0] = true;
+            for (int i = 1; i <= len; i++) {
+                for (int j = 0; j < i; j++) {
+                    if (valid[j]) {
+                        String sub = word.substring(j, i);
+                        if (dict.contains(sub)) {
+                            valid[i] = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            if (valid[len]) {
+                res.add(word);
+            }
+            dict.add(word);
         }
         for (String r : res) {
             System.out.println("\t" + r);
@@ -1538,7 +1605,7 @@ public class StringTest {
         return arr.get(len - 1);
     }
     public static ArrayList<String> PalindromePartitioning2 (String s) {
-        System.out.println("\nStart function PalindromePartitioning()");
+        System.out.println("\nStart function PalindromePartitioning2()");
         System.out.println("\ts  = " + s);
         if (s == null || s.length() <= 0)
             return new ArrayList<>();
@@ -1548,19 +1615,18 @@ public class StringTest {
 
         for (int j = 0; j < len; j++) {
             arr.add(new ArrayList<String> ());
-            for (int i = 0; i <= j; i++) {
-                String str = s.substring(i, j+1);
+            if (isPalindrome(s.substring(0, j+1))) {
+                arr.get(j).add(s.substring(0, j+1));
+            }
+            for (int i = 0; i < j; i++) {
+                if (arr.get(i).isEmpty()) continue;
+                String str = s.substring(i+1, j+1);
                 if (isPalindrome(str)) {
-                    if (i == 0) {
-                        arr.get(j).add(str);
-                    } else if (!arr.get(i - 1).isEmpty()) {
-                        for (String temp : arr.get(i - 1))
-                            arr.get(j).add(temp + "+" + str);
-                    }
+                    for (String temp : arr.get(i))
+                        arr.get(j).add(temp + "+" + str);
                 }
             }
         }
-
         for (ArrayList<String> list : arr)
             System.out.println("\t" + list);
         return arr.get(len - 1);
@@ -1898,6 +1964,19 @@ public class StringTest {
         return found;
     }
 
+    /**
+     * Word Search II
+     * Given a 2D board and a list of words from the dictionary, find all words in the board.
+     * Each word must be constructed from letters of sequentially adjacent cell, where "adjacent" cells are those horizontally or vertically neighboring. The same letter cell may not be used more than once in a word.
+     * For example,
+     * Given words = ["oath","pea","eat","rain"] and board =
+     *         [
+     *         ['o','a','a','n'],
+     *         ['e','t','a','e'],
+     *         ['i','h','k','r'],
+     *         ['i','f','l','v']
+     *         ]
+     */
     // A use case of Trie tree!!!
     // This version timeouts in LeetCode test
     public static List<String> findWords(Character[][] board, String[] words) {
@@ -1996,6 +2075,56 @@ public class StringTest {
         board[i][j] = tempChar;
     }
 
+    public static List<String> findWords3(Character[][] board, String[] words) {
+        System.out.println("\nStart function findWords3()");
+        System.out.println("\tboard:");
+        for (int i = 0; i < board.length; i++)
+            System.out.println("\t" + Arrays.asList(board[i]));
+        System.out.println("\twords  = " + Arrays.asList(words));
+
+        List<String> res = new ArrayList<>();
+        if (board == null) return res;
+        int Row = board.length;
+        if (Row <= 0) return res;
+        int Column = board[0].length;
+        if (Column <= 0) return res;
+
+        if (words.length <= 0) return res;
+
+        Trie3 dict = new Trie3();
+        for (String word : words) {
+            dict.insert(word);
+        }
+        int[][] dirs = new int[][]{
+                {-1, 0},{1, 0},{0, -1},{0, 1}
+        };
+        HashSet<String> set = new HashSet<>();
+        for (int i = 0; i < Row; i++) {
+            for (int j = 0; j < Column; j++) {
+                if (dict.root.children.containsKey(board[i][j])) {
+                    findWordsHelper3(board, dict.root.children.get(board[i][j]), i, j, Row, Column, "" + board[i][j], dirs, set);
+                }
+            }
+        }
+        res.addAll(set);
+        System.out.println("\tResults = " + res);
+        return res;
+    }
+    private static void findWordsHelper3(Character[][] board, TrieNode3 node, int i, int j, int Row, int Column, String str, int[][] dirs, HashSet<String> set) {
+        if (node.hasEnd) {
+            set.add(str);
+        }
+        Character tmp = board[i][j];
+        board[i][j] = '*';
+        for (int[] dir : dirs) {
+            int x = i + dir[0];
+            int y = j + dir[1];
+            if (x >= 0 && x < Row && y >= 0 && y < Column && board[x][y] != '*' && node.children.containsKey(board[x][y])) {
+                findWordsHelper3(board, node.children.get(board[x][y]), x, y, Row, Column, str + board[x][y], dirs, set);
+            }
+        }
+        board[i][j] = tmp;
+    }
 //    public String minWindow(String S, String T) {
 //        if (S == null) return null;
 //        else if (T == null) return "";
@@ -2290,6 +2419,34 @@ public class StringTest {
             res.add(curVal);
         }
         return res;
+    }
+    static public String countAndSay3(int n) {
+        System.out.println("\nStart function countAndSay3()");
+        System.out.println("\tn = " + n);
+
+        if (n < 1) return "";
+        Queue<Integer> Q = new LinkedList<>();
+        Q.add(1);
+        while (n-- > 1) {
+            int size = Q.size();
+            while (size > 0) {
+                int cnt = 0;
+                int cur = Q.peek();
+                while (size > 0 && cur == Q.peek()) {
+                    Q.poll();
+                    cnt++;
+                    size--;
+                }
+                Q.add(cnt);
+                Q.add(cur);
+            }
+        }
+        StringBuilder sb = new StringBuilder();
+        while (!Q.isEmpty()) {
+            sb.append(Q.poll());
+        }
+        System.out.println("\tResult = " + sb.toString());
+        return sb.toString();
     }
 
     /**
@@ -4223,7 +4380,7 @@ public class StringTest {
     }
 
     /**
-     * Fraction to Recurring Decimal My Submissions Question
+     * Fraction to Recurring Decimal
      * Given two integers representing the numerator and denominator of a fraction, return the fraction in string format.
      *
      * If the fractional part is repeating, enclose the repeating part in parentheses.
@@ -4251,7 +4408,7 @@ public class StringTest {
 
         StringBuilder sb = new StringBuilder();
         long res = n/d;
-        long rem = (n - res * d) * 10;
+        long rem = n%d * 10;
         sb.append(res);
         if (rem != 0) {
             sb.append('.');
@@ -4266,9 +4423,47 @@ public class StringTest {
                 res = rem / d;
                 sb.append(res);
                 map.put(rem, sb.length() - 1);
-                rem = (rem - res * d) * 10;
+                rem = rem%d * 10;
             }
         }
+        String result = (neg ? "-" : "") + sb.toString();
+        System.out.println("\tResult = " + result);
+        return result;
+    }
+    public static String fractionToDecimal3(int numerator, int denominator) {
+        System.out.println("\nStart function fractionToDecimal()");
+        System.out.println("\tnumerator = " + numerator);
+        System.out.println("\tdenominator = " + denominator);
+        if (denominator == 0) return null;
+        if (numerator == 0) return "0";
+        long n = numerator; // Math.abs(numerator);
+        long d = denominator; // Math.abs(denominator);
+        Boolean neg = n > 0 ? d < 0 : d > 0;
+        n = n > 0 ? n : -n; // Math.abs(numerator);
+        d = d > 0 ? d : -d; // Math.abs(denominator);
+
+        StringBuilder sb = new StringBuilder();
+        long res = n/d;
+        long rem = n%d;
+
+        sb.append(res);
+        if (rem != 0) {
+            sb.append('.');
+            HashMap<Long, Integer> M = new HashMap<>();
+            while (rem > 0) {
+                if (M.containsKey(rem)) {
+                    int lastIdx = M.get(rem);
+                    sb.insert(lastIdx, '(');
+                    sb.append(')');
+                    break;
+                }
+                res = 10*rem/d;
+                sb.append(res);
+                M.put(rem, sb.length() - 1);
+                rem = 10 * rem % d;
+            }
+        }
+
         String result = (neg ? "-" : "") + sb.toString();
         System.out.println("\tResult = " + result);
         return result;
@@ -4468,6 +4663,35 @@ public class StringTest {
             } else {
                 M1.put(cs, ct);
                 M2.put(ct, cs);
+            }
+        }
+        return true;
+    }
+
+    public static boolean isIsomorphic4(String s, String t) {
+        if (s == null || t == null) {
+            if (s == null && t == null) return true;
+            else return false;
+        }
+        int lenS = s.length();
+        int lenT = t.length();
+        if (lenS != lenT) return false;
+        if (lenS < 1) return true;
+
+        HashMap<Character, Character> s2t = new HashMap<>();
+        HashSet<Character> ts = new HashSet<>();
+
+        for (int i = 0; i < lenS; i++) {
+            char cs = s.charAt(i);
+            char ct = t.charAt(i);
+
+            if ((s2t.containsKey(cs) && !ts.contains(ct)) ||
+                (ts.contains(ct) && !s2t.containsKey(cs)) ||
+                (s2t.containsKey(cs) && s2t.get(cs) != ct)) {
+                return false;
+            } else {
+                s2t.put(cs, ct);
+                ts.add(ct);
             }
         }
         return true;
@@ -5075,13 +5299,16 @@ public class StringTest {
 
                 // This sequence is very important! Attention !!!
                 iterO.remove();
-                iterN.previous();
-                iterN.previous();
-                iterN.set(n1);
-                iterN.next();
-                iterN.next();
                 iterN.remove();
                 iterN.previous();
+                iterN.set(n1);
+//                iterN.previous();
+//                iterN.previous();
+//                iterN.set(n1);
+//                iterN.next();
+//                iterN.next();
+//                iterN.remove();
+//                iterN.previous();
             } else {
                 iterN.next();
             }
@@ -5684,6 +5911,41 @@ public class StringTest {
             }
         }
     }
+    public static List<String> addOperators4(String num, int target) {
+        System.out.println("\nStart function addOperators4()");
+        System.out.println("\tnum: " + num);
+        System.out.println("\ttarget = " + target);
+        List<String> res = new ArrayList<> ();
+        int len = num.length();
+        if (len < 1) return res;
+
+        addOperatorsHelper4(num, target, 0, 0, "", res, 0);
+
+        for (String r : res) {
+            System.out.println("\t\t" + r);
+        }
+        return res;
+    }
+    private static void addOperatorsHelper4(String num, long target, long preNum, long tempSum, String tempStr, List<String> res, int index) {
+        if (index == num.length() && tempSum == target) {
+            res.add(tempStr);
+            return;
+        }
+
+        int end = num.charAt(index) == '0' ? index + 1 : num.length();
+        for (int cut = index + 1; cut <= end; cut++) {
+            String str = num.substring(index, cut);
+            long val = Long.parseLong(str);
+
+            if (tempStr.isEmpty()) {
+                addOperatorsHelper4(num, target, val, val, "" + val, res, cut);
+            } else {
+                addOperatorsHelper4(num, target, val, tempSum + val, tempStr + "+" + val, res, cut);
+                addOperatorsHelper4(num, target, -val, tempSum - val, tempStr + "-" + val, res, cut);
+                addOperatorsHelper4(num, target, preNum * val, tempSum - preNum + preNum * val, tempStr + "*" + val, res, cut);
+            }
+        }
+    }
 
     /**
      * Bulls and Cows
@@ -5800,6 +6062,52 @@ public class StringTest {
                 removeInvalidParenthesesHelper(Q, temp + c, left, right, res);
             }
             Q.addFirst(c);
+        }
+    }
+    public static List<String> removeInvalidParentheses2(String s) {
+        System.out.println("\nStart function removeInvalidParentheses2()");
+        System.out.println("\tStr: " + s);
+
+        HashMap<Integer, HashSet<String>> res = new HashMap<>();
+
+        removeInvalidParenthesesHelper2(s, "", 0, 0, res);
+
+        int maxLen = 0;
+        for (int l : res.keySet()) {
+            maxLen = Math.max(maxLen, l);
+            for (String r : res.get(l)) {
+                System.out.println("\t\t" + r);
+            }
+        }
+        return new ArrayList<>(res.get(maxLen));
+    }
+    private static void removeInvalidParenthesesHelper2(String s, String temp, int left, int right, HashMap<Integer, HashSet<String>> res) {
+        if (s.isEmpty()) {
+            if (left == right) {
+                if (res.containsKey(temp.length())) {
+                    if (!res.get(temp.length()).contains(temp)) {
+                        res.get(temp.length()).add(temp);
+                    }
+                } else {
+                    HashSet<String> newSet = new HashSet<>();
+                    newSet.add(temp);
+                    res.put(temp.length(), newSet);
+                }
+            }
+        } else {
+            Character c = s.charAt(0);
+            String next = s.substring(1);
+            if (c == '(') {
+                removeInvalidParenthesesHelper2(next, temp + c, left + 1, right, res);
+                removeInvalidParenthesesHelper2(next, temp, left, right, res);
+            } else if (c == ')'){
+                if (left > right) {
+                    removeInvalidParenthesesHelper2(next, temp + c, left, right + 1, res);
+                }
+                removeInvalidParenthesesHelper2(next, temp, left, right, res);
+            } else {
+                removeInvalidParenthesesHelper2(next, temp + c, left, right, res);
+            }
         }
     }
 
@@ -6028,6 +6336,41 @@ public class StringTest {
         System.out.println("\tres: " + sb.deleteCharAt(0).toString());
         return sb.deleteCharAt(0).toString();
     }
+    public static String removeDuplicateLetters2(String s) {
+        System.out.println("\nStart function removeDuplicateLetters2()");
+        System.out.println("\ts: " + s);
+        int len = s.length();
+        if (len < 2) return s;
+
+        HashMap<Character, Integer> map = new HashMap<>();
+        HashSet<Character> visited = new HashSet<>();
+
+        char[] chars = s.toCharArray();
+        for (Character c : chars) {
+            if (map.containsKey(c)) {
+                map.put(c, map.get(c) + 1);
+            } else {
+                map.put(c, 1);
+            }
+        }
+
+        LinkedList<Character> list = new LinkedList<>();
+        list.add('0');
+        for (Character c : s.toCharArray()) {
+            map.put(c, map.get(c) - 1);
+            if (!visited.contains(c)) {
+                while (c < list.getLast() && map.get(list.getLast()) > 0) {
+                    visited.remove(list.getLast());
+                    list.removeLast();
+                }
+                list.add(c);
+                visited.add(c);
+            }
+        }
+        StringBuilder sb = new StringBuilder();
+        for (Character c : list) sb.append(c);
+        return sb.deleteCharAt(0).toString();
+    }
 
     /**
      * Verify Preorder Serialization of a Binary Tree
@@ -6219,7 +6562,7 @@ public class StringTest {
         int res = 0;
         int start = 0;
         int i = 0;
-        while(i + k < len) {
+        while(i + k <= len) {
             int maxNext = i;
             int[] m = new int[26];
             int mask = 0;
@@ -7731,6 +8074,9 @@ public class StringTest {
                     if (!trie.startsWith(sb.toString())) {
                         break;
                     }
+                    if (j < tmp.size() && !tmp.get(j).startsWith(sb.toString())) {
+                        break;
+                    }
                     if (j == tmp.size() && !word.startsWith(sb.toString())) {
                         break;
                     }
@@ -8009,7 +8355,9 @@ public class StringTest {
         System.out.println("\tS: " + S);
         System.out.println("\tK: " + K);
         String res = licenseKeyFormatting(S, K);
+        String res2 = licenseKeyFormatting2(S, K);
         System.out.println("\tRes: " + res);
+        System.out.println("\tRes: " + res2);
     }
     public static String licenseKeyFormatting(String S, int K) {
         String[] strs = S.split("-");
@@ -8034,6 +8382,31 @@ public class StringTest {
             tmp = tmp.substring(K);
         }
         return res.toString();
+    }
+    public static String licenseKeyFormatting2(String S, int K) {
+        StringBuilder sb = new StringBuilder(S).reverse();
+        int index = 0;
+        int cnt = 0;
+        while (index < sb.length()) {
+            if (cnt < K) {
+                if (sb.charAt(index) == '-') {
+                    sb.deleteCharAt(index);
+                } else {
+                    cnt++;
+                    index++;
+                }
+            } else {
+                if (sb.charAt(index) != '-') {
+                    sb.insert(index, '-');
+                }
+                cnt = 0;
+                index++;
+            }
+        }
+        if (sb.length() > 0 && sb.charAt(sb.length() - 1) == '-') {
+            sb.deleteCharAt(sb.length() - 1);
+        }
+        return sb.reverse().toString().toUpperCase();
     }
 
     /**
@@ -8236,6 +8609,35 @@ public class StringTest {
         System.out.println("\tRes = " + cnt);
         return cnt;
     }
+    // Better version
+    public int wordsTyping2(String[] sentence, int rows, int cols) {
+        if (rows < 1 || cols < 1) return 0;
+        int len = sentence.length;
+        int i = 0;
+        int rIdx = 0;
+        int cIdx = 0;
+        int cnt = -1;
+        while (rIdx < rows) {
+            int idx = i % len;
+            if (idx == 0) cnt++;
+            String str = sentence[idx];
+            if (str.length() > cols) {
+                break;
+            }
+            if (cIdx + str.length() > cols) {
+                rIdx++;
+                cIdx = str.length() + 1;
+                if (idx == 0) {
+                    cnt *= rows/rIdx;
+                    rIdx *= rows/rIdx;
+                }
+            } else {
+                cIdx += str.length() + 1;
+            }
+            i++;
+        }
+        return cnt;
+    }
 
     /**
      * Ternary Expression Parser
@@ -8326,6 +8728,8 @@ public class StringTest {
 
 //        rearrangeString(str, k);
         rearrangeString2(str, k);
+
+        System.out.println("\tRes = " + rearrangeString3(str, k));
     }
     public static String rearrangeString(String str, int k) {
         HashMap<Character, Integer> cnt = new HashMap<>();
@@ -8442,11 +8846,426 @@ public class StringTest {
         }
     }
 
-//    /**
-//     * Longest Common Prefix
-//     *
-//     * Write a function to find the longest common prefix string amongst an array of strings.
-//     */
+    public static String rearrangeString3(String str, int k) {
+        HashMap<Character, Integer> cnt = new HashMap<>();
+        for (char c : str.toCharArray()) {
+            addToMap(cnt, c);
+        }
+
+        PriorityQueue<int[]> Q = new PriorityQueue<>((a, b) -> b[0] - a[0]);
+        for (char key : cnt.keySet()) {
+            Q.add(new int[]{cnt.get(key), key - 'a'});
+        }
+
+        StringBuilder sb = new StringBuilder();
+        while (!Q.isEmpty()) {
+            LinkedList<int[]> tmp = new LinkedList<>();
+            int c = Math.min(k, str.length() - sb.length());
+
+            for (int i = 0; i < c; i++) {
+                if (Q.isEmpty()) return "";
+                int[] cur = Q.poll();
+                sb.append((char)(cur[1] + 'a'));
+                cur[0]--;
+                if (cur[0] > 0) {
+                    tmp.add(cur);
+                }
+            }
+
+            for (int[] t : tmp) {
+                Q.add(t);
+            }
+        }
+
+        return sb.toString();
+    }
+
+    /**
+     * Find Permutation
+     * By now, you are given a secret signature consisting of character 'D' and 'I'. 'D' represents a decreasing relationship between two numbers, 'I' represents an increasing relationship between two numbers. And our secret signature was constructed by a special integer array, which contains uniquely all the different number from 1 to n (n is the length of the secret signature plus 1). For example, the secret signature "DI" can be constructed by array [2,1,3] or [3,1,2], but won't be constructed by array [3,2,4] or [2,1,3,4], which are both illegal constructing special string that can't represent the "DI" secret signature.
+     * On the other hand, now your job is to find the lexicographically smallest permutation of [1, 2, ... n] could refer to the given secret signature in the input.
+     * Example 1:
+     *     Input: "I"
+     *     Output: [1,2]
+     *     Explanation: [1,2] is the only legal initial spectial string can construct
+     *     secret signature "I", where the number 1 and 2 construct an increasing
+     *     relationship.
+     * Example 2:
+     *     Input: "DI"
+     *     Output: [2,1,3]
+     *     Explanation: Both [2,1,3] and [3,1,2] can construct the secret signature "DI",
+     *     but since we want to find the one with the smallest lexicographical permutation,
+     *     you need to output [2,1,3]
+     * Note:
+     *    • The input string will only contain the character 'D' and 'I'.
+     *    • The length of input string is a positive integer and will not exceed 10,000
+     */
+    public static int[] findPermutation(String s) {
+        System.out.println("\nStart function findPermutation()");
+        System.out.println("\tStr:" + s);
+
+        int len = s.length();
+        int[] res = new int[len + 1];
+
+        int cur = 1;
+        int rIdx = 0;
+        int sIdx = 0;
+        while (sIdx < len) { //] && rIdx <= len) {
+            if (s.charAt(sIdx) == 'I') {
+                res[rIdx++] = cur++;
+                sIdx++;
+            } else {
+                int cnt = 1;
+                while (sIdx < len && s.charAt(sIdx) == 'D') {
+                    cnt++;
+                    sIdx++;
+                }
+                int tmp = cnt;
+//                while (rIdx <= len && tmp-- > 0) {
+                while (tmp-- > 0) {
+                    res[rIdx++] = cur + tmp;
+                }
+                cur += cnt;
+                sIdx++;
+            }
+        }
+        while (rIdx <= len) {
+            res[rIdx++] = cur++;
+        }
+        printArray(res, "\tRes: ");
+        return res;
+    }
+    public static int[] findPermutation2(String s) {
+        System.out.println("\nStart function findPermutation2()");
+        System.out.println("\tStr:" + s);
+
+        int len = s.length();
+        int[] res = new int[len + 1];
+
+        TreeMap<Integer, HashSet<Integer>> val2Idx = new TreeMap<>();
+
+        int pre = 0;
+        HashSet<Integer> newS = new HashSet<>();
+        newS.add(0);
+        val2Idx.put(0, newS);
+        for (int i = 0; i < s.length(); i++) {
+
+            if (s.charAt(i) == 'D') {
+                --pre;
+            } else {
+                ++pre;
+            }
+            if (val2Idx.containsKey(pre)) {
+                val2Idx.get(pre).add(i+1);
+            } else {
+                HashSet<Integer> tS = new HashSet<>();
+                tS.add(i+1);
+                val2Idx.put(pre, tS);
+            }
+        }
+
+        int val = 1;
+        for (int v : val2Idx.keySet()) {
+            for (int idx : val2Idx.get(v)) {
+                res[idx] = val++;
+            }
+        }
+
+        printArray(res, "\tRes: ");
+        return res;
+    }
+
+    /**
+     * Zuma Game
+     * Think about Zuma Game. You have a row of balls on the table, colored red(R), yellow(Y), blue(B), green(G), and white(W). You also have several balls in your hand.
+     * Each time, you may choose a ball in your hand, and insert it into the row (including the leftmost place and rightmost place). Then, if there is a group of 3 or more balls in the same color touching, remove these balls. Keep doing this until no more balls can be removed.
+     * Find the minimal balls you have to insert to remove all the balls on the table. If you cannot remove all the balls, output -1.
+     *
+     * Examples:
+     * Input: "WRRBBW", "RB"
+     * Output: -1
+     * Explanation: WRRBBW -> WRR[R]BBW -> WBBW -> WBB[B]W -> WW
+     * Input: "WWRRBBWW", "WRBRW"
+     * Output: 2
+     * Explanation: WWRRBBWW -> WWRR[R]BBWW -> WWBBWW -> WWBB[B]WW -> WWWW -> empty
+     * Input:"G", "GGGGG"
+     * Output: 2
+     * Explanation: G -> G[G] -> GG[G] -> empty
+     * Input: "RBYYBBRRB", "YRBGB"
+     * Output: 3
+     * Explanation: RBYYBBRRB -> RBYY[Y]BBRRB -> RBBBRRB -> RRRB -> B -> B[B] -> BB[B] -> empty
+     * Note:
+     *         1. You may assume that the initial row of balls on the table won’t have any 3 or more consecutive balls with the same color.
+     *         2. The number of balls on the table won't exceed 20, and the string represents these balls is called "board" in the input.
+     *         3. The number of balls in your hand won't exceed 5, and the string represents these balls is called "hand" in the input.
+     * Both input strings will be non-empty and only contain characters 'R','Y','B','G','W'.
+     */
+    public static int findMinStep(String board, String hand) {
+        System.out.println("\nStart function findMinStep()");
+        System.out.println("\tBoard = " + board);
+        System.out.println("\tHand = " + hand);
+
+        int len = board.length();
+        StringBuilder sb = new StringBuilder();
+
+        char[] chars = board.toCharArray();
+        int i = 0;
+        while (i < len) {
+            int j = i+1;
+            while (j < len && chars[j] == chars[i]) {
+                j++;
+            }
+            sb.append(j-i).append(chars[i]);
+            i = j;
+        }
+
+        HashMap<Character, Integer> M = new HashMap<>();
+        for (Character c : hand.toCharArray()) {
+            if (M.containsKey(c)) {
+                M.put(c, M.get(c) + 1);
+            } else {
+                M.put(c, 1);
+            }
+        }
+
+        int[] res = new int[]{Integer.MAX_VALUE};
+        findMinStepDFS(sb.toString(), M, new LinkedList<>(), res);
+
+        System.out.println("\tRes = " + (res[0] == Integer.MAX_VALUE ?  -1 : res[0]));
+        return res[0] == Integer.MAX_VALUE ?  -1 : res[0];
+    }
+    private static void findMinStepDFS(String str, HashMap<Character, Integer> M, LinkedList<Character> tmp, int[] res) {
+        if (str.isEmpty()) {
+            res[0] = Math.min(res[0], tmp.size());
+            return;
+        }
+
+        for (int i = 0; i < str.length(); i += 2) {
+            int curCnt = str.charAt(i) - '0';
+            char curChar = str.charAt(i+1);
+            if (!M.containsKey(curChar)) {
+                continue;
+            }
+            int diff = 3 - curCnt;
+            if (M.get(curChar) < diff) {
+                continue;
+            }
+            M.put(curChar, M.get(curChar) - diff);
+            int t = diff;
+            while (t-- > 0) tmp.add(curChar);
+            findMinStepDFS(updateBoard(str.substring(0, i) + str.substring(i+2)), M, tmp, res);
+            t = diff;
+            while (t-- > 0) tmp.removeLast();
+            M.put(curChar, M.get(curChar) + diff);
+        }
+    }
+    private static String updateBoard(String board) {
+        int len = board.length();
+        if (len == 0) return "";
+        StringBuilder sb = new StringBuilder();
+
+        Character preChar = board.charAt(1);
+        int preCnt = board.charAt(0) - '0';
+        int idx = 2;
+        boolean changed = false;
+        while (idx < board.length()) {
+            Character curChar = board.charAt(idx + 1);
+            int curCnt = board.charAt(idx) - '0';
+            idx += 2;
+            if (preChar != curChar) {
+                if (preCnt < 3) {
+                    sb.append(preCnt).append(preChar);
+                } else {
+                    changed = true;
+                }
+                preChar = curChar;
+                preCnt = curCnt;
+            } else {
+                preCnt += curCnt;
+                changed = true;
+            }
+        }
+        if (preChar != null && preCnt < 3) {
+            sb.append(preCnt).append(preChar);
+        } else {
+            changed = true;
+        }
+        if (changed) {
+            return updateBoard(sb.toString());
+        }
+        return sb.toString();
+    }
+
+    public static List<List<String>> findMinStep2(String board, String hand) {
+        System.out.println("\nStart function findMinStep2()");
+        System.out.println("\tBoard = " + board);
+        System.out.println("\tHand = " + hand);
+
+        int len = board.length();
+        StringBuilder sb = new StringBuilder();
+
+        char[] chars = board.toCharArray();
+        int i = 0;
+        while (i < len) {
+            int j = i+1;
+            while (j < len && chars[j] == chars[i]) {
+                j++;
+            }
+            sb.append(j-i).append(chars[i]);
+            i = j;
+        }
+
+        HashMap<Character, Integer> M = new HashMap<>();
+        for (Character c : hand.toCharArray()) {
+            if (M.containsKey(c)) {
+                M.put(c, M.get(c) + 1);
+            } else {
+                M.put(c, 1);
+            }
+        }
+
+        List<List<String>> res = new ArrayList<>();
+        findMinStepDFS2(sb.toString(), M, new LinkedList<>(Arrays.asList(new String[]{sb.toString()})), res);
+
+        System.out.println("\tRes:");
+        for (List<String> r : res) {
+            System.out.println("\t" + r);
+        }
+        return res;
+    }
+    private static void findMinStepDFS2(String str, HashMap<Character, Integer> M, LinkedList<String> tmp, List<List<String>> res) {
+        if (str.isEmpty()) {
+            res.add(new ArrayList<>(tmp));
+            return;
+        }
+
+        for (int i = 0; i < str.length(); i += 2) {
+            int curCnt = str.charAt(i) - '0';
+            char curChar = str.charAt(i+1);
+            if (!M.containsKey(curChar)) {
+                continue;
+            }
+            int diff = 3 - curCnt;
+            if (M.get(curChar) < diff) {
+                continue;
+            }
+            M.put(curChar, M.get(curChar) - diff);
+            String newStr = updateBoard(str.substring(0, i) + str.substring(i+2));
+            tmp.add(newStr);
+            findMinStepDFS2(newStr, M, tmp, res);
+            tmp.removeLast();
+            M.put(curChar, M.get(curChar) + diff);
+        }
+    }
+
+    /**
+     * SnapChat PhoneScreen
+     *
+     * Given an array of Strings, and an array of Characters.
+     * Find all possible strings which can be composed of by the characters.
+     *
+     * Fancy usage of Trie, and passing TrieNode as parameter,
+     * instead of passing Trie directly
+     */
+    public static List<String> findAllPossibleWords(String[] words, Character[] chars) {
+        System.out.println("\nStart function findAllPossibleWords()");
+        printArray(words, "\tWords");
+        printArray(chars, "\tChars");
+
+        List<String> res = new ArrayList<>();
+        if (words.length < 1) return res;
+        Trie3 dict = new Trie3();
+        for (String word : words) {
+            dict.insert(word);
+        }
+        HashMap<Character, Integer> map = new HashMap<>();
+        for (Character c : chars) {
+            if (map.containsKey(c)) {
+                map.put(c, map.get(c) + 1);
+            } else {
+                map.put(c, 1);
+            }
+        }
+
+        findAllPossibleWordsDFS(chars.length, map, dict.root, "", res);
+
+        System.out.println("\tRes: " + res);
+        return res;
+    }
+    private static void findAllPossibleWordsDFS(int len, HashMap<Character, Integer> map, TrieNode3 node, String tmp, List<String> res) {
+        if (node.hasEnd) {
+            res.add(tmp);
+        }
+        if (tmp.length() == len) {
+            return;
+        }
+        for (Character c : map.keySet()) {
+            if (map.get(c) > 0 && node.children.containsKey(c)) {
+                map.put(c, map.get(c) - 1);
+                findAllPossibleWordsDFS(len, map, node.children.get(c), tmp + c, res);
+                map.put(c, map.get(c) + 1);
+            }
+        }
+    }
+
+    /**
+     * Encode String with Shortest Length
+     *
+     * Given a non-empty string, encode the string such that its encoded length is the shortest.
+     * The encoding rule is: k[encoded_string], where the encoded_string inside the square brackets is being repeated exactly k times.
+     *         Note:
+     *         1. k will be a positive integer and encoded string will not be empty or have extra space.
+     *         2. You may assume that the input string contains only lowercase English letters. The string's length is at most 160.
+     *         3. If an encoding process does not make the string shorter, then do not encode it. If there are several solutions, return any of them is fine.
+     *         Example 1:
+     * Input: "aaa"
+     * Output: "aaa"
+     * Explanation: There is no way to encode it such that it is shorter than the input string, so we do not encode it.
+     *         Example 2:
+     * Input: "aaaaa"
+     * Output: "5[a]"
+     * Explanation: "5[a]" is shorter than "aaaaa" by 1 character.
+     *         Example 3:
+     * Input: "aaaaaaaaaa"
+     * Output: "10[a]"
+     * Explanation: "a9[a]" or "9[a]a" are also valid solutions, both of them have the same length = 5, which is the same as "10[a]".
+     * Example 4:
+     * Input: "aabcaabcd"
+     * Output: "2[aabc]d"
+     * Explanation: "aabc" occurs twice, so one answer can be "2[aabc]d".
+     * Example 5:
+     * Input: "abbbabbbcabbbabbbc"
+     * Output: "2[2[abbb]c]"
+     * Explanation: "abbbabbbc" occurs twice, but "abbbabbbc" can also be encoded to "2[abbb]c", so one answer can be "2[2[abbb]c]".
+     */
+
+
+
+    /**
+     * Longest Common Prefix
+     *
+     * Write a function to find the longest common prefix string amongst an array of strings.
+     */
+    public static void longestCommonPrefixDemo(String[] strs) {
+        System.out.println("\nStart function findAllPossibleWords()");
+        printArray(strs, "\tStrs:");
+        System.out.println("\tRes: " + longestCommonPrefix(strs));
+    }
+    public static String longestCommonPrefix(String[] strs) {
+        Trie3 trie = new Trie3();
+        for (String s : strs) {
+            trie.insert(s);
+        }
+        StringBuilder sb = new StringBuilder();
+        TrieNode3 cur = trie.root;
+        while (cur.children.size() == 1 && !cur.hasEnd) {
+            Character c = cur.children.keySet().iterator().next();
+            cur = cur.children.get(c);
+            sb.append(c);
+        }
+        return sb.toString();
+    }
+
 //    public static String longestCommonPrefix(String[] strs) {
 //        Trie trie = new Trie();
 //        String minStr = "";

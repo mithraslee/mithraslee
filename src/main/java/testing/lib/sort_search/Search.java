@@ -97,12 +97,8 @@ public class Search {
     }
 
     public static <T extends Number> int binarySearchIterative(T[] a, int size, T val) {
-        return binarySearchIterative(a, 0, size - 1, val);
-    }
-
-    public static <T extends Number> int binarySearchIterative(T[] a, int b, int e, T val) {
-        if (a == null || b < 0 || e < 0 || b > e)
-            return -1;
+        if (size < 1) return -1;
+        int b = 0, e = size - 1;
 
         while (b <= e) {
             int m = (b + e) / 2;
@@ -113,6 +109,28 @@ public class Search {
             } else {
                 b = m + 1;
             }
+        }
+        return -1;
+    }
+    public static <T extends Number> int binarySearchIterative2(T[] a, int size, T val) {
+        if (size < 1) return -1;
+        int b = 0, e = size - 1;
+
+        while (b + 1 < e) {
+            int m = b + (e - b)/2;
+            if (Utility.compareItem(a[m], val) == 0) {
+                return m;
+            } else if (Utility.compareItem(a[m], val) > 0) {
+                e = m;
+            } else {
+                b = m;
+            }
+        }
+        if (Utility.compareItem(a[b], val) == 0) {
+            return b;
+        }
+        if (Utility.compareItem(a[e], val) == 0) {
+            return e;
         }
         return -1;
     }
@@ -408,11 +426,9 @@ public class Search {
     public static void searchForClosestDemo(int[] A, int target) {
         System.out.println("\nStart function searchForClosestDemo(). Target = " + target);
         printArray(A, "\tNums:");
-        System.out.println("\tRes: " + searchForClosest(A, target));
-
+        System.out.println("\tRes1: " + searchForClosest(A, target));
     }
     public static int searchForClosest(int[] A, int target) {
-
         if (A == null) return -1;
         int len = A.length;
         if (len < 1) return -1;
@@ -457,7 +473,7 @@ public class Search {
         System.out.println("\nStart function sqrt()");
         System.out.println("\tn = " + n);
         Double precision_unit = 0.000001;
-//        System.out.println("n = " + n);
+
         if (n < 0.0) {
             System.out.println("\tres = " + -1.0);
             return -1.0;
@@ -481,7 +497,6 @@ public class Search {
 
         while (low < high) {
             mid = (low + high)/2.0;
-//            System.out.println("mid = " + mid + "; low = " + low + "; high = " + high);
             if (Math.abs((mid * mid) - n) <= precision_unit) {
                 break;
             } else if ((mid * mid) > n) {
@@ -512,7 +527,7 @@ public class Search {
         int begin = 0;
         int end = nums.length - 1;
 
-        while (begin + 1 < end) {
+        while (begin + 1 < end) {  // 这个形式保证: left < mid < right
             int mid = begin + (end - begin)/2;
             if (nums[mid] < nums[mid + 1]) {
                 begin = mid;
@@ -524,4 +539,139 @@ public class Search {
         }
         return nums[begin] > nums[end] ? begin : end;
     }
+    // Wrong version
+    public static int findPeakElement2(int[] nums) {
+        if (nums == null || nums.length < 1) return -1;
+        if (nums.length == 1) return 0;
+        int begin = 0;
+        int end = nums.length - 1;
+
+        while (begin < end) {
+            int mid = begin + (end - begin)/2;
+            if (nums[mid] < nums[mid + 1]) {
+                begin = mid + 1;
+            } else if (nums[mid] < nums[mid - 1]) { // mid - 1有可能越界
+                end = mid;
+            } else {
+                return mid;
+            }
+        }
+        return begin;
+    }
+
+    /**
+     * Split Array Largest Sum
+     *
+     * Given an array which consists of non-negative integers and an integer m,
+     * you can split the array into m non-empty continuous subarrays.
+     * Write an algorithm to minimize the largest sum among these m subarrays.
+     *
+     * Note:
+     * Given m satisfies the following constraint: 1 ≤ m ≤ length(nums) ≤ 14,000.
+     *
+     * Examples:
+     *
+     * Input:
+     * nums = [7,2,5,10,8];   m = 2
+     *
+     * Output: 18
+     *
+     * Explanation:
+     * There are four ways to split nums into two subarrays.
+     * The best way is to split it into [7,2,5] and [10,8],
+     * where the largest sum among the two subarrays is only 18.
+     */
+    // Optimal solution: http://www.cnblogs.com/grandyang/p/5933787.html
+    public static void splitArrayDemo(int[] nums, int m) {
+        System.out.println("\nStart function splitArray()");
+        printArray(nums, "Nums:");
+        System.out.println("\tm = " + m);
+
+        int maxSum1 = splitArray(nums, m);
+        System.out.println("\tMaxSum = " + maxSum1);
+        int maxSum2 = splitArray2(nums, m);
+        System.out.println("\tMaxSum = " + maxSum2);
+    }
+    public static int splitArray(int[] nums, int m) {
+        long left = 0, right = 0;
+        for (int n : nums) {
+            left = Math.max(left, n);
+            right += n;
+        }
+        while (left <= right) {
+            long mid = left + (right - left)/2;
+            if (canSplit(nums, mid, m)) {
+                right = mid - 1;
+            } else {
+                left = mid + 1;
+            }
+        }
+        return (int)left;
+    }
+    public static int splitArray2(int[] nums, int m) {
+        long left = 0, right = 0;
+        for (int n : nums) {
+            left = Math.max(left, n);
+            right += n;
+        }
+        while (left < right) {
+            long mid = left + (right - left)/2;
+            if (canSplit(nums, mid, m)) {
+                right = mid;
+            } else {
+                left = mid + 1;
+            }
+        }
+        return (int)left;
+    }
+    private static boolean canSplit(int[] nums, long mid, int m) {
+        int cnt = 1;
+        long curSum = 0;
+        for (int n : nums) {
+            curSum += n;
+            if (curSum > mid) {
+                curSum = n;
+                cnt++;
+                if (cnt > m) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Find the Duplicate Number
+     *
+     * Given an array nums containing n + 1 integers where each integer is between 1 and n (inclusive), prove that at least one duplicate number must exist. Assume that there is only one duplicate number, find the duplicate one.
+     *
+     * Note:
+     * You must not modify the array (assume the array is read only).
+     * You must use only constant, O(1) extra space.
+     * Your runtime complexity should be less than O(n2).
+     * There is only one duplicate number in the array, but it could be repeated more than once.
+     */
+    public static int findDuplicate(int[] nums) {
+        System.out.println("\nStart function findDuplicate()");
+        printArray(nums, "\tNums:");
+
+        int len = nums.length;
+        int left = 1, right = len - 1;
+        while (left < right) {
+            int mid = (left + right)/2;
+            int cnt = 0;
+            for (int n : nums) {
+                if (n <= mid) cnt++;
+            }
+            if (cnt <= mid) {
+                left = mid + 1;
+            } else {
+                right = mid;
+            }
+        }
+
+        System.out.println("\tRes = " + left);
+        return left;
+    }
+
 }

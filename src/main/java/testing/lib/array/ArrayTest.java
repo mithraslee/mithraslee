@@ -9,6 +9,8 @@ import java.util.*;
 import testing.lib.fenwick_tree.FenwickTree;
 import testing.lib.sort_search.*;
 
+import javax.swing.*;
+
 /**
  *
  * @author yunl
@@ -409,15 +411,15 @@ public class ArrayTest <T extends Number> {
         System.out.println("\nStart function largestRectangleArea()");
         printArray(height);
         System.out.println("\t************************************");
-        Stack s = new Stack();
+        Stack<Integer> s = new Stack<>();
         int len = height.length;
         int maxArea = 0;
         for (int i = 0; i < len; i++) {
             if (!s.isEmpty()) {
-                while (!s.isEmpty() && height[(Integer) s.peek()] > height[i]) {
-                    int temp = (Integer) s.pop();
+                while (!s.isEmpty() && height[s.peek()] > height[i]) {
+                    int temp = s.pop();
                     if (!s.isEmpty()) {
-                        maxArea = Math.max(maxArea, (i - (Integer) s.peek() - 1) * height[temp]);
+                        maxArea = Math.max(maxArea, (i - s.peek() - 1) * height[temp]);
                     } else {
                         maxArea = Math.max(maxArea, i * height[temp]);
                     }
@@ -428,9 +430,9 @@ public class ArrayTest <T extends Number> {
         }
         System.out.println("\t------------------------------------");
         while (!s.isEmpty()) {
-            int temp = (Integer) s.pop();
+            int temp = s.pop();
             if (!s.empty()) {
-                maxArea = Math.max(maxArea, (len - (Integer) s.peek() - 1) * height[temp]);
+                maxArea = Math.max(maxArea, (len - s.peek() - 1) * height[temp]);
             } else {
                 maxArea = Math.max(maxArea, len * height[temp]);
             }
@@ -1240,6 +1242,40 @@ public class ArrayTest <T extends Number> {
                 map.get(sum[i]).add(i);
             } else {
                 map.put(sum[i], new HashSet<>(Arrays.asList(new Integer[]{i})));
+            }
+        }
+        System.out.println("\tRes = " + res);
+        return res;
+    }
+    public static int maxSubArrayLen2(int[] nums, int k) {
+        System.out.println("\nStart function maxSubArrayLen2(). K = " + k);
+        printArray(nums, "\tNums:");
+
+        int len = nums.length;
+        if (len < 1) return 0;
+
+        int res = 0;
+        HashMap<Long, HashSet<Integer>> map = new HashMap<>();
+        long sum = 0;
+        for (int i = 0; i < len; i++) {
+            sum += nums[i];
+            if (nums[i] == k) {
+                res = Math.max(res, 1);
+            }
+            if (sum == k) {
+                res = Math.max(res, i + 1);
+            }
+            Long diff = sum - k;
+            if (map.containsKey(diff)) {
+                for (int idx : map.get(diff)) {
+                    res = Math.max(res, i - idx);
+                }
+            }
+
+            if (map.containsKey(sum)) {
+                map.get(sum).add(i);
+            } else {
+                map.put(sum, new HashSet<>(Arrays.asList(new Integer[]{i})));
             }
         }
         System.out.println("\tRes = " + res);
@@ -2191,7 +2227,6 @@ public class ArrayTest <T extends Number> {
         }
         return results;
     }
-
     private static void subsetsWithDupHelper2(ArrayList<Integer> items,
                                               HashMap<Integer, Integer> countMap,
                                               LinkedList<Integer> temp,
@@ -2208,6 +2243,44 @@ public class ArrayTest <T extends Number> {
                     subsetsWithDupHelper2(items, countMap, temp, results, index + 1);
                     for (int j = 0; j < time; j++) temp.removeLast();
                 }
+            }
+        }
+    }
+
+    public static List<List<Integer>> subsetsWithDupRecursive3(Integer[] num) {
+        System.out.println("\nStart function subsetsWithDupRecursive3()");
+        ArrayList<List<Integer>> results = new ArrayList<>();
+        if (num == null || num.length <= 0) return results;
+
+        TreeMap<Integer, Integer> countMap = new TreeMap<>();
+        for (int i : num) {
+            if (countMap.containsKey(i)) countMap.put(i, countMap.get(i) + 1);
+            else countMap.put(i, 1);
+        }
+
+        subsetsWithDupHelper3(countMap, new LinkedList<>(), results);
+        printArray(num, "Input array:");
+        for (List<Integer> list : results) {
+            System.out.println("\tsubset: " + list);
+        }
+        return results;
+    }
+    private static void subsetsWithDupHelper3(TreeMap<Integer, Integer> countMap,
+                                              LinkedList<Integer> temp,
+                                              ArrayList<List<Integer>> results) {
+        if (countMap.isEmpty()) {
+            results.add(new LinkedList<>(temp));
+        } else {
+            int k = countMap.firstKey();
+            if (countMap.get(k) > 0) {
+                int count = countMap.get(k);
+                countMap.remove(k);
+                for (int time = 0; time <= count; time++) {
+                    for (int j = 0; j < time; j++) temp.add(k);
+                    subsetsWithDupHelper3(countMap, temp, results);
+                    for (int j = 0; j < time; j++) temp.removeLast();
+                }
+                countMap.put(k, count);
             }
         }
     }
@@ -2406,8 +2479,8 @@ public class ArrayTest <T extends Number> {
 
         Arrays.sort(candidates);
 //        combinationSumDFS2 (candidates, target, new LinkedList<> (), results, 0);
-//        combinationSumDFS2_2 (candidates, target, new LinkedList<> (), results, 0);
-        combinationSumDFS2_3 (candidates, target, new LinkedList<> (), results, 0);
+        combinationSumDFS2_2 (candidates, target, new LinkedList<> (), results, 0);
+//        combinationSumDFS2_3 (candidates, target, new LinkedList<> (), results, 0);
 
         for (List<Integer> r : results) {
             System.out.println("\t\t" + r);
@@ -3038,10 +3111,45 @@ public class ArrayTest <T extends Number> {
 
         return res;
     }
-
-    // This version might be easier to follow
     public static List<List<Integer>> jumpPath2(Integer[] A) {
         System.out.println("\nStart function jumpPath2()");
+        assert A != null : "Input array is NULL";
+
+        ArrayList<List<Integer>> res = new ArrayList<>();
+        int len = A.length;
+        if (len <= 1) return res;
+
+        LinkedList<Integer> tmpList = new LinkedList<>();
+        tmpList.add(0);
+        Queue<LinkedList<Integer>> Q = new LinkedList<>();
+        Q.add(tmpList);
+        while (!Q.isEmpty()) {
+            int size = Q.size();
+            while (size-- > 0) {
+                LinkedList<Integer> curList = Q.poll();
+                int lastIdx = curList.getLast();
+                for (int i = 1; i <= A[lastIdx] && lastIdx + i <= len - 1; i++) {
+                    LinkedList<Integer> newList = new LinkedList<>(curList);
+                    newList.add(lastIdx + i);
+                    if (lastIdx + i == len - 1) {
+                        res.add(newList);
+                    } else {
+                        Q.add(newList);
+                    }
+                }
+            }
+        }
+
+        System.out.println(Arrays.asList(A) + "'s all jump possibilities: ");
+        for (List<Integer> list : res) {
+            System.out.println("\t" + list);
+        }
+
+        return res;
+    }
+    // This version might be easier to follow
+    public static List<List<Integer>> jumpPath3(Integer[] A) {
+        System.out.println("\nStart function jumpPath3()");
         assert A != null : "Input array is NULL";
 
         int len = A.length;
@@ -4543,6 +4651,8 @@ public class ArrayTest <T extends Number> {
      * @return
      */
     public static int maxProfitII(Integer[] prices) {
+        System.out.println("\nStart function maxProfitII()");
+        printArray(prices, "\tPrices:");
         int maxP = 0;
         int len = prices.length;
         if (len < 2) return 0;
@@ -4552,7 +4662,35 @@ public class ArrayTest <T extends Number> {
                 maxP += prices[i] - prices[i - 1];
             }
         }
+        System.out.println("\tRes: " + maxP);
         return maxP;
+    }
+
+    /**
+     * Best Time To Buy And Sell Stock with Fee
+     * Say you have an array for which the ith element is the price of a given stock on day i.
+     * Design an algorithm to find the maximum profit. You may complete as many transactions as you like (ie, buy one and sell one share of the stock multiple times). However, you may not engage in multiple transactions at the same time (ie, you must sell the stock before you buy again).
+     * For each of the transaction, there is a fee.
+     * Figure out the maximum profit.
+     */
+    public static int maxProfitVI(Integer[] prices, int fee) {
+        System.out.println("\nStart function maxProfitII2()");
+        printArray(prices, "\tPrices:");
+        System.out.println("\tFee: " + fee);
+        int len = prices.length;
+        if (len < 2) return 0;
+        int[] DP = new int[len];
+
+        for (int i = 1; i < len; i++) {
+            DP[i] = DP[i-1];
+            for (int j = 0; j < i; j++) {
+                if (prices[i] > prices[j]) {
+                    DP[i] = Math.max(DP[i], DP[j] + prices[i] - prices[j] - fee);
+                }
+            }
+        }
+        printArray(DP, "\tDP:");
+        return DP[len-1];
     }
 
     /**
@@ -5725,6 +5863,32 @@ public class ArrayTest <T extends Number> {
             i >>= 1;
         }
     }
+    public static int totalHammingDistance3(Integer[] nums) {
+        System.out.println("\nStart function totalHammingDistance3()");
+        System.out.println("\tnums: " + Arrays.asList(nums));
+        int len = nums.length;
+        int[] cnts = new int[32];
+
+        for (int n : nums) {
+            countDigits(n, cnts);
+        }
+        int sum = 0;
+        for (int cnt : cnts) {
+            sum += cnt * (len - cnt);
+        }
+        System.out.println("\tsum = " + sum);
+        return sum;
+    }
+    private static void countDigits(int n, int[] cnts) {
+        int idx = 0;
+        while (n > 0) {
+            if ((n & 0x1) == 1) {
+                cnts[idx]++;
+            }
+            idx++;
+            n >>= 1;
+        }
+    }
 
     /**
      * Game of Life
@@ -5856,6 +6020,64 @@ public class ArrayTest <T extends Number> {
         System.out.println("\tRes = " + res);
         return res;
     }
+
+    public static List<Integer> findMinHeightTrees2(int n, Integer[][] edges) {
+        System.out.println("\nStart function findMinHeightTrees2()");
+        printTwoDimentinalArray(edges);
+        List<Integer> res = new ArrayList<>();
+        int connLen = edges.length;
+        if (connLen < 1) {
+            for (int i = 0; i < n; i++) {
+                res.add(i);
+            }
+            return res;
+        }
+
+        HashMap<Integer, HashSet<Integer>> conn = new HashMap<>();
+        for (int i = 0; i < connLen; i++) {
+            int n1 = edges[i][0];
+            int n2 = edges[i][1];
+            if (conn.containsKey(n1)) {
+                conn.get(n1).add(n2);
+            } else {
+                HashSet<Integer> newSet = new HashSet<>();
+                newSet.add(n2);
+                conn.put(n1, newSet);
+            }
+            if (conn.containsKey(n2)) {
+                conn.get(n2).add(n1);
+            } else {
+                HashSet<Integer> newSet = new HashSet<>();
+                newSet.add(n1);
+                conn.put(n2, newSet);
+            }
+        }
+
+        Queue<Integer> Q = new LinkedList<>();
+        for (Integer i : conn.keySet()) {
+            if (conn.get(i).size() <= 1) {
+                Q.add(i);
+            }
+        }
+        while (conn.size() > 2) {
+            int size = Q.size();
+            while (size-- > 0) {
+                int cur = Q.poll();
+                for (int neighbor : conn.get(cur)) {
+                    conn.get(neighbor).remove(cur);
+                    if (conn.get(neighbor).size() <= 1) {
+                        Q.add(neighbor);
+                    }
+                }
+                conn.remove(cur);
+            }
+        }
+
+        res.addAll(conn.keySet());
+        System.out.println("\tRes = " + res);
+        return res;
+    }
+
 //    public static List<Integer> findMinHeightTrees(int n, Integer[][] edges) {
 //        System.out.println("\nStart function findMinHeightTrees()");
 //        printTwoDimentinalArray(edges);
@@ -6168,6 +6390,32 @@ public class ArrayTest <T extends Number> {
         return maxR;
     }
 
+    /**
+     * Self Crossing
+     * You are given an array x of n positive numbers. You start at point (0,0) and moves x[0] metres to the north, then x[1] metres to the west, x[2] metres to the south, x[3] metres to the east and so on. In other words, after each move your direction changes counter-clockwise.
+     * Write a one-pass algorithm with O(1) extra space to determine, if your path crosses itself, or not.
+     *         Example 1:
+     * Given x = [2, 1, 1, 2],
+     *         ┌───┐
+     *         │   │
+     *         └───┼──>
+     *             │
+     * Return true (self crossing)
+     * Example 2:
+     * Given x = [1, 2, 3, 4],
+     *         ┌──────┐
+     *         │      │
+     *         │
+     *         │
+     *         └────────────>
+     * Return false (not self crossing)
+     * Example 3:
+     * Given x = [1, 1, 1, 1],
+     *         ┌───┐
+     *         │   │
+     *         └───┼>
+     * Return true (self crossing)
+     */
     private static class Line {
         int x1;
         int y1;
@@ -6191,7 +6439,8 @@ public class ArrayTest <T extends Number> {
         printArray(x, "\tInput:");
         System.out.println("\tisSelfCrossing = " + isSelfCrossing(x));
     }
-    public static boolean isSelfCrossing(int[] x) {
+    // Wrong version
+    public static boolean isSelfCrossing2(int[] x) {
         int len = x.length;
         if (len <= 3) return false;
         LinkedList<Line> Q = new LinkedList<>();
@@ -6215,6 +6464,21 @@ public class ArrayTest <T extends Number> {
                 return true;
             }
             Q.addLast(newLine);
+        }
+        return false;
+    }
+    // http://www.cnblogs.com/grandyang/p/5216856.html
+    public static boolean isSelfCrossing(int[] x) {
+        for (int i = 3; i < x.length; ++i) {
+            if (x[i] >= x[i - 2] && x[i - 3] >= x[i - 1]) {
+                return true;
+            }
+            if (i >= 4 && x[i-1] == x[i-3] && x[i] >= x[i-2] - x[i-4]) {
+                return true;
+            }
+            if (i >= 5 && x[i-2] >= x[i-4] && x[i-3] >= x[i-1] && x[i-1] >= x[i-3] - x[i-5] && x[i] >= x[i-2] - x[i-4]) {
+                return true;
+            }
         }
         return false;
     }
@@ -7660,6 +7924,39 @@ public class ArrayTest <T extends Number> {
         return sum;
     }
 
+    public static int numberOfArithmeticSlicesII2(int[] A) {
+        System.out.println("\nStart function numberOfArithmeticSlicesII2()");
+        printArray(A, "\tA:");
+        int len = A.length;
+        ArrayList<HashMap<Integer, Integer>> idxToMap = new ArrayList<>();
+        idxToMap.add(new HashMap<>());
+
+        int res = 0;
+        for (int i = 1; i < len; i++) {
+            idxToMap.add(new HashMap<>());
+            for (int j = 0; j < i; j++) {
+                long diff = (long)A[i] - (long)A[j];
+                if (diff > Integer.MAX_VALUE || diff < Integer.MIN_VALUE) continue;
+                int d = (int)diff;
+
+                if (!idxToMap.get(i).containsKey(d)) {
+                    idxToMap.get(i).put(d, 0);
+                }
+                idxToMap.get(i).put(d, idxToMap.get(i).get(d) + 1);
+                if (idxToMap.get(j).containsKey(d)) {
+                    idxToMap.get(i).put(d, idxToMap.get(i).get(d) + idxToMap.get(j).get(d));
+                    res += idxToMap.get(j).get(d);
+                }
+//                if (idxToMap.get(i).get(d) > 1) {
+//                    res += idxToMap.get(i).get(d) - 1;
+//                }
+            }
+        }
+
+        System.out.println("\tRes = " + res);
+        return res;
+    }
+
     /**
      * Partition Equal Subset Sum
      * Given a non-empty array containing only positive integers, find if the array can be partitioned into two subsets such that the sum of elements in both subsets is equal.
@@ -8328,7 +8625,61 @@ public class ArrayTest <T extends Number> {
             return -1;
         }
     }
+    public static int[] findRightInterval2(Interval2[] intervals) {
+        System.out.println("\nStart function findRightInterval2()");
+        printArray(intervals, "\tIntervals:");
+        int len = intervals.length;
+        int[][] start2Idx = new int[len][2];
+        for (int i = 0; i < len; i++) {
+            start2Idx[i][0] = intervals[i].start;
+            start2Idx[i][1] = i;
+        }
+        Arrays.sort(start2Idx, (a, b) -> a[0] - b[0]);
+        printTwoDimentinalArray(start2Idx, "\torder:");
 
+        int[] res = new int[len];
+        for (int i = 0; i < len; i++) {
+            res[i] = binarySearch3(start2Idx, intervals[i].end);
+        }
+        printArray(res, "\tRes:");
+        return res;
+    }
+    private static int binarySearch2(int[][] start2Idx, int val) {
+        int len = start2Idx.length;
+        int b = 0, e = len - 1;
+        while (b <= e) {
+            int m = (b + e) / 2;
+            if (start2Idx[m][0] == val) {
+                return start2Idx[m][1];
+            } else if (start2Idx[m][0] > val) {
+                e = m - 1;
+            } else {
+                b = m + 1;
+            }
+        }
+        while (e < len && start2Idx[e][0] < val) {
+            e++;
+        }
+        if (e < len) {
+            return start2Idx[e][1];
+        } else {
+            return -1;
+        }
+    }
+    public static int binarySearch3(int[][] start2Idx, int val) {
+        int len = start2Idx.length;
+        int lb = -1, ub = len;
+        while (lb + 1 < ub) {
+            int mid = lb + (ub - lb) / 2;
+            if (start2Idx[mid][0] < val) {
+                lb = mid;
+            } else {
+                ub = mid;
+            }
+        }
+
+        return lb + 1 == len ? -1 : start2Idx[lb+1][1];
+    }
     /**
      * Minimum Moves to Equal Array Elements
      * Given a non-empty integer array of size n, find the minimum number of moves required to make all array elements equal, where a move is incrementing n - 1 elements by 1.
@@ -8785,7 +9136,7 @@ public class ArrayTest <T extends Number> {
      */
     // Works, but timed out
     // Optimal solution: http://www.cnblogs.com/grandyang/p/5933787.html
-    public static int splitArray(int[] nums, int m) {
+    public static int splitArray2(int[] nums, int m) {
         System.out.println("\nStart function splitArray()");
         printArray(nums, "Nums:");
         System.out.println("\tm = " + m);
@@ -8821,6 +9172,45 @@ public class ArrayTest <T extends Number> {
         }
 
         return globalMin;
+    }
+    // Optimal solution
+    public static int splitArray(int[] nums, int m) {
+        System.out.println("\nStart function splitArray()");
+        printArray(nums, "Nums:");
+        System.out.println("\tm = " + m);
+
+        long left = 0, right = 0;
+        for (int n : nums) {
+            left = Math.max(left, n);
+            right += n;
+        }
+//        while (left < right) {
+        while (left <= right) {
+            long mid = left + (right - left)/2;
+            if (canSplit(nums, mid, m)) {
+//                right = mid;
+                right = mid - 1;
+            } else {
+                left = mid + 1;
+            }
+        }
+        System.out.println("\tMaxSum = " + (int)left);
+        return (int)left;
+    }
+    private static boolean canSplit(int[] nums, long mid, int m) {
+        int cnt = 1;
+        long curSum = 0;
+        for (int n : nums) {
+            curSum += n;
+            if (curSum > mid) {
+                curSum = n;
+                cnt++;
+                if (cnt > m) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     /**
@@ -10218,6 +10608,22 @@ public class ArrayTest <T extends Number> {
         }
         return res;
     }
+    public int findMaxConsecutiveOnes2(int[] nums) {
+        int len = nums.length;
+        if (len < 1) return 0;
+
+        int res = 0;
+        for (int i = 0, start = 0, pre = -1; i < len; i++) {
+            if (nums[i] == 0) {
+                if (pre != -1) {
+                    start = pre + 1;
+                }
+                pre = i;
+            }
+            res = Math.max(res, (i - start + 1));
+        }
+        return res;
+    }
 
     public static int[] sortTransformedArray(int[] nums, int a, int b, int c) {
         int len = nums.length;
@@ -10601,6 +11007,825 @@ public class ArrayTest <T extends Number> {
         return area == (maxX - minX) * (maxY - minY);
     }
 
+    /**
+     * Poor Pigs
+     *
+     * There are 1000 buckets, one and only one of them contains poison, the rest are filled with water. They all look the same. If a pig drinks that poison it will die within 15 minutes. What is the minimum amount of pigs you need to figure out which bucket contains the poison within one hour.
+     * Answer this question, and write an algorithm for the follow-up general case.
+     * Follow-up:
+     * If there are n buckets and a pig drinking poison will die within m minutes, how many pigs (x) you need to figure out the "poison" bucket within p minutes? There is exact one bucket with poison.
+     */
+    public static int poorPigs(int buckets, int minutesToDie, int minutesToTest) {
+        System.out.println("\nStart function poorPigs()");
+        System.out.println("\nbucekts = " + buckets + ", minutesToDie = " + minutesToDie + ", minutesToTest = " + minutesToTest);
+        int pigs = 0;
+        int tests = minutesToTest / minutesToDie + 1;
+        while (Math.pow(tests, pigs) < buckets) {
+            pigs++;
+        }
+        System.out.println("\tPigs = " + pigs);
+        return pigs;
+    }
+    public static int poorPigs2(int buckets, int minutesToDie, int minutesToTest) {
+        System.out.println("\nStart function poorPigs()");
+        System.out.println("\nbucekts = " + buckets + ", minutesToDie = " + minutesToDie + ", minutesToTest = " + minutesToTest);
+        if (buckets-- == 1) return 0;
+        int base = minutesToTest/minutesToDie + 1;
+        int count = 0;
+        while (buckets > 0) {
+            buckets /= base;
+            count++;
+        }
+        System.out.println("\tPigs = " + count);
+        return count;
+    }
+
+    /**
+     * Target Sum
+     *
+     * You are given a list of non-negative integers, a1, a2, ..., an, and a target, S. Now you have 2 symbols + and -. For each integer, you should choose one from + and - as its new symbol.
+     *
+     * Find out how many ways to assign symbols to make sum of integers equal to target S.
+     *
+     *         Example 1:
+     * Input: nums is [1, 1, 1, 1, 1], S is 3.
+     * Output: 5
+     * Explanation:
+     *
+     *         -1+1+1+1+1 = 3
+     *         +1-1+1+1+1 = 3
+     *         +1+1-1+1+1 = 3
+     *         +1+1+1-1+1 = 3
+     *         +1+1+1+1-1 = 3
+     *
+     * There are 5 ways to assign symbols to make the sum of nums be target 3.
+     * Note:
+     * The length of the given array is positive and will not exceed 20.
+     * The sum of elements in the given array will not exceed 1000.
+     * Your output answer is guaranteed to be fitted in a 32-bit integer.
+     */
+    public static int findTargetSumWays(int[] nums, int S) {
+        System.out.println("\nStart function findTargetSumWays(). S = " + S);
+        printArray(nums, "\tNums: ");
+        int[] res = new int[1];
+        findTargetSumWaysDFS(nums, 0, S, 0, res);
+        System.out.println("\tRes = " + res[0]);
+        return res[0];
+    }
+    private static void findTargetSumWaysDFS(int[] nums, int idx, int S, int tmp, int[] res) {
+        if (idx == nums.length) {
+            if (tmp == S) res[0]++;
+            return;
+        }
+        findTargetSumWaysDFS(nums, idx+1, S, tmp + nums[idx], res);
+        findTargetSumWaysDFS(nums, idx+1, S, tmp - nums[idx], res);
+    }
+
+    public static void findSubsequencesDemo(int[] nums) {
+        System.out.println("\nStart function findSubsequencesDemo()");
+        printArray(nums, "\tNums: ");
+        List<List<Integer>> res = findSubsequences(nums);
+        System.out.println("\tRes:");
+        for (List<Integer> r : res) {
+            System.out.println("\t" + r);
+        }
+    }
+    public static List<List<Integer>> findSubsequences3(int[] nums) {
+        List<List<Integer>> res = new ArrayList<>();
+
+        int len = nums.length;
+        if (len < 2) return res;
+
+        HashSet<String> used = new HashSet<>();
+        HashMap<Integer, List<LinkedList<Integer>>> past = new HashMap<>();
+        for (int i = 0; i < len; i++) {
+            past.put(i, new ArrayList<>());
+        }
+
+        for (int i = 1; i < len; i++) {
+            for (int j = 0; j < i; j++) {
+                if (nums[j] <= nums[i]) {
+                    LinkedList<Integer> new1 = new LinkedList<>(Arrays.asList(new Integer[]{nums[j], nums[i]}));
+                    past.get(i).add(new1);
+                    if (!used.contains(new1.toString())) {
+                        res.add(new1);
+                        used.add(new1.toString());
+                    }
+                    for (LinkedList<Integer> list : past.get(j)) {
+                        LinkedList<Integer> newList = new LinkedList<>(list);
+                        newList.add(nums[i]);
+                        past.get(i).add(newList);
+                        if (!used.contains(newList.toString())) {
+                            res.add(newList);
+                            used.add(newList.toString());
+                        }
+                    }
+                }
+            }
+        }
+        return res;
+    }
+    public static List<List<Integer>> findSubsequences(int[] nums) {
+        List<List<Integer>> res = new ArrayList<>();
+
+        int len = nums.length;
+        if (len < 2) return res;
+
+        LinkedList<Integer> tmp = new LinkedList<>();
+        tmp.add(nums[0]);
+        HashMap<Integer, List<LinkedList<Integer>>> past = new HashMap<>();
+        for (int i = 0; i < len; i++) {
+            past.put(i, new ArrayList<>());
+        }
+
+        for (int i = 1; i < len; i++) {
+            int j = 0;
+            if (nums[i] == nums[i-1]) {
+                j = i-1;
+            }
+            for (; j < i; j++) {
+                if (nums[j] <= nums[i]) {
+                    LinkedList<Integer> new1 = new LinkedList<>(Arrays.asList(new Integer[]{nums[j], nums[i]}));
+                    past.get(i).add(new1);
+                    res.add(new1);
+                    for (LinkedList<Integer> list : past.get(j)) {
+                        LinkedList<Integer> newList = new LinkedList<>(list);
+                        newList.add(nums[i]);
+                        past.get(i).add(newList);
+                        res.add(newList);
+                    }
+                }
+            }
+        }
+        return res;
+    }
+    public static List<List<Integer>> findSubsequences2(int[] nums) {
+        List<List<Integer>> res = new ArrayList<>();
+
+        int len = nums.length;
+        if (len < 2) return res;
+
+        findSubsequencesDFS(nums, 0, new LinkedList<>(), res);
+        return res;
+    }
+    public static void findSubsequencesDFS(int[] nums, int start, LinkedList<Integer> tmp, List<List<Integer>> res) {
+        if (tmp.size() >= 2) {
+            res.add(new LinkedList<>(tmp));
+        }
+        if (start == nums.length) {
+            return;
+        }
+        for (int i = start; i < nums.length; i++) {
+            if (i > start && nums[i] == nums[i - 1]) {
+                continue;
+            }
+
+            if (tmp.isEmpty() || nums[i] >= tmp.getLast()) {
+                tmp.add(nums[i]);
+                findSubsequencesDFS(nums, i + 1, tmp, res);
+                tmp.removeLast();
+            }
+        }
+    }
+
+    /**
+     * Predict the Winner
+     * Given an array of scores that are non-negative integers. Player 1 picks one of the numbers from either end of the array followed by the player 2 and then player 1 and so on. Each time a player picks a number, that number will not be available for the next player. This continues until all the scores have been chosen. The player with the maximum score wins.
+     * Given an array of scores, predict whether player 1 is the winner. You can assume each player plays to maximize his score.
+     * Example 1:
+     * Input: [1, 5, 2]
+     * Output: False
+     * Explanation: Initially, player 1 can choose between 1 and 2.
+     * If he chooses 2 (or 1), then player 2 can choose from 1 (or 2) and 5. If player 2 chooses 5, then player 1 will be left with 1 (or 2).
+     * So, final score of player 1 is 1 + 2 = 3, and player 2 is 5.
+     * Hence, player 1 will never be the winner and you need to return False.
+     *         Example 2:
+     * Input: [1, 5, 233, 7]
+     * Output: True
+     * Explanation: Player 1 first chooses 1. Then player 2 have to choose between 5 and 7. No matter which number player 2 choose, player 1 can choose 233.
+     * Finally, player 1 has more score (234) than player 2 (12), so you need to return True representing player1 can win.
+     *         Note:
+     *         1. 1 <= length of the array <= 20.
+     *         2. Any scores in the given array are non-negative integers and will not exceed 10,000,000.
+     *         3. If the scores of both players are equal, then player 1 is still the winner.
+     */
+    public static void PredictTheWinnerDemo(int[] nums) {
+        System.out.println("\nStart function PredictTheWinnerDemo()");
+        printArray(nums, "\tNums: ");
+        System.out.println("\tRes:" + PredictTheWinner(nums));
+    }
+    public static boolean PredictTheWinner(int[] nums) {
+        int len = nums.length;
+        if (len == 1) return true;
+        return PredictTheWinnerHelper(nums, 0, len - 1, 0, 0, true);
+    }
+    private static boolean PredictTheWinnerHelper(int[] nums, int left, int right, long p1, long p2, boolean first) {
+        if (left > right) {
+            if (p1 >= p2) {
+                return first;
+            } else {
+                return !first;
+            }
+        }
+        boolean leftRes = PredictTheWinnerHelper(nums, left + 1, right, first ? p1 + nums[left] : p1, first ? p2 : p2 + nums[left], !first);
+        boolean rightRes = PredictTheWinnerHelper(nums, left, right - 1, first ? p1 + nums[right] : p1, first ? p2 : p2 + nums[right], !first);
+
+        if (leftRes && rightRes) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * Smallest Rectangle Enclosing Black Pixels
+     * An image is represented by a binary matrix with 0 as a white pixel and 1 as a black pixel. The black pixels are connected, i.e., there is only one black region. Pixels are connected horizontally and vertically. Given the location (x, y) of one of the black pixels, return the area of the smallest (axis-aligned) rectangle that encloses all black pixels.
+     * For example, given the following image:
+     *         [
+     *         "0010",
+     *         "0110",
+     *         "0100"
+     *         ]
+     * and x = 0, y = 2,
+     * Return 6.
+     */
+    public static int minArea(Character[][] image, int x, int y) {
+        System.out.println("\nStart function minArea()");
+
+        int R = image.length;
+        if (R < 1) return 0;
+        int C = image[0].length;
+        if (C < 1) return 0;
+
+        assert x >= 0 && x < R && y >= 0 && y < C && image[x][y] == '1';
+
+        System.out.println("\tImage:");
+        for (int i = 0; i < R; i++) {
+            System.out.println("\t" + Arrays.asList(image[i]));
+        }
+        System.out.println("\tX = " + x + "; Y = " + y);
+
+        int[][] dirs = new int[][]{
+                {-1, 0},{1, 0},{0, -1},{0, 1}
+        };
+
+        int minX = R - 1;
+        int maxX = 0;
+        int minY = C - 1;
+        int maxY = 0;
+        Queue<int[]> Q = new LinkedList<>();
+        Q.add(new int[]{x, y});
+        image[x][y] = '2';
+        while (!Q.isEmpty()) {
+            int[] cur = Q.poll();
+            minX = Math.min(minX, cur[0]);
+            maxX = Math.max(maxX, cur[0]);
+            minY = Math.min(minY, cur[1]);
+            maxY = Math.max(maxY, cur[1]);
+
+            for (int[] dir : dirs) {
+                int newX = cur[0] + dir[0];
+                int newY = cur[1] + dir[1];
+                if (newX >= 0 && newX < R && newY >= 0 && newY < C && image[newX][newY] == '1') {
+                    image[newX][newY] = '2';
+                    Q.add(new int[]{newX, newY});
+                }
+            }
+        }
+        System.out.println("\tMinArea = " + (maxX - minX + 1) * (maxY - minY + 1));
+        return (maxX - minX + 1) * (maxY - minY + 1);
+    }
+
+    /**
+     * The Maze
+     * There is a ball in a maze with empty spaces and walls. The ball can go through empty spaces by rolling up, down, left or right, but it won't stop rolling until hitting a wall. When the ball stops, it could choose the next direction.
+     * Given the ball's start position, the destination and the maze, determine whether the ball could stop at the destination.
+     * The maze is represented by a binary 2D array. 1 means the wall and 0 means the empty space. You may assume that the borders of the maze are all walls. The start and destination coordinates are represented by row and column indexes.
+     * Example 1
+     * Input 1: a maze represented by a 2D array
+0 0  * 1 0 0
+     *     0 0 0 0 0
+     *     0 0 0 1 0
+     *     1 1 0 1 1
+     *     0 0 0 0 0
+     * Input 2: start coordinate (rowStart, colStart) = (0, 4)
+     * Input 3: destination coordinate (rowDest, colDest) = (4, 4)
+     * Output: true
+     * Explanation: One possible way is : left -> down -> left -> down -> right -> down -> right.
+     *
+     *         Example 2
+     * Input 1: a maze represented by a 2D array
+     *     0 0 1 0 0
+     *     0 0 0 0 0
+     *     0 0 0 1 0
+     *     1 1 0 1 1
+     *     0 0 0 0 0
+     * Input 2: start coordinate (rowStart, colStart) = (0, 4)
+     * Input 3: destination coordinate (rowDest, colDest) = (3, 2)
+     * Output: false
+     * Explanation: There is no way for the ball to stop at the destination.
+     *
+     *         Note:
+     *         1. There is only one ball and one destination in the maze.
+     *         2. Both the ball and the destination exist on an empty space, and they will not be at the same position initially.
+     *         3. The given maze does not contain border (like the red rectangle in the example pictures), but you could assume the border of the maze are all walls.
+     *         4. The maze contains at least 2 empty spaces, and both the width and height of the maze won't exceed 100.
+     */
+    public static void hasPathDemo(int[][] maze, int[] start, int[] destination) {
+        System.out.println("\nStart function hasPath()");
+        printTwoDimentinalArray(maze, "\tMaze:");
+        printArray(start, "\tStart:");
+        printArray(destination, "\tDestionation:");
+        System.out.println("\tRes: " + hasPath(maze, start, destination));
+    }
+    public static boolean hasPath(int[][] maze, int[] start, int[] destination) {
+        int R = maze.length;
+        if (R < 1) return false;
+        int C = maze[0].length;
+        if (C < 1) return false;
+
+        int[][] dirs = new int[][]{
+                {-1, 0},{1, 0},{0, -1},{0, 1}
+        };
+        boolean[][] visited = new boolean[R][C];
+
+        visited[start[0]][start[1]] = true;
+        for (int[] dir : dirs) {
+            if (hasPathDFS(maze, R, C, start[0], start[1], destination, dirs, dir, visited)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    private static boolean hasPathDFS(int[][] maze, int R, int C, int i, int j, int[] destination,int[][] dirs, int[] d, boolean[][] visited) {
+        if (i < 0 || i >= R || j < 0 || j >= C) {
+            return false;
+        }
+        if (!reachWall(maze, i, j, R, C, d)) {
+            return hasPathDFS(maze, R, C, i + d[0], j + d[1], destination, dirs, d, visited);
+        }
+        if (destination[0] == i && destination[1] == j) {
+            return true;
+        }
+        if (visited[i][j]) {
+            return false;
+        }
+        visited[i][j] = true;
+        for (int[] dir : dirs) {
+            if ((dir[0] != d[0] && dir[1] != d[1]) &&
+                (d[0] + dir[0] != 0 && d[1] + dir[1] != 0)) {
+                if (hasPathDFS(maze, R, C, i, j, destination, dirs, dir, visited)) {
+                    return true;
+                }
+            }
+        }
+        // visited[i][j] = false;
+        return false;
+    }
+    private static boolean reachWall(int[][] maze, int i, int j, int R, int C, int[] dir) {
+        int x = i + dir[0];
+        int y = j + dir[1];
+
+        return (x < 0 || x >= R || y < 0 || y >= C || maze[x][y] == 1);
+    }
+
+    /**
+     * The Maze II
+     * There is a ball in a maze with empty spaces and walls. The ball can go through empty spaces by rolling up, down, left or right, but it won't stop rolling until hitting a wall. When the ball stops, it could choose the next direction.
+     * Given the ball's start position, the destination and the maze, find the shortest distance for the ball to stop at the destination. The distance is defined by the number of empty spaces traveled by the ball from the start position (excluded) to the destination (included). If the ball cannot stop at the destination, return -1.
+     * The maze is represented by a binary 2D array. 1 means the wall and 0 means the empty space. You may assume that the borders of the maze are all walls. The start and destination coordinates are represented by row and column indexes.
+     * Example 1
+     * Input 1: a maze represented by a 2D array
+0 0  * 1 0 0
+     *     0 0 0 0 0
+     *     0 0 0 1 0
+     *     1 1 0 1 1
+     *     0 0 0 0 0
+     * Input 2: start coordinate (rowStart, colStart) = (0, 4)
+     * Input 3: destination coordinate (rowDest, colDest) = (4, 4)
+     * Output: 12
+     * Explanation: One shortest way is : left -> down -> left -> down -> right -> down -> right.
+     * The total distance is 1 + 1 + 3 + 1 + 2 + 2 + 2 = 12.
+     *
+     * Example 2
+     * Input 1: a maze represented by a 2D array
+     *     0 0 1 0 0
+     *     0 0 0 0 0
+     *     0 0 0 1 0
+     *     1 1 0 1 1
+     *     0 0 0 0 0
+     * Input 2: start coordinate (rowStart, colStart) = (0, 4)
+     * Input 3: destination coordinate (rowDest, colDest) = (3, 2)
+     * Output: -1
+     * Explanation: There is no way for the ball to stop at the destination.
+     *
+     *         Note:
+     *         1. There is only one ball and one destination in the maze.
+     *         2. Both the ball and the destination exist on an empty space, and they will not be at the same position initially.
+     *         3. The given maze does not contain border (like the red rectangle in the example pictures), but you could assume the border of the maze are all walls.
+     * The maze contains at least 2 empty spaces, and both the width and height of the maze won't exceed 100.
+     */
+    public static void shortestDistanceDemo(int[][] maze, int[] start, int[] destination) {
+        System.out.println("\nStart function shortestDistanceDemo()");
+        printTwoDimentinalArray(maze, "\tMaze:");
+        printArray(start, "\tStart:");
+        printArray(destination, "\tDestionation:");
+        System.out.println("\tRes: " + shortestDistance(maze, start, destination));
+    }
+    public static int shortestDistance(int[][] maze, int[] start, int[] destination) {
+        int R = maze.length;
+        if (R < 1) return -1;
+        int C = maze[0].length;
+        if (C < 1) return -1;
+        int M = Math.max(R, C) + 1;
+
+        int s = start[0] * M + start[1];
+        int e = destination[0] * M + destination[1];
+
+        int[][] dirs = new int[][]{
+                {-1, 0},{1, 0},{0, -1},{0, 1}
+        };
+        HashMap<Integer, Integer> visited = new HashMap<>();
+        visited.put(s, 0);
+        int[] res = new int[]{Integer.MAX_VALUE};
+        for (int[] dir : dirs) {
+            shortestDistanceDFS(maze, R, C, M, s, e, dirs, dir, visited, 0, res);
+        }
+        return res[0] == Integer.MAX_VALUE ? -1 : res[0];
+    }
+    private static void shortestDistanceDFS(int[][] maze, int R, int C, int M, int cur, int end, int[][] dirs, int[] d, HashMap<Integer, Integer> visited, int cnt, int[] res) {
+        int i = cur/M;
+        int j = cur%M;
+        // if (i < 0 || i >= R || j < 0 || j >= C || res[0] <= cnt) {
+        //     return;
+        // }
+        if (!reachWall(maze, i, j, R, C, d)) {
+            while (!reachWall(maze, i, j, R, C, d)) {
+                i += d[0];
+                j += d[1];
+                cnt++;
+            }
+            cur = i * M + j;
+        }
+
+        if (cur == end) {
+            res[0] = Math.min(res[0], cnt);
+            return;
+        }
+
+        if (res[0] <= cnt + 1) {
+            return;
+        }
+        if (visited.containsKey(cur) && visited.get(cur) <= cnt) {
+            return;
+        }
+        visited.put(cur, cnt);
+        for (int[] dir : dirs) {
+            if ((dir[0] != d[0] && dir[1] != d[1]) &&
+                    (d[0] + dir[0] != 0 && d[1] + dir[1] != 0)) {
+                int x = i + dir[0], y = j + dir[1];
+                if (x < 0 || x >= R || y < 0 || y >= C || maze[x][y] == 1) {
+                    continue;
+                }
+                shortestDistanceDFS(maze, R, C, M, x * M + y, end, dirs, dir, visited, cnt + 1, res);
+            }
+        }
+    }
+    public static int shortestDistance2(int[][] maze, int[] start, int[] destination) {
+        int R = maze.length;
+        if (R < 1) return -1;
+        int C = maze[0].length;
+        if (C < 1) return -1;
+        int M = Math.max(R, C) + 1;
+
+        int s = start[0] * M + start[1];
+        int e = destination[0] * M + destination[1];
+
+        int[][] dirs = new int[][]{
+                {-1, 0},{1, 0},{0, -1},{0, 1}
+        };
+        HashMap<Integer, Integer> visited = new HashMap<>();
+        visited.put(s, 0);
+        int[] res = new int[]{Integer.MAX_VALUE};
+        for (int[] dir : dirs) {
+            shortestDistanceDFS2(maze, R, C, M, s, e, dirs, dir, visited, 0, res);
+        }
+        return res[0] == Integer.MAX_VALUE ? -1 : res[0];
+    }
+    private static void shortestDistanceDFS2(int[][] maze, int R, int C, int M, int cur, int end, int[][] dirs, int[] d, HashMap<Integer, Integer> visited, int cnt, int[] res) {
+        int i = cur/M;
+        int j = cur%M;
+        if (i < 0 || i >= R || j < 0 || j >= C) {
+            return;
+        }
+        if (!reachWall(maze, i, j, R, C, d)) {
+            shortestDistanceDFS2(maze, R, C, M, (i + d[0]) * M + j + d[1], end, dirs, d, visited, cnt + 1, res);
+            return;
+        }
+        if (cur == end) {
+            res[0] = Math.min(res[0], cnt);
+            return;
+        }
+        if (visited.containsKey(cur) && visited.get(cur) <= cnt) {
+            return;
+        }
+        visited.put(cur, cnt);
+        for (int[] dir : dirs) {
+            if ((dir[0] != d[0] && dir[1] != d[1]) &&
+                    (d[0] + dir[0] != 0 && d[1] + dir[1] != 0)) {
+                shortestDistanceDFS2(maze, R, C, M, (i + dir[0]) * M + j + dir[1], end, dirs, dir, visited, cnt + 1, res);
+            }
+        }
+    }
+
+    /**
+     * The Maze III
+     * There is a ball in a maze with empty spaces and walls. The ball can go through empty spaces by rolling up (u), down (d), left (l) or right (r), but it won't stop rolling until hitting a wall. When the ball stops, it could choose the next direction. There is also a hole in this maze. The ball will drop into the hole if it rolls on to the hole.
+     * Given the ball position, the hole position and the maze, find out how the ball could drop into the hole by moving the shortest distance. The distance is defined by the number of empty spaces traveled by the ball from the start position (excluded) to the hole (included). Output the moving directions by using 'u', 'd', 'l' and 'r'. Since there could be several different shortest ways, you should output the lexicographically smallest way. If the ball cannot reach the hole, output "impossible".
+     * The maze is represented by a binary 2D array. 1 means the wall and 0 means the empty space. You may assume that the borders of the maze are all walls. The ball and the hole coordinates are represented by row and column indexes.
+     *         Example 1
+     * Input 1: a maze represented by a 2D array
+     *         0 0 0 0 0
+     *         1 1 0 0 1
+     *         0 0 0 0 0
+     *         0 1 0 0 1
+     *         0 1 0 0 0
+     * Input 2: ball coordinate (rowBall, colBall) = (4, 3)
+     * Input 3: hole coordinate (rowHole, colHole) = (0, 1)
+     * Output: "lul"
+     * Explanation: There are two shortest ways for the ball to drop into the hole.
+     * The first way is left -> up -> left, represented by "lul".
+     * The second way is up -> left, represented by 'ul'.
+     * Both ways have shortest distance 6, but the first way is lexicographically smaller because 'l' < 'u'. So the output is "lul".
+     *
+     * Example 2
+     * Input 1: a maze represented by a 2D array
+     * 0 0 0 0 0
+     *         1 1 0 0 1
+     *         0 0 0 0 0
+     *         0 1 0 0 1
+     *         0 1 0 0 0
+     * Input 2: ball coordinate (rowBall, colBall) = (4, 3)
+     * Input 3: hole coordinate (rowHole, colHole) = (3, 0)
+     * Output: "impossible"
+     * Explanation: The ball cannot reach the hole.
+     *
+     * Note:
+     *         1. There is only one ball and one hole in the maze.
+     *         2. Both the ball and hole exist on an empty space, and they will not be at the same position initially.
+     *         3. The given maze does not contain border (like the red rectangle in the example pictures), but you could assume the border of the maze are all walls.
+     * The maze contains at least 2 empty spaces, and the width and the height of the maze won't exceed 30.
+     */
+    public static void findShortestWayDemo(int[][] maze, int[] ball, int[] hole) {
+        System.out.println("\nStart function findShortestWayDemo()");
+        printTwoDimentinalArray(maze, "\tMaze:");
+        printArray(ball, "\tBall:");
+        printArray(hole, "\tHole:");
+        System.out.println("\tRes: " + findShortestWay(maze, ball, hole));
+    }
+    private static class VisitedNode {
+        int i;
+        int j;
+        String path;
+        public VisitedNode(int x, int y, String p) {
+            i = x;
+            j = y;
+            path = p;
+        }
+    }
+    public static String findShortestWay(int[][] maze, int[] ball, int[] hole) {
+        int R = maze.length;
+        if (R < 1) return "impossible";
+        int C = maze[0].length;
+        if (C < 1) return "impossible";
+
+        HashMap<Character, int[]> dirs = new HashMap<>();
+        dirs.put('u', new int[]{-1, 0});
+        dirs.put('d', new int[]{1, 0});
+        dirs.put('l', new int[]{0, -1});
+        dirs.put('r', new int[]{0, 1});
+        HashMap<Character, Integer> dirsInt = new HashMap<>();
+        dirsInt.put('u', 1);
+        dirsInt.put('d', 2);
+        dirsInt.put('l', 4);
+        dirsInt.put('r', 8);
+
+        Queue<VisitedNode> Q = new LinkedList<>();
+        Q.add(new VisitedNode(ball[0], ball[1], "u"));
+        Q.add(new VisitedNode(ball[0], ball[1], "d"));
+        Q.add(new VisitedNode(ball[0], ball[1], "l"));
+        Q.add(new VisitedNode(ball[0], ball[1], "r"));
+        int[][] visited = new int[R][C];
+        visited[ball[0]][ball[1]] = 15;
+        boolean found = false;
+        PriorityQueue<String> res = new PriorityQueue<>();
+
+        while (!Q.isEmpty()) {
+            int size = Q.size();
+            LinkedList<VisitedNode> nextLevel = new LinkedList<>();
+            while (size-- > 0) {
+                VisitedNode vn = Q.poll();
+                if (vn.i == hole[0] && vn.j == hole[1]) {
+                    res.add(vn.path);
+                    found = true;
+                    continue;
+                }
+
+                Character dc = vn.path.charAt(vn.path.length() - 1);
+                int[] dir = dirs.get(dc);
+                int x = vn.i + dir[0], y = vn.j + dir[1];
+
+                if (!(x < 0 || x >= R || y < 0 || y >= C || maze[x][y] == 1)) {
+                    if ((visited[x][y] & dirsInt.get(dc)) == 0) {
+                        nextLevel.add(new VisitedNode(x, y, vn.path));
+                    }
+                } else {
+                    if (vn.i == ball[0] && vn.j == ball[1]) {
+                        continue;
+                    }
+                    for (Character d : dirs.keySet()) {
+                        if (d != dc && (dirs.get(d)[0] + dir[0] != 0 && dirs.get(d)[1] + dir[1] != 0)) {
+                            x = vn.i + dirs.get(d)[0];
+                            y = vn.j + dirs.get(d)[1];
+                            if (!(x < 0 || x >= R || y < 0 || y >= C || maze[x][y] == 1 || (visited[x][y] & dirsInt.get(d)) != 0)) {
+                                nextLevel.add(new VisitedNode(x, y, vn.path + d));
+                            }
+                        }
+                    }
+                }
+            }
+            if (!found) {
+                for (VisitedNode vn : nextLevel) {
+                    visited[vn.i][vn.j] |= dirsInt.get(vn.path.charAt(vn.path.length() - 1));
+                    Q.add(vn);
+                }
+            }
+        }
+
+        if (res.isEmpty()) return "impossible";
+        return res.peek();
+    }
+    public static String findShortestWay3(int[][] maze, int[] ball, int[] hole) {
+        int R = maze.length;
+        if (R < 1) return "impossible";
+        int C = maze[0].length;
+        if (C < 1) return "impossible";
+        int M = Math.max(R, C) + 1;
+
+        int s = ball[0] * M + ball[1];
+        int e = hole[0] * M + hole[1];
+
+        HashMap<Character, int[]> dirs = new HashMap<>();
+        dirs.put('u', new int[]{-1, 0});
+        dirs.put('d', new int[]{1, 0});
+        dirs.put('l', new int[]{0, -1});
+        dirs.put('r', new int[]{0, 1});
+
+        Queue<VisitedNode> Q = new LinkedList<>();
+        Q.add(new VisitedNode(ball[0], ball[1], "u"));
+        Q.add(new VisitedNode(ball[0], ball[1], "d"));
+        Q.add(new VisitedNode(ball[0], ball[1], "l"));
+        Q.add(new VisitedNode(ball[0], ball[1], "r"));
+        HashSet<Character>[][] visited = new HashSet[R][C];
+        for (int i = 0; i < R; i++) {
+            for (int j = 0; j < C; j++) {
+                visited[i][j] = new HashSet<>();
+            }
+        }
+        visited[ball[0]][ball[1]].add('u');
+        visited[ball[0]][ball[1]].add('d');
+        visited[ball[0]][ball[1]].add('l');
+        visited[ball[0]][ball[1]].add('r');
+        boolean found = false;
+        PriorityQueue<String> res = new PriorityQueue<>();
+
+        while (!Q.isEmpty()) {
+            int size = Q.size();
+            LinkedList<VisitedNode> nextLevel = new LinkedList<>();
+            while (size-- > 0) {
+                VisitedNode vn = Q.poll();
+                if (vn.i == hole[0] && vn.j == hole[1]) {
+                    res.add(vn.path);
+                    found = true;
+                    continue;
+                }
+
+                Character dc = vn.path.charAt(vn.path.length() - 1);
+                int[] dir = dirs.get(dc);
+                int x = vn.i + dir[0], y = vn.j + dir[1];
+
+                if (!(x < 0 || x >= R || y < 0 || y >= C || maze[x][y] == 1)) {
+                    if (!visited[x][y].contains(dc)) {
+                        nextLevel.add(new VisitedNode(x, y, vn.path));
+                    }
+                } else {
+                    if (vn.i == ball[0] && vn.j == ball[1]) {
+                        continue;
+                    }
+                    for (Character d : dirs.keySet()) {
+                        if (d != dc && (dirs.get(d)[0] + dir[0] != 0 && dirs.get(d)[1] + dir[1] != 0)) {
+                            x = vn.i + dirs.get(d)[0];
+                            y = vn.j + dirs.get(d)[1];
+                            if (!(x < 0 || x >= R || y < 0 || y >= C || maze[x][y] == 1 || visited[x][y].contains(d))) {
+                                nextLevel.add(new VisitedNode(x, y, vn.path + d));
+                            }
+                        }
+                    }
+                }
+            }
+            if (!found) {
+                for (VisitedNode vn : nextLevel) {
+                    visited[vn.i][vn.j].add(vn.path.charAt(vn.path.length() - 1));
+                    Q.add(vn);
+                }
+            }
+        }
+
+        if (res.isEmpty()) return "impossible";
+        return res.peek();
+    }
+    public static String findShortestWay2(int[][] maze, int[] ball, int[] hole) {
+        int R = maze.length;
+        if (R < 1) return "impossible";
+        int C = maze[0].length;
+        if (C < 1) return "impossible";
+        int M = Math.max(R, C) + 1;
+
+        int s = ball[0] * M + ball[1];
+        int e = hole[0] * M + hole[1];
+
+        HashMap<Character, int[]> dirs = new HashMap<>();
+        dirs.put('u', new int[]{-1, 0});
+        dirs.put('d', new int[]{1, 0});
+        dirs.put('l', new int[]{0, -1});
+        dirs.put('r', new int[]{0, 1});
+
+        HashMap<Integer, Integer> visited = new HashMap<>();
+        visited.put(s, 0);
+        HashMap<Integer, HashSet<String>> res = new HashMap<>();
+        int[] tCnt = new int[]{Integer.MAX_VALUE};
+        for (Character dir : dirs.keySet()) {
+            findShortestWayDFS2(maze, R, C, M, s, e, dirs, dir, visited, 0, new StringBuilder(dir.toString()), tCnt, res);
+        }
+        if (tCnt[0] == Integer.MAX_VALUE) {
+            return "impossible";
+        }
+        HashSet<String> shortest = res.get(tCnt[0]);
+        String finalRes = shortest.iterator().next();
+        for (String r : shortest) {
+            System.out.println("\t" + r);
+            if (r.length() < finalRes.length()) {
+                finalRes = r;
+            } else if (r.length() == finalRes.length()) {
+                finalRes = finalRes.compareTo(r) < 0 ? finalRes : r;
+            }
+        }
+        return finalRes;
+    }
+    private static void findShortestWayDFS2(int[][] maze, int R, int C, int M, int cur, int end, HashMap<Character, int[]> dirs, Character d, HashMap<Integer, Integer> visited, int cnt, StringBuilder tmp, int[] tCnt, HashMap<Integer, HashSet<String>> res) {
+        int i = cur / M;
+        int j = cur % M;
+
+        if (cur == end) {
+            if (cnt <= tCnt[0]) {
+                if (res.containsKey(cnt)) {
+                    res.get(cnt).add(tmp.toString());
+                } else {
+                    HashSet<String> newSet = new HashSet<>();
+                    newSet.add(tmp.toString());
+                    res.put(cnt, newSet);
+                }
+                tCnt[0] = cnt;
+            }
+            return;
+        }
+
+        if (!reachWall(maze, i, j, R, C, dirs.get(d))) {
+            findShortestWayDFS2(maze, R, C, M, (i + dirs.get(d)[0]) * M + j + dirs.get(d)[1], end, dirs, d, visited, cnt + 1, tmp, tCnt, res);
+            return;
+        }
+
+        if (cnt + 1 > tCnt[0]) {
+            return;
+        }
+
+        if (visited.containsKey(cur) && visited.get(cur) <= cnt) {
+            return;
+        }
+        visited.put(cur, cnt);
+        for (Character dir : dirs.keySet()) {
+            if ((dirs.get(dir)[0] != dirs.get(d)[0] && dirs.get(dir)[1] != dirs.get(d)[1]) &&
+                (dirs.get(d)[0] + dirs.get(dir)[0] != 0 && dirs.get(d)[1] + dirs.get(dir)[1] != 0)) {
+                int x = i + dirs.get(dir)[0], y = j + dirs.get(dir)[1];
+                if (x < 0 || x >= R || y < 0 || y >= C || maze[x][y] == 1) {
+                    continue;
+                }
+                tmp.append(dir);
+                findShortestWayDFS2(maze, R, C, M, (i + dirs.get(dir)[0]) * M + j + dirs.get(dir)[1], end, dirs, dir, visited, cnt + 1, tmp, tCnt, res);
+                tmp.deleteCharAt(tmp.length() - 1);
+            }
+        }
+    }
 //    public int depthSumReverse(List<NestedInteger> nestedList) {
 //        ArrayList<Integer> depthSum = new ArrayList<>();
 //        depthSumReverseDFS(nestedList, depthSum);
@@ -10657,6 +11882,59 @@ public class ArrayTest <T extends Number> {
 //        }
 //        return max;
 //    }
+
+
+    /**
+     * Diagonal traverse
+     * Given a matrix of M x N elements (M rows, N columns), return all elements of the matrix in diagonal order.
+     * Example 1:
+     * Input:
+     *         [
+     *         [ 1, 2, 3 ],
+     *         [ 4, 5, 6 ],
+     *         [ 7, 8, 9 ]
+     *         ]
+     * Output:  [1,2,4,7,5,3,6,8,9]
+     * Explanation:
+     *
+     * Note:
+     *         1. The total number of elements of the given matrix will not exceed 10,000.
+     *
+     * https://leetcode.com/contest/leetcode-weekly-contest-18b/problems/diagonal-traverse/
+     */
+    public static int[] findDiagonalOrder(int[][] matrix) {
+        System.out.println("\nStart function findDiagonalOrder()");
+        printTwoDimentinalArray(matrix, "\tMatrix:");
+
+        int R = matrix.length;
+        if (R < 1) return new int[]{};
+        int C = matrix[0].length;
+        if (C < 1) return new int[]{};
+
+        int[] res = new int[R * C];
+        int idx = 0;
+        boolean i2j = true;
+
+        for (int sum = 0; sum < R * C; sum++) {
+            if (i2j) {
+                int i = Math.min(sum, R-1);
+                int j = sum - i;
+                for (; i >= 0 && j <= Math.min(sum, C - 1); i--, j++) {
+                    res[idx++] = matrix[i][j];
+                }
+            } else {
+                int j = Math.min(sum, C-1);
+                int i = sum - j;
+                for (; j >= 0 && i <= Math.min(sum, R - 1); i++, j--) {
+                    res[idx++] = matrix[i][j];
+                }
+            }
+            i2j = !i2j;
+        }
+
+        printArray(res, "\tRes");
+        return res;
+    }
 }
 
 //    /**

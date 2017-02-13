@@ -1573,6 +1573,8 @@ public class NumberTest {
     }
     public static int nthSuperUglyNumber2(int n, Integer[] primes) {
         System.out.println("\nStart function nthSuperUglyNumber2()");
+        printArray(primes, "\tPrimes:");
+
         int len = primes.length;
         LinkedList<Integer> res = new LinkedList<>();
         res.add(1);
@@ -2358,6 +2360,7 @@ public class NumberTest {
     public static int findMaximumXOR(int[] nums) {
         System.out.println("\nStart function findMaximumXOR()");
         printArray(nums, "\tNums: ");
+
         int max = 0, mask = 0;
         for(int i = 31; i >= 0; i--){
             mask = mask | (1 << i);
@@ -2367,8 +2370,11 @@ public class NumberTest {
             }
             System.out.println("\tSet: " + set);
             int tmp = max | (1 << i);
+            System.out.println("\t\tTmp: " + tmp);
             for(int prefix : set){
+                System.out.println("\t\tPrefix: " + prefix);
                 if(set.contains(tmp ^ prefix)) {
+                    System.out.println("\t\tMax = " + tmp);
                     max = tmp;
                     break;
                 }
@@ -2587,6 +2593,41 @@ public class NumberTest {
         }
         return res;
     }
+    public static List<String> findStrobogrammatic2(int n) {
+        System.out.println("\nStart function findStrobogrammatic2(). n = " + n);
+        List<String> res = findStrobogrammaticHelper2(n);
+        ListIterator<String> iter = res.listIterator();
+        while (iter.hasNext()) {
+            String cur = iter.next();
+            if (cur.startsWith("0") && cur.length() > 1) {
+                iter.remove();
+            }
+        }
+        System.out.println("\tRes = " + res);
+        return res;
+    }
+    public static List<String> findStrobogrammaticHelper2(int n) {
+        List<String> res = new ArrayList<String>();
+        if (n == 0) {
+            res.add("");
+            return res;
+        }
+        if (n == 1) {
+            res.add("0");
+            res.add("1");
+            res.add("8");
+            return res;
+        }
+        List<String> tmp = findStrobogrammaticHelper2(n - 2);
+        for (String t : tmp) {
+            res.add("0" + t + "0");
+            res.add("1" + t + "1");
+            res.add("6" + t + "9");
+            res.add("8" + t + "8");
+            res.add("9" + t + "6");
+        }
+        return res;
+    }
 
     /**
      * Strobogrammatic Number III 
@@ -2685,4 +2726,96 @@ public class NumberTest {
         return -1;
     }
 
+    /**
+     * Construct the Rectangle
+     * For a web developer, it is very important to know how to design a web page's size. So, given a specific rectangular web page’s area, your job by now is to design a rectangular web page, whose length L and width W satisfy the following requirements:
+     *         1. The area of the rectangular web page you designed must equal to the given target area.
+     *         2. The width W should not be larger than the length L, which means L >= W.
+     * 3. The difference between length L and width W should be as small as possible.
+     * You need to output the length L and the width W of the web page you designed in sequence.
+     *         Example:
+     * Input: 4
+     * Output: [2, 2]
+     * Explanation: The target area is 4, and all the possible ways to construct it are [1,4], [2,2], [4,1].
+     * But according to requirement 2, [1,4] is illegal; according to requirement 3,  [4,1] is not optimal compared to [2,2]. So the length L is 2, and the width W is 2.
+     * Note:
+     *         1. The given area won't exceed 10,000,000 and is a positive integer
+     * The web page's width and length you designed must be positive integers.
+     */
+    public static void constructRectangleDemo(int area) {
+        System.out.println("\nStart function constructRectangleDemo(). Area = " + area);
+        printArray(constructRectangle(area), "\tRes");
+    }
+    public static int[] constructRectangle(int area) {
+        int L = (int)Math.ceil(Math.sqrt((double)area));
+        while (L <= area) {
+            if (area % L == 0) {
+                return new int[]{L, area/L};
+            }
+            L++;
+        }
+        return new int[]{area, 1};
+    }
+
+    /**
+     * Smallest Good Base
+     * For an integer n, we call k>=2 a good base of n, if all digits of n base k are 1.
+     *
+     * Now given a string representing n, you should return the smallest good base of n in string format.
+     *
+     *         Example 1:
+     * Input: "13"
+     * Output: "3"
+     * Explanation: 13 base 3 is 111.
+     * Example 2:
+     * Input: "4681"
+     * Output: "8"
+     * Explanation: 4681 base 8 is 11111.
+     * Example 3:
+     * Input: "1000000000000000000"
+     * Output: "999999999999999999"
+     * Explanation: 1000000000000000000 base 999999999999999999 is 11.
+     * Note:
+     * The range of n is [3, 10^18].
+     * The string representing n is always valid and will not have leading zeros.
+     */
+    public static void smallestGoodBaseDemo(String n) {
+        System.out.println("\nStart function smallestGoodBaseDemo(). N = " + n);
+        System.out.println("\tRes = " + smallestGoodBase(n));
+    }
+    public static String smallestGoodBase(String n) {
+        Long N = Long.parseLong(n);
+        for (Long K = 2L; K * K <= N; K++) {
+            if (N % K == 1) {
+                long t = N;
+                while (t > 0) {
+                    long d = t % K;
+                    if (d != 1) break;
+                    t /= K;
+                }
+                if (t == 0) {
+                    return K.toString();
+                }
+            }
+        }
+        return ""+(N-1);
+    }
+    public static String smallestGoodBase2(String n) {
+        Long N = Long.parseLong(n);
+        Long M = N - 1;
+        for (Long K = 2L; K <= M; K++) {
+            if (N % K == 1) {
+                long t = N;
+                while (t > 0) {
+                    long d = t % K;
+                    if (d != 1) break;
+                    t /= K;
+                }
+                if (t == 0) {
+                    return K.toString();
+                }
+            }
+        }
+        return "-1";
+    }
 }

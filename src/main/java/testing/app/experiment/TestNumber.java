@@ -154,14 +154,14 @@ public class TestNumber {
 
         NumberTest.findNthDigit(11);
 
-//        NumberTest.integerReplacement(11);
-//        NumberTest.integerReplacement2(11);
-//        NumberTest.integerReplacement(111);
+        NumberTest.integerReplacement(11);
+        NumberTest.integerReplacement2(11);
+        NumberTest.integerReplacement(111);
         NumberTest.integerReplacement2(111);
-//        NumberTest.integerReplacement(211);
-//        NumberTest.integerReplacement2(211);
-//        NumberTest.integerReplacement(57);
-//        NumberTest.integerReplacement2(57);
+        NumberTest.integerReplacement(211);
+        NumberTest.integerReplacement2(211);
+        NumberTest.integerReplacement(57);
+        NumberTest.integerReplacement2(57);
 
         for (int n = 1; n <= 12; n++) {
             NumberTest.lastRemaining(n);
@@ -200,9 +200,13 @@ public class TestNumber {
         NumberTest.isStrobogrammaticDemo("868");
 
         NumberTest.findStrobogrammatic(0);
+        NumberTest.findStrobogrammatic2(0);
         NumberTest.findStrobogrammatic(1);
+        NumberTest.findStrobogrammatic2(1);
         NumberTest.findStrobogrammatic(2);
+        NumberTest.findStrobogrammatic2(2);
         NumberTest.findStrobogrammatic(3);
+        NumberTest.findStrobogrammatic2(3);
 
         NumberTest.strobogrammaticInRange("100", "200");
 
@@ -215,6 +219,18 @@ public class TestNumber {
         NumberTest.getFactorsDemo(12);
         NumberTest.getFactorsDemo(32);
         NumberTest.getFactorsDemo(37);
+
+
+        NumberTest.constructRectangleDemo(4);
+        NumberTest.constructRectangleDemo(6);
+        NumberTest.constructRectangleDemo(8);
+        NumberTest.constructRectangleDemo(9);
+        NumberTest.constructRectangleDemo(10);
+
+        NumberTest.smallestGoodBaseDemo("13");
+        NumberTest.smallestGoodBaseDemo("4681");
+//        NumberTest.smallestGoodBaseDemo("470988884881403701");
+//        NumberTest.smallestGoodBaseDemo("1000000000000000000");
 
     }
 }
