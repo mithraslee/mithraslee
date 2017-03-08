@@ -209,6 +209,8 @@ public class TestNumber {
         NumberTest.findStrobogrammatic2(3);
 
         NumberTest.strobogrammaticInRange("100", "200");
+        NumberTest.strobogrammaticInRange("50", "100");
+        NumberTest.strobogrammaticInRange("100", "50");
 
         NumberTest.findCelebrityDemo(4);
 

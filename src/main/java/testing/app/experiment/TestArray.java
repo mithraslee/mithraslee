@@ -847,6 +847,13 @@ public class TestArray {
                 {15, 20},{0, 30},{5, 10}
         });
 
+//        ArrayTest.minMeetingRooms3(new int[][]{
+//                {15, 20},{0, 30},{5, 10}
+//        });
+        ArrayTest.minMeetingRooms3(new int[][]{
+                {2, 7}
+        });
+
         ArrayTest.multiply(new int[][]{{1, 0, 0},{-1, 0, 3}}, new int[][]{{7, 0, 0},{0, 0, 0},{0, 0, 1}});
         ArrayTest.multiply2(new int[][]{{1, 0, 0},{-1, 0, 3}}, new int[][]{{7, 0, 0},{0, 0, 0},{0, 0, 1}});
 

@@ -4,13 +4,10 @@
  */
 package testing.lib.string;
 
-import testing.lib.common.CommonUtils;
 import testing.lib.node.TrieNode3;
 import testing.lib.trie.*;
-import testing.lib.common.CommonUtils.*;
 
 import java.util.*;
-import java.util.stream.Collector;
 
 import static testing.lib.common.CommonUtils.printArray;
 import static testing.lib.common.CommonUtils.printTwoDimentinalArray;
@@ -2958,11 +2955,11 @@ public class StringTest {
         if (s == null || s.length() == 0) {
             return results;
         }
-        restoreIpAddressesHelper(s, 0, 1, "", results);
+        restoreIpAddressesDFS(s, 0, 1, "", results);
         System.out.println("\tValid IPs: " + results);
         return results;
     }
-    private static void restoreIpAddressesHelper (String str, int index, int seg, String cur, ArrayList<String> res) {
+    private static void restoreIpAddressesDFS(String str, int index, int seg, String cur, ArrayList<String> res) {
         if (index >= str.length()) {
             return;
         }
@@ -2977,10 +2974,40 @@ public class StringTest {
             String sub = str.substring(index, index + i);
             if (isValidIPSegment(sub)) {
                 if (seg == 1) {
-                    restoreIpAddressesHelper(str, index + i, seg+1, sub, res);
+                    restoreIpAddressesDFS(str, index + i, seg+1, sub, res);
                 } else {
-                    restoreIpAddressesHelper(str, index + i, seg+1, cur + "." + sub, res);
+                    restoreIpAddressesDFS(str, index + i, seg+1, cur + "." + sub, res);
                 }
+            }
+        }
+    }
+    public static List<String> restoreIpAddresses2(String s) {
+        System.out.println("\nStart function restoreIpAddresses2()");
+        System.out.println("\ts = " + s);
+        ArrayList<String> results = new ArrayList<> ();
+        if (s == null || s.length() == 0) {
+            return results;
+        }
+        restoreIpAddressesDFS2(s, 0, 0, new String[4], results);
+        System.out.println("\tValid IPs: " + results);
+        return results;
+    }
+    private static void restoreIpAddressesDFS2(String str, int index, int seg, String[] ips, ArrayList<String> res) {
+        if (index > str.length()) {
+            return;
+        }
+        if (seg == 4) {
+            if (index == str.length()) {
+                res.add(ips[0] + "." + ips[1] + "." + ips[2] + "." + ips[3]);
+            }
+            return;
+        }
+        for (int i = 1; i < 4 && (i + index <= str.length()); i++) {
+            String sub = str.substring(index, index + i);
+            if (isValidIPSegment(sub)) {
+                ips[seg] = sub;
+                restoreIpAddressesDFS2(str, index + i, seg+1, ips, res);
+                ips[seg] = "";
             }
         }
     }
@@ -6110,6 +6137,58 @@ public class StringTest {
             }
         }
     }
+    public static void removeInvalidParenthesesDemo3(String s) {
+        System.out.println("\nStart function removeInvalidParenthesesDemo3()");
+        System.out.println("\tStr: " + s);
+        System.out.println("\tRes = " + removeInvalidParentheses3(s));
+    }
+    public static String removeInvalidParentheses3(String s) {
+        if (s == null || s.isEmpty()) return "";
+
+        int diff = 0;
+
+        StringBuilder sb = new StringBuilder();
+        for (char c : s.toCharArray()) {
+            if (c == '(') {
+                diff++;
+                sb.append(c);
+            } else if (c == ')') {
+                if (diff > 0) {
+                    diff--;
+                    sb.append(c);
+                }
+            } else {
+                sb.append(c);
+            }
+        }
+        System.out.println("\tDiff = " + diff + "; Mid = " + sb.toString());
+        if (diff == 0) {
+            return sb.toString();
+        }
+        String t = sb.toString();
+        sb = new StringBuilder();
+        int diff2 = 0;
+        for (int i = t.length() - 1; i >= 0; i--) {
+            if (t.charAt(i) == ')') {
+                diff2++;
+                sb.insert(0, t.charAt(i));
+            } else if (t.charAt(i) == '(') {
+                if (diff2 > 0) {
+                    diff2--;
+                    sb.insert(0, t.charAt(i));
+                } else {
+                    diff--;
+                }
+            } else {
+                sb.insert(0, t.charAt(i));
+            }
+            if (diff == 0) {
+                sb.insert(0, t.substring(0, i));
+            }
+        }
+
+        return sb.toString();
+    }
 
     /**
      * Additive Number
@@ -8354,10 +8433,12 @@ public class StringTest {
         System.out.println("\nStart function licenseKeyFormattingDemo().");
         System.out.println("\tS: " + S);
         System.out.println("\tK: " + K);
-        String res = licenseKeyFormatting(S, K);
-        String res2 = licenseKeyFormatting2(S, K);
-        System.out.println("\tRes: " + res);
-        System.out.println("\tRes: " + res2);
+//        String res = licenseKeyFormatting(S, K);
+//        String res2 = licenseKeyFormatting2(S, K);
+        String res3 = licenseKeyFormatting3(S, K);
+//        System.out.println("\tRes: " + res);
+//        System.out.println("\tRes: " + res2);
+        System.out.println("\tRes: " + res3);
     }
     public static String licenseKeyFormatting(String S, int K) {
         String[] strs = S.split("-");
@@ -8406,6 +8487,50 @@ public class StringTest {
         if (sb.length() > 0 && sb.charAt(sb.length() - 1) == '-') {
             sb.deleteCharAt(sb.length() - 1);
         }
+        return sb.reverse().toString().toUpperCase();
+    }
+    public static String licenseKeyFormatting3(String S, int K) {
+        StringBuilder sb = new StringBuilder(S);
+        int index = sb.length() - 1;
+        int cnt = 0;
+        while (index >= 0) {
+            if (cnt < K) {
+                if (sb.charAt(index) == '-') {
+                    sb.deleteCharAt(index);
+                    if (index == sb.length()) {
+                        index = sb.length() - 1;
+                    }
+                } else {
+                    cnt++;
+                    index--;
+                }
+            } else {
+                if (sb.charAt(index) != '-') {
+                    sb.insert(index, '-');
+                }
+                cnt = 0;
+                index--;
+            }
+        }
+        if (sb.length() > 0 && sb.charAt(0) == '-') {
+            sb.deleteCharAt(0);
+        }
+        return sb.toString().toUpperCase();
+    }
+    public static String licenseKeyFormatting4(String S, int K) {
+        StringBuilder sb = new StringBuilder();
+        int cnt = 0;
+        for (int i = S.length() - 1; i >= 0; i--) {
+            char cur = S.charAt(i);
+            if (cur == '-') {
+                continue;
+            }
+            sb.append(cur);
+            if (++cnt % K == 0) {
+                sb.append("-");
+            }
+        }
+        if (sb.length() > 0 && sb.charAt(sb.length() - 1) == '-') sb.deleteCharAt(sb.length() - 1);
         return sb.reverse().toString().toUpperCase();
     }
 
@@ -8490,6 +8615,24 @@ public class StringTest {
                 removeFromMap(map, chars[start++]);
             }
             res = Math.max(res, (end - start));
+        }
+
+        return res;
+    }
+    public int lengthOfLongestSubstringKDistinct2(String s, int k) {
+        HashMap<Character, Integer> map = new HashMap<>();
+        char[] chars = s.toCharArray();
+
+        int res = 0;
+        for (int left = 0, i = 0; i < s.length(); i++) {
+            map.put(chars[i], i);
+            while (map.size() > k) {
+                if (map.get(chars[left]) == left) {
+                    map.remove(chars[left]);
+                }
+                left++;
+            }
+            res = Math.max(res, (i - left + 1));
         }
 
         return res;
@@ -9266,6 +9409,33 @@ public class StringTest {
         return sb.toString();
     }
 
+
+    public static int lengthOfLongestSubstring(String s) {
+        System.out.println("\nStart function lengthOfLongestSubstring(). S = " + s);
+
+        if (s == null) return 0;
+        int len = s.length();
+        if (len <= 1) return len;
+
+        HashSet<Character> set = new HashSet<> ();
+
+        int maxLen = 1;
+        for (int b = 0, e = 0; e < len; e++) {
+            if (!set.contains(s.charAt(e))) {
+                set.add(s.charAt(e));
+            } else {
+                while (s.charAt(b) != s.charAt(e)) {
+                    set.remove(s.charAt(b));
+                    b++;
+                }
+                b++;
+            }
+            System.out.println("\tb = " + b + "; e = " + e);
+            maxLen = Math.max(maxLen, e - b + 1);
+        }
+        System.out.println("\tMaxLen = " + maxLen);
+        return maxLen;
+    }
 //    public static String longestCommonPrefix(String[] strs) {
 //        Trie trie = new Trie();
 //        String minStr = "";

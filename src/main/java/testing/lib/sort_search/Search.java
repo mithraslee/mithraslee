@@ -188,9 +188,9 @@ public class Search {
             while (end > mid && num[end] == num[mid])
                 end--;
 
-            if (num[mid] > num[begin] && num[mid] < num[end])
+            if (num[mid] > num[begin] && num[mid] < num[end]) {
                 return num[begin];
-            else if (num[mid] > num[begin] && num[mid] > num[end]) {
+            } else if (num[mid] > num[begin] && num[mid] > num[end]) {
                 begin = mid + 1;
             } else if (num[mid] < num[begin] && num[mid] < num[end]) {
                 if (num[mid-1] > num[mid])

@@ -237,6 +237,7 @@ public class TestString {
         StringTest.minCut3("aacaabee");
 
         StringTest.restoreIpAddresses("25525511135");
+        StringTest.restoreIpAddresses2("25525511135");
 
         StringTest.minWindow("bba", "ab");
         StringTest.minWindow2("bba", "ab");
@@ -560,6 +561,14 @@ public class TestString {
         StringTest.removeInvalidParentheses("(r(()()(");
         StringTest.removeInvalidParentheses2("(r(()()(");
 
+        StringTest.removeInvalidParenthesesDemo3("()())");
+        StringTest.removeInvalidParenthesesDemo3("()())()");
+        StringTest.removeInvalidParenthesesDemo3("(a)())()");
+        StringTest.removeInvalidParenthesesDemo3(")(");
+        StringTest.removeInvalidParenthesesDemo3("(r(()()(");
+        StringTest.removeInvalidParenthesesDemo3("(r(()))))");
+        StringTest.removeInvalidParenthesesDemo3("(((((r(())");
+
         StringTest.isAdditiveNumber("112358");
         StringTest.isAdditiveNumber("199100199");
         StringTest.isAdditiveNumber("1023");
@@ -687,10 +696,10 @@ public class TestString {
         StringTest.generateAbbreviations2("word");
         StringTest.generateAbbreviations3("word");
 
-        StringTest.licenseKeyFormattingDemo("abcd", 3);
-        StringTest.licenseKeyFormattingDemo("abcd", 4);
-        StringTest.licenseKeyFormattingDemo("ab-cd-ef", 3);
-        StringTest.licenseKeyFormattingDemo("abc-def", 4);
+//        StringTest.licenseKeyFormattingDemo("abcd", 3);
+//        StringTest.licenseKeyFormattingDemo("abcd", 4);
+//        StringTest.licenseKeyFormattingDemo("ab-cd-ef", 3);
+//        StringTest.licenseKeyFormattingDemo("abc-def", 4);
         StringTest.licenseKeyFormattingDemo("2-4A0r7-4k", 3);
         StringTest.licenseKeyFormattingDemo("2-4A0r7-4k", 4);
 
@@ -751,5 +760,7 @@ public class TestString {
         StringTest.findAllPossibleWords(new String[] {"BAT", "CAT", "RAT", "A", "AA", "AAA", "RC"}, new Character[] {'A', 'B', 'R', 'C', 'T', 'A'});
 
         StringTest.longestCommonPrefixDemo(new String[]{"BATMAN", "BATM", "BA", "BAT"});
+
+        StringTest.lengthOfLongestSubstring("tmmzuxt");
     }
 }

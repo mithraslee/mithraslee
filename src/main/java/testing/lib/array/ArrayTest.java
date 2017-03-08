@@ -1281,6 +1281,29 @@ public class ArrayTest <T extends Number> {
         System.out.println("\tRes = " + res);
         return res;
     }
+    // Optimal Solution
+    public static int maxSubArrayLen3(int[] nums, int k) {
+        int len = nums.length;
+        if (len < 1) return 0;
+        int res = 0;
+        long sum = 0;
+        HashMap<Long, Integer> M = new HashMap<>();
+        for (int i = 0; i < len; i++) {
+            sum += nums[i];
+            if (nums[i] == k) res = Math.max(res, 1);
+            if (sum == k) res = Math.max(res, i + 1);
+
+            long diff = sum - k;
+            if (M.containsKey(diff)) {
+                res = Math.max(res, i - M.get(diff));
+            }
+
+            if (!M.containsKey(sum)) {
+                M.put(sum, i);
+            }
+        }
+        return res;
+    }
 
     /**
      * Attention! Important!
@@ -6679,6 +6702,7 @@ public class ArrayTest <T extends Number> {
         LinkedList<String> list = new LinkedList<>();
         list.add(start);
         Q.add(list);
+        visited.add(start);
         while(!Q.isEmpty()) {
             int size = Q.size();
             while (size-- > 0) {
@@ -6686,11 +6710,11 @@ public class ArrayTest <T extends Number> {
                 if (tmpList.getLast().equals(end)) {
                     return getValFromPath(map, tmpList);
                 } else {
-                    visited.add(tmpList.getLast());
                     for (String divisor : Dd2Dv.get(tmpList.getLast())) {
                         if (!visited.contains(divisor)) {
                             LinkedList<String> tmpList2 = new LinkedList<>(tmpList);
                             tmpList2.add(divisor);
+                            visited.add(divisor);
                             Q.add(tmpList2);
                         }
                     }
@@ -6699,6 +6723,32 @@ public class ArrayTest <T extends Number> {
         }
         return -1.0;
     }
+//    private static double getPath(HashMap<String, Double> map, HashMap<String, HashSet<String>> Dd2Dv, String start, String end) {
+//        Queue<LinkedList<String>> Q = new LinkedList<>();
+//        HashSet<String> visited = new HashSet<>();
+//        LinkedList<String> list = new LinkedList<>();
+//        list.add(start);
+//        Q.add(list);
+//        while(!Q.isEmpty()) {
+//            int size = Q.size();
+//            while (size-- > 0) {
+//                LinkedList<String> tmpList = Q.poll();
+//                if (tmpList.getLast().equals(end)) {
+//                    return getValFromPath(map, tmpList);
+//                } else {
+//                    visited.add(tmpList.getLast());
+//                    for (String divisor : Dd2Dv.get(tmpList.getLast())) {
+//                        if (!visited.contains(divisor)) {
+//                            LinkedList<String> tmpList2 = new LinkedList<>(tmpList);
+//                            tmpList2.add(divisor);
+//                            Q.add(tmpList2);
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//        return -1.0;
+//    }
     private static double getValFromPath(HashMap<String, Double> map, LinkedList<String> tmpList) {
         double res = 1.0;
         String dd = null;
@@ -8108,7 +8158,13 @@ public class ArrayTest <T extends Number> {
                             }
                         }
                     }
-                    if (neighborIds.size() == 1) {
+                    if (neighborIds.size() == 0) {
+                        p2id.put(newP, id);
+                        HashSet<Point> newS = new HashSet<>();
+                        newS.add(newP);
+                        id2ps.put(id, newS);
+                        id++;
+                    } else if (neighborIds.size() == 1) {
                         int nid = neighborIds.iterator().next();
                         p2id.put(newP, nid);
                         id2ps.get(nid).add(newP);
@@ -8133,6 +8189,70 @@ public class ArrayTest <T extends Number> {
 //                    tmp.add(v);
 //                }
 //                res.add(tmp.size());
+                res.add(id2ps.size());
+            }
+        }
+        System.out.println("\tRes = " + res);
+        return res;
+    }
+    public static List<Integer> numIslands2_2(int m, int n, int[][] positions) {
+        System.out.println("\nStart function numIslands2_2()");
+        System.out.println("\tm = " + m + "; n = " + n);
+        printTwoDimentinalArray(positions, "\tPositions");
+
+        Integer R = Math.max(m, n);
+
+        HashMap<Integer, HashSet<Integer>> id2ps = new HashMap<>();
+        HashMap<Integer, Integer> p2id = new HashMap<>();
+        HashSet<Integer> used = new HashSet<>();
+
+        int[][] dirs = new int[][]{
+                {-1, 0},{1, 0},{0, -1},{0, 1}
+        };
+
+        int id = 0;
+        List<Integer> res = new ArrayList<>();
+        for (int[] p : positions) {
+            if (p[0] >= 0 && p[0] < m && p[1] >= 0 && p[1] < n) {
+                Integer newP = p[0] * R + p[1];
+                if (!used.contains(newP)) {
+                    HashSet<Integer> neighborIds = new HashSet<>();
+                    for (int[] dir : dirs) {
+                        int x = newP/R + dir[0];
+                        int y = newP%R + dir[1];
+                        if (x >= 0 && x < m && y >= 0 && y < n) {
+                            Integer np = x * R + y;
+                            if (p2id.containsKey(np)) {
+                                neighborIds.add(p2id.get(np));
+                            }
+                        }
+                    }
+                    if (neighborIds.size() == 0) {
+                        p2id.put(newP, id);
+                        HashSet<Integer> newS = new HashSet<>();
+                        newS.add(newP);
+                        id2ps.put(id, newS);
+                        id++;
+                    } else if (neighborIds.size() == 1) {
+                        int nid = neighborIds.iterator().next();
+                        p2id.put(newP, nid);
+                        id2ps.get(nid).add(newP);
+                    } else {
+                        p2id.put(newP, id);
+                        HashSet<Integer> newSet = new HashSet<>();
+                        newSet.add(newP);
+                        for (int nid : neighborIds) {
+                            for (Integer np : id2ps.get(nid)) {
+                                p2id.put(np, id);
+                                newSet.add(np);
+                            }
+                            id2ps.remove(nid);
+                        }
+                        id2ps.put(id, newSet);
+                        id++;
+                    }
+                    used.add(newP);
+                }
                 res.add(id2ps.size());
             }
         }
@@ -9064,7 +9184,7 @@ public class ArrayTest <T extends Number> {
      * majorityNumber
      */
     public static List<Integer> majorityElementIII(int[] nums, int k) {
-        System.out.println("\nStart function majorityElementIII()");
+        System.out.println("\nStart function majorityElementIII(). K = " + k);
         printArray(nums, "\tNums:");
 
         List<Integer> res = new ArrayList<>();
@@ -10073,6 +10193,31 @@ public class ArrayTest <T extends Number> {
 
         System.out.println("\tMax = " + max);
         return max;
+    }
+    public static int minMeetingRooms3(int[][] intervals) {
+        System.out.println("\nStart function minMeetingRooms3().");
+        printTwoDimentinalArray(intervals, "\tIntervals:");
+
+        PriorityQueue<Integer> starts = new PriorityQueue<>();
+        PriorityQueue<Integer> ends = new PriorityQueue<>();
+        for (int[] inter : intervals) {
+            starts.add(inter[0]);
+            ends.add(inter[1]);
+        }
+        int res = 0;
+        int cnt = 0;
+        while (!starts.isEmpty()) {
+            if (starts.peek() < ends.peek()) {
+                cnt++;
+                starts.poll();
+            } else {
+                cnt--;
+                ends.poll();
+            }
+            res = Math.max(res, cnt);
+        }
+        System.out.println("\tMax = " + res);
+        return res;
     }
 
     /**
@@ -11933,6 +12078,42 @@ public class ArrayTest <T extends Number> {
         }
 
         printArray(res, "\tRes");
+        return res;
+    }
+
+    /**
+     * Contiguous Array
+     * Given a binary array, find the maximum length of a contiguous subarray with equal number of 0 and 1.
+     * Example 1:
+     * Input: [0,1]
+     * Output: 2
+     * Explanation: [0, 1] is the longest contiguous subarray with equal number of 0 and 1.
+     * Example 2:
+     * Input: [0,1,0]
+     * Output: 2
+     * Explanation: [0, 1] (or [1, 0]) is a longest contiguous subarray with equal number of 0 and 1.
+     * Note: The length of the given binary array will not exceed 50,000.
+     */
+    public int findMaxLength(int[] nums) {
+        HashMap<Integer, Integer> v2i = new HashMap<>();
+        int len = nums.length;
+        if (len < 2) return 0;
+
+        int res = 0;
+        int sum = 0;
+        for (int i = 0; i < len; i++) {
+            sum += nums[i] == 1 ? 1 : -1;
+            if (sum == 0) {
+                res = i + 1;
+            } else {
+                if (v2i.containsKey(sum)) {
+                    res = Math.max(res, i - v2i.get(sum));
+                } else {
+                    v2i.put(sum, i);
+                }
+            }
+        }
+
         return res;
     }
 }

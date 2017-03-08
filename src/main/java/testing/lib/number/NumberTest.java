@@ -1578,8 +1578,8 @@ public class NumberTest {
         int len = primes.length;
         LinkedList<Integer> res = new LinkedList<>();
         res.add(1);
-        Integer[] index = new Integer[len];
-        Arrays.fill(index, 0);
+/*        Integer[] index = new Integer[len];
+        Arrays.fill(index, 0);*/
 
         PriorityQueue<TempNode> Q = new PriorityQueue<>(len, (t1, t2) -> t1.val - t2.val);
         for (int i = 0; i < len; i++) {
@@ -1642,6 +1642,28 @@ public class NumberTest {
         }
     }
 
+    public static int nthSuperUglyNumber4(int n, int[] primes) {
+        int len = primes.length;
+        int[] res = new int[n+1];
+        res[0] = 1;
+
+        PriorityQueue<long[]> Q = new PriorityQueue<>((t1, t2) -> Long.compare(t1[0], t2[0]));
+        for (int i = 0; i < len; i++) {
+            Q.add(new long[]{(long)primes[i], 0L, (long)primes[i]});
+        }
+
+        int idx = 0;
+        for (int i = 1; i <= n; i++) {
+            long min = Q.peek()[0];
+            res[i] = (int)min;
+            while (!Q.isEmpty() && Q.peek()[0] == min) {
+                long[] cur = Q.poll();
+                cur[0] = cur[2] * (long)res[(int)++cur[1]];
+                Q.add(cur);
+            }
+        }
+        return res[n-1];
+    }
 //    public static int nthSuperUglyNumber(int n, Integer[] primes) {
 //        if (n == 1) return 1;
 //        ArrayList<Queue<Long>> queues = new ArrayList<>();
@@ -2639,6 +2661,9 @@ public class NumberTest {
      * Because the range might be a large number, the low and high numbers are represented as string.
      */
     public static int strobogrammaticInRange(String low, String high) {
+        System.out.println("\nStart function strobogrammaticInRange().");
+        System.out.println("\tLow = " + low + "; High = " + high);
+
         HashSet<String> res = new HashSet<>();
 
         strobogrammaticInRangeHelper(low, high, "", res);
@@ -2646,6 +2671,9 @@ public class NumberTest {
         strobogrammaticInRangeHelper(low, high, "1", res);
         strobogrammaticInRangeHelper(low, high, "8", res);
 
+        for (String r : res) {
+            System.out.println("\t\t" + r);
+        }
         return res.size();
     }
     private static void strobogrammaticInRangeHelper(String low, String high, String tmp, HashSet<String> res) {
@@ -2653,13 +2681,9 @@ public class NumberTest {
             if ((tmp.length() == low.length() && tmp.compareTo(low) < 0) || (tmp.length() == high.length() && tmp.compareTo(high) > 0)) {
                 return;
             }
-            if (!(tmp.length() > 1 && tmp.startsWith("0"))) {
+            if (tmp.length() > 1 && !tmp.startsWith("0")) {
                 res.add(tmp);
             }
-//            if (tmp.length() > 1 && tmp.startsWith("0")) {
-//                return;
-//            }
-//            res.add(tmp);
         }
         if (tmp.length() + 2 > high.length()) {
             return;
@@ -2669,6 +2693,23 @@ public class NumberTest {
         strobogrammaticInRangeHelper(low, high, "6" + tmp + "9", res);
         strobogrammaticInRangeHelper(low, high, "8" + tmp + "8", res);
         strobogrammaticInRangeHelper(low, high, "9" + tmp + "6", res);
+    }
+    private static void strobogrammaticInRangeHelper2(String low, String high, String tmp, HashSet<String> res) {
+        if (tmp.length() >= low.length() && tmp.length() <= high.length()) {
+            if (!((tmp.length() == low.length() && tmp.compareTo(low) < 0) || (tmp.length() == high.length() && tmp.compareTo(high) > 0))) {
+                if (!(tmp.length() > 1 && tmp.startsWith("0"))) {
+                    res.add(tmp);
+                }
+            }
+        }
+        if (tmp.length() + 2 > high.length()) {
+            return;
+        }
+        strobogrammaticInRangeHelper2(low, high, "0" + tmp + "0", res);
+        strobogrammaticInRangeHelper2(low, high, "1" + tmp + "1", res);
+        strobogrammaticInRangeHelper2(low, high, "6" + tmp + "9", res);
+        strobogrammaticInRangeHelper2(low, high, "8" + tmp + "8", res);
+        strobogrammaticInRangeHelper2(low, high, "9" + tmp + "6", res);
     }
 
     /**
