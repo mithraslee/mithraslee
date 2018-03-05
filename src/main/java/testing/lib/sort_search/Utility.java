@@ -28,7 +28,7 @@ public class Utility<T extends Number> {
     }
     
     public static <T extends Number> void merge (T [] a, int b1, int e1, int b2, int e2) {
-        List<T> list = new ArrayList<> ();
+        List<T> list = new LinkedList<T> ();
         
         int index1 = b1;
         int index2 = b2;

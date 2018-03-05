@@ -139,7 +139,7 @@ public class Search {
         if (a == null || b < 0 || e < 0 || b > e)
             return -1;
 
-        while (b < e) {
+        while (b <= e) {
             int m = (b + e) / 2;
             if (Utility.compareItem(a[m], val) == 0) {
                 return m;
