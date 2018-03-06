@@ -4,6 +4,7 @@ import testing.lib.node.TreeNode;
 import testing.lib.node.TreeNodeInt;
 import testing.lib.tree.Tree;
 import testing.lib.tree.TreeIterator;
+import testing.lib.tree.TreeIterator2;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -125,8 +126,15 @@ public class TestTree {
         }
         ti4.printTreeVertical();
         TreeIterator<Integer> iter = ti4.iterator();
+        System.out.println("Iterator: ");
         while (iter.hasNext()) {
             System.out.println(iter.next().getData());
+        }
+
+        TreeIterator2<Integer> iter2 = ti4.iterator2();
+        System.out.println("Iterator2: ");
+        while (iter2.hasNext()) {
+            System.out.println(iter2.next().getData());
         }
 
 //        Tree<Integer> ti5 = new Tree<> ();

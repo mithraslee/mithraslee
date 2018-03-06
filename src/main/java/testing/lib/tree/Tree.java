@@ -27,6 +27,10 @@ public class Tree <T extends Number> {
         return new TreeIterator<>(root);
     }
 
+    public TreeIterator2<T> iterator2() {
+        return new TreeIterator2<>(root);
+    }
+
     public List<T> inorder() {
         TreeNode<T> cur = root;
         Stack<TreeNode> s = new Stack<>();
@@ -426,6 +430,16 @@ public class Tree <T extends Number> {
         flag |= printNodeAtLevelHelper(n.right, level - 1);
         return flag;
     }
+    private boolean printNodeAtLevelHelper2(TreeNode<T> n, int level) {
+        if (n == null || level < 0)
+            return false;
+        if (level == 0) {
+            System.out.print(n.getData() + "\t");
+            return true;
+        }
+
+        return printNodeAtLevelHelper2(n.left, level - 1) | printNodeAtLevelHelper2(n.right, level - 1);
+    }
 
     public void printNodeByLevel() {
         int level = 0;
@@ -494,15 +508,13 @@ public class Tree <T extends Number> {
                     nextLevelStart = cur.left == null ? cur.right : cur.left;
                 }
                 if (cur.left != null)
-                    if (nextLevelPre != null) {
+                    if (nextLevelPre != null)
                         nextLevelPre.next = cur.left;
-                        nextLevelPre = cur.left;
-                    }
+                    nextLevelPre = cur.left;
                 if (cur.right != null)
-                    if (nextLevelPre != null) {
+                    if (nextLevelPre != null)
                         nextLevelPre.next = cur.right;
-                        nextLevelPre = cur.right;
-                    }
+                    nextLevelPre = cur.right;
                 if (cur.next == null) {
                     cur = nextLevelStart;
                     nextLevelStart = null;      // Important!
