@@ -885,6 +885,13 @@ public class Tree <T extends Number> {
         return isBSTRecursiveHelper(node.left, leftPre, (long)node.val) &&
                 isBSTRecursiveHelper(node.right, (long)node.val, rightPre);
     }
+    // Better version
+    public boolean isBSTRecursiveHelper2(TreeNodeInt node, long mn, long mx) {
+        if (node == null) return true;
+        if ((long)node.val <= mn || (long)node.val >= mx) return false;
+        return isBSTRecursiveHelper2(node.left, mn, node.val) &&
+            isBSTRecursiveHelper2(node.right, node.val, mx);
+    }
 
 
     public void printPath() {
