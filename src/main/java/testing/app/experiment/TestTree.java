@@ -5,6 +5,7 @@ import testing.lib.node.TreeNodeInt;
 import testing.lib.tree.Tree;
 import testing.lib.tree.TreeIterator;
 import testing.lib.tree.TreeIterator2;
+import testing.lib.tree.TreeIterator3;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -137,6 +138,12 @@ public class TestTree {
             System.out.println(iter2.next().getData());
         }
 
+        TreeIterator3<Integer> iter3 = ti4.iterator3();
+        System.out.println("Iterator3: ");
+        while (iter3.hasNext()) {
+            System.out.println(iter3.next().getData());
+        }
+
 //        Tree<Integer> ti5 = new Tree<> ();
 //        for (int i = 0; i < 10; i++) {
 //            ti5.insert((int)(Math.random() * 10 + 1));
@@ -259,7 +266,14 @@ public class TestTree {
         root8_2.right = new TreeNodeInt(3);
         root8_2.right.left = new TreeNodeInt(2);
         root8_2.right.left.left = new TreeNodeInt(1);
+        System.out.print("longestConsecutive:");
         System.out.println(Tree.longestConsecutive(root8_2));
+        System.out.print("longestConsecutive2:");
+        System.out.println(Tree.longestConsecutive2(root8_2));
+
+        ti2.printTreeVertical();
+        System.out.print("longestConsecutive2:");
+        System.out.println(ti2.longestConsecutive2());
 
         TreeNodeInt root9 = new TreeNodeInt(5);
         root9.left = new TreeNodeInt(1);
@@ -268,6 +282,11 @@ public class TestTree {
         root9.right = new TreeNodeInt(5);
         root9.right.right = new TreeNodeInt(5);
         System.out.println(Tree.countUnivalSubtrees2(root9));
+
+        System.out.println("Tree.verticalOrder(root9):");
+        System.out.println(Tree.verticalOrder(root9));
+        System.out.println("Tree.verticalOrder3(root9):");
+        System.out.println(Tree.verticalOrder3(root9));
 
         System.out.println();
         System.out.println("Test verifyPreorder");

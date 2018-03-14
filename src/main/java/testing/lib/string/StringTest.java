@@ -4578,8 +4578,19 @@ public class StringTest {
             sb.insert(0, (char)('A' + rem - 1));
         }
         String result = sb.toString();
-        System.out.println("\nStart function convertToTitle1(): " + input + " => " + result);
+        System.out.println("\nStart function convertToTitle2(): " + input + " => " + result);
         return result;
+    }
+    public static String convertToTitle3 (int n) {
+        int input = n;
+        StringBuilder sb = new StringBuilder();
+        while (n > 0) {
+            n--;
+            sb.insert(0, (char)((n % 26) + 'A'));
+            n /= 26;
+        }
+        System.out.println("\nStart function convertToTitle3(): " + input + " => " + sb.toString());
+        return sb.toString();
     }
 
     /**

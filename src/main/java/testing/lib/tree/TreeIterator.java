@@ -8,6 +8,9 @@ import java.util.Stack;
  * Created by yunli on 11/16/15.
  */
 public class TreeIterator <T extends Number> {
+    private Stack<TreeNode<T>> preStack = new Stack<>();
+    private TreeNode<T> cur;
+    
     public TreeIterator (TreeNode<T> root) {
         cur = leftMostLeaf(root);
     }
@@ -40,7 +43,4 @@ public class TreeIterator <T extends Number> {
         }
         return n;
     }
-
-    private Stack<TreeNode<T>> preStack = new Stack<>();
-    private TreeNode<T> cur;
 }

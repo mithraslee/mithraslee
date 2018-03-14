@@ -418,18 +418,25 @@ public class TestString {
 
         StringTest.convertToTitle(26);
         StringTest.convertToTitle2(26);
+        StringTest.convertToTitle3(26);
         StringTest.convertToTitle(27);
         StringTest.convertToTitle2(27);
+        StringTest.convertToTitle3(27);
         StringTest.convertToTitle(30);
         StringTest.convertToTitle2(30);
+        StringTest.convertToTitle3(30);
         StringTest.convertToTitle(51);
         StringTest.convertToTitle2(51);
+        StringTest.convertToTitle3(51);
         StringTest.convertToTitle(52);
         StringTest.convertToTitle2(52);
+        StringTest.convertToTitle3(52);
         StringTest.convertToTitle(53);
         StringTest.convertToTitle2(53);
+        StringTest.convertToTitle3(53);
         StringTest.convertToTitle(1000);
         StringTest.convertToTitle2(1000);
+        StringTest.convertToTitle3(1000);
 
         String s = "abacb";
         String t = "xmxum";

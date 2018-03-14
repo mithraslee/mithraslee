@@ -31,6 +31,10 @@ public class Tree <T extends Number> {
         return new TreeIterator2<>(root);
     }
 
+    public TreeIterator3<T> iterator3() {
+        return new TreeIterator3<>(root);
+    }
+
     public List<T> inorder() {
         TreeNode<T> cur = root;
         Stack<TreeNode> s = new Stack<>();
@@ -273,11 +277,26 @@ public class Tree <T extends Number> {
         return minDepthHelper(root);
     }
 
-    private int minDepthHelper(TreeNode<T> n) {
-        if (n == null)
+    // This version is WRONG!!!
+    // private int minDepthHelper(TreeNode<T> n) {
+    //     if (n == null)
+    //         return 0;
+    //     else
+    //         return 1 + Math.min(minDepthHelper(n.left), minDepthHelper(n.right));
+    // }
+    private int minDepthHelper(TreeNode root) {
+        if (root == null)
             return 0;
+        int leftDepth = minDepthHelper(root.left);
+        int rightDepth = minDepthHelper(root.right);
+        if (leftDepth == 0 && rightDepth == 0)
+            return 1;
+        else if (leftDepth != 0 && rightDepth != 0)
+            return 1+Math.min(leftDepth, rightDepth);
+        else if (leftDepth == 0)
+            return 1 + rightDepth;
         else
-            return 1 + Math.min(minDepthHelper(n.left), minDepthHelper(n.right));
+            return 1 + leftDepth;
     }
 
     public void printTreeHorizontal() {
@@ -1882,6 +1901,40 @@ public class Tree <T extends Number> {
         verticalOrder(node.right, level + 1, map);
     }
 
+    public static List<List<Integer>> verticalOrder3(TreeNodeInt root) {
+        ArrayList<List<Integer>> res = new ArrayList<>();
+        if (root == null) return res;
+
+        TreeMap<Integer, List<Integer>> map = new TreeMap<>();
+        Queue<TreeNodeInt> nodes = new LinkedList<>();
+        Queue<Integer> cols = new LinkedList<>();
+        nodes.add(root);
+        cols.add(0);
+        while (!nodes.isEmpty()) {
+            TreeNodeInt cur = nodes.poll();
+            Integer col = cols.poll();
+            if (!map.containsKey(col)) {
+                ArrayList<Integer> newList = new ArrayList<>();
+                newList.add(cur.val);
+                map.put(col, newList);
+            } else {
+                map.get(col).add(cur.val);
+            }
+            if (cur.left != null) {
+                nodes.add(cur.left);
+                cols.add(col - 1);
+            }
+            if (cur.right != null) {
+                nodes.add(cur.right);
+                cols.add(col + 1);
+            }
+        }
+        for (Integer col : map.keySet()) {
+            res.add(map.get(col));
+        }
+        return res;
+    }
+
     /**
      * Binary Tree Longest Consecutive Sequence
      * <p>
@@ -1910,14 +1963,13 @@ public class Tree <T extends Number> {
     public static int longestConsecutive(TreeNodeInt root) {
         if (root == null) return 0;
         ArrayList<Integer> res = new ArrayList<Integer>();
-        longestConsecutiveDFS(root, root.val - 1, 1, res);
+        longestConsecutiveDFS(root, root.val - 1, 0, res);
         int max = 0;
         for (int i : res) {
             max = Math.max(max, i);
         }
         return max;
     }
-
     private static void longestConsecutiveDFS(TreeNodeInt node, int lastVal, int curLen, ArrayList<Integer> res) {
         if (node == null) {
             return;
@@ -1931,6 +1983,43 @@ public class Tree <T extends Number> {
         longestConsecutiveDFS(node.left, node.val, curLen, res);
         longestConsecutiveDFS(node.right, node.val, curLen, res);
     }
+
+    public int longestConsecutive2() {
+        if (root == null) return 0;
+        return longestConsecutiveDFS2(root, root.getData().intValue() - 1, 0);
+    }
+
+    private int longestConsecutiveDFS2(TreeNode<T> node, int lastVal, int curLen) {
+        if (node == null) return 0;
+        if (node.getData().intValue() == lastVal + 1) {
+            curLen++;
+        } else {
+            curLen = 1;
+        }
+        return Math.max(curLen, Math.max(
+            longestConsecutiveDFS2(node.left, node.getData().intValue(), curLen),
+            longestConsecutiveDFS2(node.right, node.getData().intValue(), curLen)
+        ));
+    }
+    // Better version
+    public static int longestConsecutive2(TreeNodeInt root) {
+        if (root == null) return 0;
+        return longestConsecutiveDFS2(root, root.val - 1, 0);
+    }
+
+    private static int longestConsecutiveDFS2(TreeNodeInt node, int lastVal, int curLen) {
+        if (node == null) return 0;
+        if (node.val == lastVal + 1) {
+            curLen++;
+        } else {
+            curLen = 1;
+        }
+        return Math.max(curLen, Math.max(
+                longestConsecutiveDFS2(node.left, node.val, curLen),
+                longestConsecutiveDFS2(node.right, node.val, curLen)
+        ));
+    }
+
 
     /**
      * Count Univalue Subtrees
