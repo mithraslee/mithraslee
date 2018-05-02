@@ -1194,6 +1194,24 @@ public class ArrayTest <T extends Number> {
         System.out.println("The minlen is " + minLen);
         return minLen;
     }
+    static public int minSubArrayLen2(int s, int[] nums) {
+        int len = nums.length;
+        if (len < 1) return 0;
+        int start = 0, end = 0;
+        int minLen = len + 1;
+        int sum = 0;
+        while (end < len) {
+            sum += nums[end];
+
+            while (start <= end && sum >= s) {
+                minLen = Math.min(minLen, end - start + 1);
+                sum -= nums[start++];
+            }
+            end++;
+        }
+        minLen = minLen == len + 1 ? 0 : minLen;
+        return minLen;
+    }
 
     /**
      * Maximum Size Subarray Sum Equals k
@@ -2158,27 +2176,51 @@ public class ArrayTest <T extends Number> {
      * <p>
      * DFS
      */
-    public static List<Set<Integer>> subsetsWithNoDup(Integer[] num) {
+    public static List<List<Integer>> subsetsWithNoDup(Integer[] num) {
         System.out.println("\nStart function subsetsWithNoDup()");
-        ArrayList<Set<Integer>> res = new ArrayList<>();
+        ArrayList<List<Integer>> res = new ArrayList<>();
         if (num == null || num.length <= 0) return res;
 
-        subsetsWithNoDupHelper(num, new HashSet<>(), res, 0);
+        subsetsWithNoDupHelper(num, new LinkedList<>(), res, 0);
 
         printArray(num, "Input array:");
-        for (Set<Integer> set : res) {
+        for (List<Integer> set : res) {
             System.out.println("\tsubset: " + set);
         }
         return res;
     }
-
-    private static void subsetsWithNoDupHelper(Integer[] num, HashSet<Integer> temp, ArrayList<Set<Integer>> res, int index) {
+    private static void subsetsWithNoDupHelper(Integer[] num, LinkedList<Integer> temp, ArrayList<List<Integer>> res, int index) {
         if (index == num.length) {
-            res.add((HashSet<Integer>) temp.clone());
+            res.add(new LinkedList<Integer>(temp));
         } else {
             subsetsWithNoDupHelper(num, temp, res, index + 1);
             temp.add(num[index]);
             subsetsWithNoDupHelper(num, temp, res, index + 1);
+            temp.remove(num[index]);
+        }
+    }
+
+    public static List<List<Integer>> subsetsWithNoDup2(Integer[] num) {
+        System.out.println("\nStart function subsetsWithNoDup2()");
+        ArrayList<List<Integer>> res = new ArrayList<>();
+        if (num == null || num.length <= 0) return res;
+
+        Arrays.sort(num);
+        subsetsWithNoDupHelper2(num, new LinkedList<>(), res, 0);
+
+        printArray(num, "Input array:");
+        for (List<Integer> set : res) {
+            System.out.println("\tsubset: " + set);
+        }
+        return res;
+    }
+    private static void subsetsWithNoDupHelper2(Integer[] num, LinkedList<Integer> temp, ArrayList<List<Integer>> res, int index) {
+        if (index == num.length) {
+            res.add(new LinkedList<Integer>(temp));
+        } else {
+            subsetsWithNoDupHelper2(num, temp, res, index + 1);
+            temp.add(num[index]);
+            subsetsWithNoDupHelper2(num, temp, res, index + 1);
             temp.remove(num[index]);
         }
     }
@@ -2470,6 +2512,40 @@ public class ArrayTest <T extends Number> {
             if(candidates[i] <= target) {
                 temp.add(candidates[i]);
                 combinationSumDFS2(candidates, target-candidates[i], temp, results, i);
+                temp.removeLast();
+            }
+        }
+    }
+
+    public static List<List<Integer>> combinationSumI_2(Integer[] candidates, int target) {
+        System.out.println("\nStart function combinationSumI_2()");
+        System.out.println("\tTarget = " + target);
+        printArray(candidates, "\tCandidate: ");
+        ArrayList<List<Integer>> results = new ArrayList<> ();
+        TreeSet<Integer> keys = new TreeSet<>();
+        for (int i : candidates) {
+            keys.add(i);
+        }
+        System.out.println("\tkeys = " + keys);
+
+        combinationSumDFSI_2 (new ArrayList<Integer>(keys), target, new LinkedList<Integer> (), results, 0);
+
+        for (List<Integer> r : results) {
+            System.out.println("\t\t" + r);
+        }
+        return results;
+    }
+    private static void combinationSumDFSI_2(ArrayList<Integer> keys, int target, LinkedList<Integer> temp, ArrayList<List<Integer>> results, int idx) {
+        System.out.println("\ttemp = " + temp);
+        System.out.println("\ttarget = " + target);
+        if (target == 0) {
+            results.add(new LinkedList<>(temp));
+            return;
+        }
+        for (int i = idx; i < keys.size(); i++) {
+            if (target >= keys.get(i)) {
+                temp.add(keys.get(i));
+                combinationSumDFSI_2(keys, target - keys.get(i), temp, results, i);
                 temp.removeLast();
             }
         }
@@ -12115,6 +12191,24 @@ public class ArrayTest <T extends Number> {
         }
 
         return res;
+    }
+
+    public void moveZeros(Integer[] nums) {
+        if (nums == null) return;
+        int len = nums.length;
+        if (len <= 1) return;
+
+        int startZero = 0, idx = 0;
+        while (idx < len) {
+            while (startZero < len && nums[startZero] != 0) {
+                startZero++;
+            }
+            idx = Math.max(idx, startZero);
+            while (idx < len && nums[idx] == 0) {
+                idx++;
+            }
+            if (idx < len) swap(nums, idx++, startZero++);
+        }
     }
 }
 

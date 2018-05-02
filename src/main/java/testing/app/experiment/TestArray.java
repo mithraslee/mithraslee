@@ -242,7 +242,8 @@ public class TestArray {
         ArrayTest.permuteUnique(new Integer [] {1, 2, 3});
         ArrayTest.permuteUnique(new Integer [] {1, 1, 2});
 
-        ArrayTest.subsetsWithNoDup(new Integer [] {1, 2, 3});
+        ArrayTest.subsetsWithNoDup(new Integer [] {3, 2, 1});
+        ArrayTest.subsetsWithNoDup2(new Integer [] {3, 2, 1});
         ArrayTest.subsetsWithDupRecursive(new Integer [] {1, 2, 2});
         ArrayTest.subsetsWithDupRecursive2(new Integer [] {1, 2, 2});
         ArrayTest.subsetsWithDupRecursive3(new Integer [] {1, 2, 2});
@@ -253,6 +254,9 @@ public class TestArray {
         //region Combination Sum
         ArrayTest.combinationSum(new Integer [] {2, 3, 4, 6, 7}, 7);
         ArrayTest.combinationSum(new Integer [] {2, 2, 3, 4, 6, 7}, 7);
+
+        ArrayTest.combinationSumI_2(new Integer [] {2, 3, 4, 6, 7}, 7);
+        ArrayTest.combinationSumI_2(new Integer [] {2, 2, 3, 4, 6, 7}, 7);
 
         ArrayTest.combinationSum2(new Integer [] {10, 1, 2, 7, 6, 1, 5}, 8);
 

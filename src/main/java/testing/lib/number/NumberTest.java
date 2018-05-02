@@ -818,6 +818,11 @@ public class NumberTest {
         factorCombinationDFS(n, 2, new LinkedList<Integer> (), res);
         for (List<Integer> list : res)
             System.out.println("\t" + list);
+        List<List<Integer>> res2 = new ArrayList<> ();
+        System.out.println("DFS2");
+        factorCombinationDFS2(n, 2, new LinkedList<Integer> (), res2);
+        for (List<Integer> list : res2)
+            System.out.println("\t" + list);
         return res;
     }
     private static void factorCombinationDFS (int n, int start, LinkedList<Integer> tmp, List<List<Integer>> res) {
@@ -833,6 +838,21 @@ public class NumberTest {
             tmp.addLast(i);
             factorCombinationDFS(n/i, i, tmp, res);
             tmp.removeLast();
+        }
+    }
+    private static void factorCombinationDFS2 (int n, int start, LinkedList<Integer> tmp, List<List<Integer>> res) {
+        if (n == 1) {
+            if (tmp.size() > 1) {
+                res.add(new LinkedList<>(tmp));
+            }
+            return;
+        }
+        for (int i = start; i <= n; i++) {
+            if (n % i == 0) {
+                tmp.add(i);
+                factorCombinationDFS2(n/i, i, tmp, res);
+                tmp.removeLast();
+            }
         }
     }
 

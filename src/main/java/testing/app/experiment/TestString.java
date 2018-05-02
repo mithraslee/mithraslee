@@ -769,5 +769,28 @@ public class TestString {
         StringTest.longestCommonPrefixDemo(new String[]{"BATMAN", "BATM", "BA", "BAT"});
 
         StringTest.lengthOfLongestSubstring("tmmzuxt");
+
+
+        List<List<String>> accounts = new ArrayList<>();
+        String[][] accountsArr = new String[][]{
+                {"John", "johnsmith@mail.com", "john00@mail.com"},
+                {"John", "johnnybravo@mail.com"},
+                {"John", "johnsmith@mail.com", "john_newyork@mail.com"},
+                {"Mary", "mary@mail.com"}
+        };
+        for (String[] at : accountsArr) {
+            ArrayList<String> ts = new ArrayList<>();
+            for (String as : at) {
+                ts.add(as);
+            }
+            accounts.add(ts);
+        }
+        StringTest.accountsMergeDemo(accounts);
+        StringTest.accountsMergeDemo2(accounts);
+
+        String str = "abc";
+        System.out.println("sub(0,0) of \"" + str + "\" is \"" + str.substring(0, 0) + "\"");
+        System.out.println("sub(2,2) of \"" + str + "\" is \"" + str.substring(2, 2) + "\"");
+        System.out.println("sub(2,3) of \"" + str + "\" is \"" + str.substring(2, 3) + "\"");
     }
 }

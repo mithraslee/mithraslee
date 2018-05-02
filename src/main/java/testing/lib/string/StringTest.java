@@ -4,6 +4,7 @@
  */
 package testing.lib.string;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import testing.lib.node.TrieNode3;
 import testing.lib.trie.*;
 
@@ -3084,11 +3085,13 @@ public class StringTest {
         if (S == null || T == null || S.length() == 0 || T.length() == 0) return "";
         HashMap<Character, Integer> map = new HashMap<>();
         for (Character c : T.toCharArray()) {
-            if (map.containsKey(c)) {
-                map.put(c, map.get(c) + 1);
-            } else {
-                map.put(c, 1);
-            }
+            map.putIfAbsent(c, 0);
+            map.put(c, map.get(c) + 1);
+//            if (map.containsKey(c)) {
+//                map.put(c, map.get(c) + 1);
+//            } else {
+//                map.put(c, 1);
+//            }
         }
 
         int lenS = S.length();
@@ -6199,6 +6202,57 @@ public class StringTest {
         }
 
         return sb.toString();
+    }
+    public static void removeInvalidParenthesesDemo4(String s) {
+        System.out.println("\nStart function removeInvalidParenthesesDemo4()");
+        System.out.println("\tStr: " + s);
+        System.out.println("\tRes = " + removeInvalidParentheses4(s));
+    }
+    private static Boolean isValidParentheses(String s) {
+        if (s == null) return false;
+        int cnt = 0;
+        for (char c : s.toCharArray()) {
+            if (c == '(') {
+                cnt++;
+            } else if (c == ')') {
+                cnt--;
+            }
+            if (cnt < 0) {
+                return false;
+            }
+        }
+        return cnt == 0;
+    }
+    public static List<String> removeInvalidParentheses4(String s) {
+        ArrayList<String> res = new ArrayList<>();
+        if (s == null) return res;
+        HashSet<String> visited = new HashSet<>();
+        Queue<String> Q = new LinkedList<>();
+        visited.add(s);
+        Q.add(s);
+        while (!Q.isEmpty()) {
+            int size = Q.size();
+            while (size-- > 0) {
+                String cur = Q.poll();
+                if (isValidParentheses(cur)) {
+                    res.add(cur);
+                } else if (res.isEmpty()) {
+                    for (int i = 0; i < cur.length(); i++) {
+                        String leftSub = i == 0 ? "" : s.substring(0, i);
+                        String rightSub = i == cur.length() - 1 ? "" : s.substring(i+1);
+                        String next = leftSub + rightSub;
+                        if (!visited.contains(next)) {
+                            Q.add(next);
+                            visited.add(next);
+                        }
+                    }
+                }
+            }
+            if (!res.isEmpty()) {
+                break;
+            }
+        }
+        return res;
     }
 
     /**
@@ -9464,7 +9518,7 @@ public class StringTest {
 //        }
 //    }
 
-    /**
+    /*
      * Count The Repetitions
      *
      * Define S = [s,n] as the string S which consists of n connected strings s. For example, ["abc", 3] ="abcabcabc".
@@ -9485,4 +9539,153 @@ public class StringTest {
 //    public static int getMaxRepetitions(String s1, int n1, String s2, int n2) {
 //
 //    }
+
+
+    /**
+     * 721. Accounts Merge
+     *
+     * Given a list accounts, each element accounts[i] is a list of strings,
+     * where the first element accounts[i][0] is a name,
+     * and the rest of the elements are emails representing emails of the account.
+     *
+     * Now, we would like to merge these accounts. Two accounts definitely belong to the same person if there is
+     * some email that is common to both accounts. Note that even if two accounts have the same name, they may
+     * belong to different people as people could have the same name. A person can have any number of accounts
+     * initially, but all of their accounts definitely have the same name.
+     *
+     * After merging the accounts, return the accounts in the following format: the first element of each account
+     * is the name, and the rest of the elements are emails in sorted order. The accounts themselves can be
+     * returned in any order.
+     *
+     * Example 1:
+     *
+     * Input:
+     *  accounts = [["John", "johnsmith@mail.com", "john00@mail.com"], ["John", "johnnybravo@mail.com"], ["John", "johnsmith@mail.com", "john_newyork@mail.com"], ["Mary", "mary@mail.com"]]
+     *  Output: [["John", 'john00@mail.com', 'john_newyork@mail.com', 'johnsmith@mail.com'],  ["John", "johnnybravo@mail.com"], ["Mary", "mary@mail.com"]]
+     *
+     * Explanation:
+     * The first and third John's are the same person as they have the common email "johnsmith@mail.com".
+     * The second John and Mary are different people as none of their email addresses are used by other accounts.
+     * We could return these lists in any order, for example the answer [['Mary', 'mary@mail.com'], ['John', 'johnnybravo@mail.com'],
+     *         ['John', 'john00@mail.com', 'john_newyork@mail.com', 'johnsmith@mail.com']] would still be accepted.
+     *
+     * Note:
+     * The length of accounts will be in the range [1, 1000].
+     * The length of accounts[i] will be in the range [1, 10].
+     * The length of accounts[i][j] will be in the range [1, 30].
+     */
+     public static void accountsMergeDemo(List<List<String>> accounts) {
+        System.out.println("\nStart function accountsMergeDemo().");
+        System.out.println("Accounts:");
+        for (List<String> a : accounts) {
+            System.out.println("\t" + a);
+        }
+        List<List<String>> res = accountsMerge(accounts);
+        System.out.println("Result:");
+        for (List<String> r : res) {
+            System.out.println("\t" +r);
+        }
+    }
+    public static List<List<String>> accountsMerge(List<List<String>> accounts) {
+        ArrayList<List<String>> res = new ArrayList<>();
+        HashMap<String, HashMap<String, HashSet<String>>> map = new HashMap<>();
+        for (List<String> account : accounts) {
+            String name = null;
+            for (String s : account) {
+                if (name == null) {
+                    name = s;
+                    if (!map.containsKey(name)) map.put(name, new HashMap<>());
+                } else {
+                    HashSet<String> nSet = new HashSet<>(account);
+                    nSet.remove(name);
+                    nSet.remove(s);
+                    if (!map.get(name).containsKey(s)) {
+                        map.get(name).put(s, new HashSet<>());
+                    }
+                    map.get(name).get(s).addAll(nSet);
+                }
+            }
+        }
+        for (String name : map.keySet()) {
+            HashMap<String, HashSet<String>> group = map.get(name);
+            HashSet<String> emails = new HashSet<>(group.keySet());
+            while (!emails.isEmpty()) {
+                Iterator<String> iter = emails.iterator();
+                String email = iter.next();
+                TreeSet<String> nEmails = new TreeSet<>();
+                Queue<String> Q = new LinkedList<>();
+                Q.add(email);
+                while (!Q.isEmpty()) {
+                    String curEmail = Q.poll();
+                    nEmails.add(curEmail);
+                    emails.remove(curEmail);
+                    for (String es : group.get(curEmail)) {
+                        if (emails.contains(es)) {
+                            Q.add(es);
+                        }
+                    }
+                }
+                LinkedList<String> emailGroup = new LinkedList<>();
+                for (String s : nEmails) emailGroup.add(s);
+                emailGroup.addFirst(name);
+                res.add(emailGroup);
+            }
+        }
+        return res;
+    }
+    public static void accountsMergeDemo2(List<List<String>> accounts) {
+        System.out.println("\nStart function accountsMergeDemo2().");
+        System.out.println("Accounts:");
+        for (List<String> a : accounts) {
+            System.out.println("\t" + a);
+        }
+        List<List<String>> res = accountsMerge2(accounts);
+        System.out.println("Result:");
+        for (List<String> r : res) {
+            System.out.println("\t" +r);
+        }
+    }
+    public static List<List<String>> accountsMerge2(List<List<String>> accounts) {
+        ArrayList<List<String>> res = new ArrayList<>();
+        if (accounts == null || accounts.isEmpty()) return res;
+        ArrayList<List<String>> arr = new ArrayList<>(accounts);
+
+        HashMap<String, HashSet<Integer>> email2Idx = new HashMap<>();
+        for (int i = 0; i < arr.size(); i++) {
+            ArrayList<String> records = new ArrayList<>(arr.get(i));
+            for (int j = 1; j < records.size(); j++) {
+                if (!email2Idx.containsKey(records.get(j))) {
+                    email2Idx.put(records.get(j), new HashSet<>());
+                }
+                email2Idx.get(records.get(j)).add(i);
+            }
+        }
+
+        boolean[] visited = new boolean[arr.size()];
+        Arrays.fill(visited, false);
+        for (int i = 0; i < arr.size(); i++) {
+            if (!visited[i]) {
+                TreeSet<String> emails = new TreeSet<>();
+                Queue<Integer> idxes = new LinkedList<>();
+                idxes.add(i);
+                visited[i] = true;
+                while (!idxes.isEmpty()) {
+                    int idx = idxes.poll();
+                    for (String email : arr.get(idx).subList(1, arr.get(idx).size())) {
+                        emails.add(email);
+                        for (int id : email2Idx.get(email)) {
+                            if (!visited[id]) {
+                                visited[id] = true;
+                                idxes.add(id);
+                            }
+                        }
+                    }
+                }
+                LinkedList<String> tRes = new LinkedList<>(emails);
+                tRes.addFirst(arr.get(i).get(0));
+                res.add(tRes);
+            }
+        }
+        return res;
+    }
 }
