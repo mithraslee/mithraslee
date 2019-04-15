@@ -241,14 +241,19 @@ public class TestString {
 
         StringTest.minWindow("bba", "ab");
         StringTest.minWindow2("bba", "ab");
+        StringTest.minWindow3("bba", "ab");
         StringTest.minWindow("bba", "aabccc");
         StringTest.minWindow2("bba", "aabccc");
+        StringTest.minWindow3("bba", "aabccc");
         StringTest.minWindow("aabcbcc", "bba");
         StringTest.minWindow2("aabcbcc", "bba");
+        StringTest.minWindow3("aabcbcc", "bba");
         StringTest.minWindow("cfcccbbeeetacaahibjka", "aabcc");
         StringTest.minWindow2("cfcccbbeeetacaahibjka", "aabcc");
+        StringTest.minWindow3("cfcccbbeeetacaahibjka", "aabcc");
         StringTest.minWindow("ADOBECODEBANC", "ABC");
         StringTest.minWindow2("ADOBECODEBANC", "ABC");
+        StringTest.minWindow3("ADOBECODEBANC", "ABC");
 
         String Input = "lingmindraboofooowingdingbarrwingmonkeypoundcake";
         String [] Input2 = new String [] {"fooo","barr","wing","ding","wing"};
@@ -526,9 +531,13 @@ public class TestString {
 
         StringTest.wordPattern("abba", "dog cat cat dog");
         StringTest.wordPatternMatch("aba", "xxyyyxx");
+        StringTest.wordPatternMatch2("aba", "xxyyyxx");
         StringTest.wordPatternMatch("abab", "redblueredblue");
+        StringTest.wordPatternMatch2("abab", "redblueredblue");
         StringTest.wordPatternMatch("aaaa", "asdasdasdasd");
+        StringTest.wordPatternMatch2("aaaa", "asdasdasdasd");
         StringTest.wordPatternMatch("aabb", "xyzabcxzyabc");
+        StringTest.wordPatternMatch2("aabb", "xyzabcxzyabc");
 
         StringTest.generatePossibleNextMoves("++");
         StringTest.generatePossibleNextMoves("+++");
@@ -626,7 +635,7 @@ public class TestString {
         StringTest.addStrings2("1234", "567");
 
         StringTest.characterReplacement("ABAB", 2);
-        StringTest.characterReplacement("AABABBA", 1);
+        StringTest.characterReplacement("AABABBBBA", 1);
         StringTest.characterReplacement("ABABB", 2);
         StringTest.characterReplacement("AAAB", 0);
 
@@ -702,6 +711,8 @@ public class TestString {
 
         StringTest.generateAbbreviations2("word");
         StringTest.generateAbbreviations3("word");
+        StringTest.generateAbbreviations5("word");
+        StringTest.generateAbbreviations6("word");
 
 //        StringTest.licenseKeyFormattingDemo("abcd", 3);
 //        StringTest.licenseKeyFormattingDemo("abcd", 4);

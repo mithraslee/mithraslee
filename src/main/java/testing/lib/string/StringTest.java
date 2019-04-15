@@ -3126,6 +3126,54 @@ public class StringTest {
         return res;
     }
 
+    // Similar to minWindow2
+    public static String minWindow3(String S, String T) {
+        System.out.println("\nStart function minWindow3()");
+        System.out.println("\tS = " + S);
+        System.out.println("\tT = " + T);
+        if (S == null || T == null || S.length() == 0 || T.length() == 0) return "";
+        HashMap<Character, Integer> map = new HashMap<>();
+        for (Character c : T.toCharArray()) {
+            map.putIfAbsent(c, 0);
+            map.put(c, map.get(c) + 1);
+        }
+
+        int lenS = S.length();
+        int lenT = T.length();
+        int count = 0;
+        int minLen = lenS;
+        String res = "";
+        for (int end = 0, start = 0; end < lenS; end++) {
+            Character newE = S.charAt(end);
+            if (map.containsKey(newE)) {
+                if (map.get(newE) > 0) {
+                    count++;
+                }
+                map.put(newE, map.get(newE) - 1);
+            }
+            if (count == lenT) {
+                while (start < end) {
+                    Character newS = S.charAt(start);
+                    if (map.containsKey(newS)) {
+                        if (map.get(newS) == 0) {
+                            break;
+                        } else if (map.get(newS) < 0) {
+                            map.put(newS, map.get(newS) + 1);
+                        }
+                    }
+                    start++;
+                }
+                if (end - start + 1 > minLen) {
+                    minLen = end - start + 1;
+                    res = S.substring(start, end + 1);
+                }
+            }
+        }
+
+        System.out.println("\tminWin = " + res);
+        return res;
+    }
+
     /**
      * You are given a string, s, and a list of words, words, that are all of the same length.
      * Find all starting indices of substring(s) in s that is a concatenation of each word in words exactly once and without any intervening characters.
@@ -5716,6 +5764,49 @@ public class StringTest {
         return false;
     }
 
+    public static boolean wordPatternMatch2(String pattern, String str) {
+        System.out.println("\nStart function wordPatternMatch2()");
+        System.out.println("\tPattern = " + pattern + "; Str = " + str);
+
+        HashMap<Character, String> c2s = new HashMap<>();
+        HashSet<String> set = new HashSet<>();
+
+        boolean res = wordPatternMatchHelper2(pattern, str, c2s, set);
+        System.out.println("\tMatched: " + res);
+        return res;
+    }
+    private static boolean wordPatternMatchHelper2(
+        String pattern, String str, HashMap<Character, String> c2s, HashSet<String> set
+    ) {
+        if (pattern.isEmpty() && str.isEmpty()) {
+            return true;
+        }
+        if (pattern.isEmpty() || str.isEmpty()) {
+            return false;
+        }
+        Character c = pattern.charAt(0);
+        if (c2s.containsKey(c)) {
+            String s = c2s.get(c);
+            if (str.startsWith(s) && set.contains(s)) {
+                return wordPatternMatchHelper2(pattern.substring(1), str.substring(s.length()), c2s, set);
+            }
+        } else {
+            for (int cut = 1; cut <= str.length(); cut++) {
+                String s = str.substring(0, cut);
+                if (!set.contains(s)) {
+                    c2s.put(c, s);
+                    set.add(s);
+                    if (wordPatternMatchHelper2(pattern.substring(1), str.substring(s.length()), c2s, set)) {
+                        return true;
+                    }
+                    c2s.remove(c);
+                    set.remove(s);
+                }
+            }
+        }
+        return false;
+    }
+
     /**
      * You are playing the following Flip Game with your friend: Given a string that contains only these two characters:+ and -, you and your friend take turns to flip two consecutive "++" into "--". The game ends when a person can no longer make a move and therefore the other person will be the winner.
      *
@@ -5773,12 +5864,25 @@ public class StringTest {
         System.out.println("\nStart function Flip Game canWinDemo()");
         System.out.println("\tStr: " + s);
         System.out.println("\tCanWin = " + canWin(s));
+        System.out.println("\tCanWin2 = " + canWin2(s));
     }
     public static boolean canWin(String s) {
         for (int i = -1; (i = s.indexOf("++", i+1)) >= 0;) {
             if (!canWin(s.substring(0, i) + "--" + s.substring(i+2))) {
                 return true;
             }
+        }
+        return false;
+    }
+    public static boolean canWin2(String s) {
+        int idx = s.indexOf("++");
+        while (idx >= 0) {
+            String left = s.substring(0, idx);
+            String right = s.substring(idx + 2);
+            if (!canWin2(left + "--" + right)) {
+                return true;
+            }
+            idx = s.indexOf("++", idx + 1);
         }
         return false;
     }
@@ -8030,6 +8134,34 @@ public class StringTest {
         return cnt;
     }
 
+    public static int magicalString2(int n) {
+        System.out.println("\nStart function magicalString2(). n = " + n);
+        if (n < 1) return 0;
+        if (n <= 3) return 1;
+        int[] arr = new int[n];
+        arr[0] = 1;
+        arr[1] = 2;
+        arr[2] = 2;
+        boolean fillOne = true;
+        int curIdx = 2;
+        int onesCnt = 1;
+        int idx = 3;
+        while (idx < n) {
+            int tmpCnt = arr[curIdx];
+            int val = fillOne ? 1 : 2;
+            while (tmpCnt-- > 0 && idx < n) {
+                arr[idx++] = val;
+                if (fillOne) {
+                    onesCnt++;
+                }
+            }
+            fillOne = !fillOne;
+            curIdx++;
+        }
+        System.out.println("\tRes = " + onesCnt);
+        return onesCnt;
+    }
+
     /**
      * Valid Word Square
      *
@@ -8426,6 +8558,50 @@ public class StringTest {
         System.out.println("\tRes: " + res);
         return res;
     }
+
+    public static List<String> generateAbbreviations5(String word) {
+        System.out.println("\nStart function generateAbbreviations5().");
+        System.out.println("\tWord: " + word);
+        List<String> res = new ArrayList<>();
+        HashSet<String> dict = new HashSet<>();
+//        res.add(word);
+        generateAbbreviationsDFS5(word, "", dict);
+        res.addAll(dict);
+        System.out.println("\tRes:" + res);
+        return res;
+    }
+    private static void generateAbbreviationsDFS5(String cur, String tmp, HashSet<String> res) {
+        if (cur.isEmpty()) {
+            res.add(tmp);
+            return;
+        }
+        for (int cut = 1; cut <= cur.length(); cut++) {
+            generateAbbreviationsDFS5(cur.substring(cut), tmp + cur.substring(0, cut), res);
+            String newStr = "" + (cut - 0) + (cut < cur.length() ? cur.charAt(cut) : "");
+            generateAbbreviationsDFS5(cur.substring(cut + 1 > cur.length() ? cur.length() : cut + 1), tmp + newStr, res);
+        }
+    }
+
+//    public static List<String> generateAbbreviations6(String word) {
+//        System.out.println("\nStart function generateAbbreviations6().");
+//        System.out.println("\tWord: " + word);
+//        List<String> res = new ArrayList<>();
+////        res.add(word);
+//        generateAbbreviationsDFS6(word, "", res);
+//        System.out.println("\tRes:" + res);
+//        return res;
+//    }
+//    private static void generateAbbreviationsDFS6(String cur, String tmp, List<String> res) {
+//        if (cur.isEmpty()) {
+//            res.add(tmp);
+//            return;
+//        }
+//        generateAbbreviationsDFS6("", tmp + cur, res);
+//        for (int cut = 1; cut <= cur.length(); cut++) {
+//            String newStr = "" + (cut - 0) + (cut < cur.length() ? cur.charAt(cut) : "");
+//            generateAbbreviationsDFS6(cur.substring(cut + 1 > cur.length() ? cur.length() : cut + 1), tmp + newStr, res);
+//        }
+//    }
 
     public static void minAbbreviationDemo(String target, String[] dictionary) {
         System.out.println("\nStart function minAbbreviation().");

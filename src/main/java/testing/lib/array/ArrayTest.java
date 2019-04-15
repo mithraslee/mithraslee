@@ -16,6 +16,7 @@ import javax.swing.*;
  * @author yunl
  */
 public class ArrayTest <T extends Number> {
+
     //region Utilities
     private static <T extends Number> void printTwoDimentinalArray(T[][] arr) {
         if (arr == null) return;
