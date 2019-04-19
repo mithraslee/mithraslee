@@ -238,6 +238,7 @@ public class TestString {
 
         StringTest.restoreIpAddresses("25525511135");
         StringTest.restoreIpAddresses2("25525511135");
+        StringTest.restoreIpAddresses3("25525511135");
 
         StringTest.minWindow("bba", "ab");
         StringTest.minWindow2("bba", "ab");
@@ -712,7 +713,7 @@ public class TestString {
         StringTest.generateAbbreviations2("word");
         StringTest.generateAbbreviations3("word");
         StringTest.generateAbbreviations5("word");
-        StringTest.generateAbbreviations6("word");
+//        StringTest.generateAbbreviations6("word");
 
 //        StringTest.licenseKeyFormattingDemo("abcd", 3);
 //        StringTest.licenseKeyFormattingDemo("abcd", 4);

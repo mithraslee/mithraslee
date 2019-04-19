@@ -3012,6 +3012,37 @@ public class StringTest {
             }
         }
     }
+    public static List<String> restoreIpAddresses3(String s) {
+        System.out.println("\nStart function restoreIpAddresses3()");
+        System.out.println("\ts = " + s);
+        ArrayList<String> results = new ArrayList<> ();
+        if (s == null || s.length() == 0) {
+            return results;
+        }
+        restoreIpAddressesDFS3(s, 1, "0", results);
+        System.out.println("\tValid IPs: " + results);
+        return results;
+    }
+    private static void restoreIpAddressesDFS3(String str, int seg, String cur, ArrayList<String> res) {
+        int len = str.length();
+        int rem = 5 - seg;
+
+        if (len < rem || len > 3 * rem) {
+            return;
+        }
+        if (seg == 4) {
+            if (isValidIPSegment(str)) {
+                res.add(cur.substring(2) + "." + str);
+            }
+            return;
+        }
+        for (int cut = 1; cut < 4 && cut <= len; cut++) {
+            String sub = str.substring(0, cut);
+            if (isValidIPSegment(sub)) {
+                restoreIpAddressesDFS3(str.substring(cut), seg + 1, cur + "." + sub, res);
+            }
+        }
+    }
     private static boolean isValidIPSegment (String ip) {
         if (ip == null || ip.length() > 3 || ip.length() == 0)
             return false;

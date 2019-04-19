@@ -900,6 +900,10 @@ public class TestArray {
         ArrayTest.numberOfPatterns2(1, 1);
         ArrayTest.numberOfPatterns2(3, 3);
 
+        ArrayTest.findMaxConsecutiveOnes(new int[]{1,0,1,1,0});
+        ArrayTest.findMaxConsecutiveOnes2(new int[]{1,0,1,1,0});
+        ArrayTest.findMaxConsecutiveOnes3(new int[]{1,0,1,1,0});
+
         ArrayTest.isReflectedDemo(new int[][]{
                 {1,1},{-1,1}
         });
@@ -1045,6 +1049,9 @@ public class TestArray {
         ArrayTest.findDiagonalOrder(new int[][]{
                 {1}, {2}, {3}, {4}
         });
+
+        ArrayTest.leastIntervalOrdered(new Character[] {'A', 'A', 'A', 'B', 'B', 'B'}, 2);
+        ArrayTest.leastIntervalOrdered2(new Character[] {'A', 'A', 'A', 'B', 'B', 'B'}, 2);
     }
 
 //        try {

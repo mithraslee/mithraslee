@@ -10812,9 +10812,10 @@ public class ArrayTest <T extends Number> {
      * Follow up:
      * What if the input numbers come in one by one as an infinite stream? In other words, you can't store all numbers coming from the stream as it's too large to hold in memory. Could you solve it efficiently?
      */
-    public int findMaxConsecutiveOnes(int[] nums) {
+    public static int findMaxConsecutiveOnes(int[] nums) {
+        System.out.println("\nStart function findMaxConsecutiveOnes()");
         int len = nums.length;
-         if (len < 1) return 0;
+        if (len < 1) return 0;
 
         int res = 0;
         for (int i = 0, start = 0, pre = -1; i < len; i++) {
@@ -10828,9 +10829,11 @@ public class ArrayTest <T extends Number> {
             }
             res = Math.max(res, (i - start + 1));
         }
+        System.out.println("\tRes: " + res);
         return res;
     }
-    public int findMaxConsecutiveOnes2(int[] nums) {
+    public static int findMaxConsecutiveOnes2(int[] nums) {
+        System.out.println("\nStart function findMaxConsecutiveOnes2()");
         int len = nums.length;
         if (len < 1) return 0;
 
@@ -10844,6 +10847,25 @@ public class ArrayTest <T extends Number> {
             }
             res = Math.max(res, (i - start + 1));
         }
+        System.out.println("\tRes: " + res);
+        return res;
+    }
+    public static int findMaxConsecutiveOnes3(int[] nums) {
+        System.out.println("\nStart function findMaxConsecutiveOnes3()");
+        int len = nums.length;
+        if (len < 1) return 0;
+
+        int res = 0;
+        for (int i = 0, start = 0, pre = -1; i < len; i++) {
+            if (nums[i] == 0) {
+//                if (pre != -1) {
+                start = pre + 1;
+//                }
+                pre = i;
+            }
+            res = Math.max(res, (i - start + 1));
+        }
+        System.out.println("\tRes: " + res);
         return res;
     }
 
@@ -10982,7 +11004,7 @@ public class ArrayTest <T extends Number> {
 
 
     public static void isReflectedDemo(int[][] points) {
-        System.out.println("\nStart function numberOfPatterns()");
+        System.out.println("\nStart function isReflectedDemo()");
         printTwoDimentinalArray(points, "\tPoints:");
         System.out.println("\tRes: " + isReflected(points));
     }
@@ -12210,6 +12232,71 @@ public class ArrayTest <T extends Number> {
             }
             if (idx < len) swap(nums, idx++, startZero++);
         }
+    }
+
+    /*
+     * Similar to 'Task Scheduler', but this time the order of the tasks in the input array has to be kept.
+     * Example 1:
+     *      Input: tasks = ["A","A","A","B","B","B"], n = 2
+     *      Output: 8
+     *      Explanation: A -> idle -> idle -> A -> idle -> idle -> A -> B -> idle -> idle -> B -> idle -> idle -> B
+     * Note:
+     * 1. The number of tasks is in the range [1, 10000].
+     * 2. The integer n is in the range [0, 100].
+     */
+    public static int leastIntervalOrdered(Character[] tasks, int n) {
+        System.out.println("\nStart function leastIntervalOrdered()");
+        printArray(tasks, "\tTasks:");
+        if (tasks == null || n <= 0) return 0;
+        int len = tasks.length;
+        StringBuilder sb = new StringBuilder();
+        HashMap<Character, Integer> map = new HashMap<>();
+        int time = 0;
+        for (int i = 0; i < len; i++) {
+            char cur = tasks[i];
+            System.out.println("\n\t\t = " + i + "; cur = " + cur);
+            if (!map.containsKey(cur)) {
+                map.put(cur, time + n + 1);
+                sb.append(cur);
+            } else {
+                int nextTime = map.get(cur);
+                if (time >= nextTime) {
+                    map.put(cur, time + n + 1);
+                    sb.append(cur);
+                } else {
+                    sb.append('-');
+                    i--;
+                }
+            }
+            time++;
+            System.out.println("\n\t\ttime = " + time);
+            System.out.println("\n\t\tsb = " + sb.toString());
+        }
+        System.out.println("\n\tRes = " + time);
+        return time;
+    }
+    public static int leastIntervalOrdered2(Character[] tasks, int n) {
+        System.out.println("\nStart function leastIntervalOrdered2()");
+        printArray(tasks, "\tTasks:");
+        if (tasks == null || n <= 0) return 0;
+        int len = tasks.length;
+        StringBuilder sb = new StringBuilder();
+        HashMap<Character, Integer> map = new HashMap<>();
+        int time = 0;
+        for (int i = 0; i < len; i++) {
+            char cur = tasks[i];
+            if (!map.containsKey(cur)) {
+                map.put(cur, time + n + 1);
+                sb.append(cur);
+            } else {
+                int nextTime = map.get(cur);
+                time = Math.max(time, nextTime);
+                map.put(cur, time + n + 1);
+            }
+            time++;
+        }
+        System.out.println("\n\tRes = " + time);
+        return time;
     }
 }
 
