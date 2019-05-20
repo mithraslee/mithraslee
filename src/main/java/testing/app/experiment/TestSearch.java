@@ -58,6 +58,11 @@ public class TestSearch {
         System.out.println(Search.lowerBound2(nums, 7)); // 8
         System.out.println(Search.upperBound(nums, 7)); // 7
         System.out.println(Search.upperBound2(nums, 7)); // 7
+        System.out.println();
+        System.out.println(Search.lowerBound(nums, 5)); // 5
+        System.out.println(Search.lowerBound2(nums, 5)); // 5
+        System.out.println(Search.upperBound(nums, 5)); // 4
+        System.out.println(Search.upperBound2(nums, 5)); // 4
 
         Search.searchRange(new int[]{5, 7, 7, 8, 8, 10}, 5);
         Search.searchRange(new int[]{5, 7, 7, 8, 8, 10}, 7);

@@ -72,6 +72,22 @@ public class TestGraph {
                 {"JFK","A"},{"JFK","C"},{"C","A"},{"A","B"},{"B","JFK"}
         });
 
+        GraphTest.findItinerary(new String[][]{
+                {"MUC", "LHR"},{"JFK", "MUC"},{"SFO", "SJC"},{"LHR", "SFO"}
+        });
+
+//        GraphTest.findItinerary2(new String[][]{
+//                {"JFK","SFO"},{"JFK","ATL"},{"SFO","ATL"},{"ATL","JFK"},{"ATL","SFO"}
+//        });
+//
+//        GraphTest.findItinerary2(new String[][]{
+//                {"JFK","A"},{"JFK","C"},{"C","A"},{"A","B"},{"B","JFK"}
+//        });
+
+        GraphTest.findItinerary2(new String[][]{
+                {"MUC", "LHR"},{"JFK", "MUC"},{"SFO", "SJC"},{"LHR", "SFO"}
+        });
+
 //        GraphTest.alienOrderDemo(new String[]{
 //                "wrt",
 //                "wrf",

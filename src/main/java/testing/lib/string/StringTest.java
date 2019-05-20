@@ -8317,16 +8317,16 @@ public class StringTest {
      *         ["abat","baba","atan","atal"]
      * Output:
      *         [
-     *         [ "baba",
-     *         "abat",
-     *         "baba",
-     *         "atan"
-     *         ],
-     *         [ "baba",
-     *         "abat",
-     *         "baba",
-     *         "atal"
-     *         ]
+     *          [ "baba",
+     *            "abat",
+     *            "baba",
+     *            "atan"
+     *          ],
+     *          [ "baba",
+     *            "abat",
+     *            "baba",
+     *            "atal"
+     *          ]
      *         ]
      * Explanation:
      * The output consists of two word squares. The order of output does not matter (just the order of words in each word square matters).

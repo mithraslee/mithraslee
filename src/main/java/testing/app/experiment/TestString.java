@@ -696,6 +696,9 @@ public class TestString {
         StringTest.wordSquares(new String[]{
                 "abaa","aaab","baaa","aaba"
         });
+        StringTest.wordSquares(new String[]{
+                "aaaa","abab"
+        });
         StringTest.wordSquares2(new String[]{
                 "abat","baba","atan","atal"
         });

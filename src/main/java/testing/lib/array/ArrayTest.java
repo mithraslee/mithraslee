@@ -442,7 +442,38 @@ public class ArrayTest <T extends Number> {
         System.out.println("\t************************************");
         return maxArea;
     }
-
+    public static int largestRectangleArea2(Integer[] height) {
+        System.out.println("\nStart function largestRectangleArea2()");
+        printArray(height);
+        System.out.println("\t************************************");
+        Stack<Integer> s = new Stack<>();
+        int len = height.length;
+        int maxArea = 0;
+        for (int i = 0; i < len; i++) {
+            while (!s.isEmpty() && height[s.peek()] > height[i]) {
+                int temp = s.pop();
+                if (!s.isEmpty()) {
+                    maxArea = Math.max(maxArea, (i - s.peek() - 1) * height[temp]);
+                } else {
+                    maxArea = Math.max(maxArea, i * height[temp]);
+                }
+            }
+            s.push(i);
+            printStack(s, height, maxArea);
+        }
+        System.out.println("\t------------------------------------");
+        while (!s.isEmpty()) {
+            int temp = s.pop();
+            if (!s.empty()) {
+                maxArea = Math.max(maxArea, (len - s.peek() - 1) * height[temp]);
+            } else {
+                maxArea = Math.max(maxArea, len * height[temp]);
+            }
+            printStack(s, height, maxArea);
+        }
+        System.out.println("\t************************************");
+        return maxArea;
+    }
     private static void printStack(Stack s, Integer[] height, int maxArea) {
         Stack sHelper = new Stack();
         StringBuilder sb = new StringBuilder();
@@ -651,6 +682,26 @@ public class ArrayTest <T extends Number> {
                 newArr.add((code << 1) + (tag ? 1 : 0));
                 tag = !tag;
                 newArr.add((code << 1) + (tag ? 1 : 0));
+            }
+        }
+        return newArr;
+    }
+    public static ArrayList<Integer> grayCode2(int n) {
+        System.out.println("\nStart function grayCode2(); n = " + n);
+        ArrayList<Integer> newArr = new ArrayList<Integer>();
+        if (n <= 0) {
+            newArr.add(0);
+        } else if (n == 1) {
+            newArr.add(0);
+            newArr.add(1);
+        } else {
+            ArrayList<Integer> arr = grayCode(n - 1);
+            for (int i : arr) {
+                newArr.add((i << 1) + 0);
+            }
+            ListIterator<Integer> listIterator = arr.listIterator(arr.size());
+            while (listIterator.hasPrevious()) {
+                newArr.add((listIterator.previous() << 1) + 1);
             }
         }
         return newArr;
@@ -3274,6 +3325,40 @@ public class ArrayTest <T extends Number> {
                     } else {
                         Q.add(newList);
                     }
+                }
+            }
+        }
+
+        System.out.println(Arrays.asList(A) + "'s all jump possibilities: ");
+        for (List<Integer> list : res) {
+            System.out.println("\t" + list);
+        }
+
+        return res;
+    }
+    public static List<List<Integer>> jumpPath4(Integer[] A) {
+        System.out.println("\nStart function jumpPath4()");
+        assert A != null : "Input array is NULL";
+
+        int len = A.length;
+        ArrayList<List<Integer>> res = new ArrayList<>();
+
+        Queue<LinkedList<Integer>> Q = new LinkedList<>();
+        LinkedList<Integer> init = new LinkedList<>();
+        init.addLast(0);
+        Q.add(init);
+
+        while (!Q.isEmpty()) {
+            LinkedList<Integer> curList = Q.poll();
+            int lastIndex = curList.getLast();
+            int steps = A[lastIndex];
+            for (int i = 1; i <= steps && lastIndex + i < len; i++) {
+                LinkedList<Integer> newList = new LinkedList<>(curList);
+                newList.addLast(lastIndex + i);
+                if (lastIndex + i == len - 1) {
+                    res.add(newList);
+                } else {
+                    Q.add(newList);
                 }
             }
         }

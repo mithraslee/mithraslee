@@ -431,11 +431,39 @@ public class GraphTest <T extends Number> {
 //        if (!map.containsKey(start) || map.get(start).isEmpty()) {
 //            return;
 //        }
-        while(!map.get(start).isEmpty()) {
+        while(map.containsKey(start) && !map.get(start).isEmpty()) {
             String next = map.get(start).poll();
             findItineraryDFS(map, next, res);
         }
         res.addFirst(start);
+    }
+    public static List<String> findItinerary2(String[][] tickets) {
+        System.out.println("\nStart function findItinerary2()");
+        HashMap<String, PriorityQueue<String>> map = new HashMap<>();
+
+        for (String[] ticket : tickets) {
+            String from = ticket[0];
+            String to = ticket[1];
+            map.putIfAbsent(from, new PriorityQueue<String>());
+            map.get(from).add(to);
+        }
+        assert map.containsKey("JFK") && map.get("JFK").size() > 0;
+
+        Stack<String> stack = new Stack<>();
+        stack.push("JFK");
+        LinkedList<String> res = new LinkedList<>();
+
+        while (!stack.isEmpty()) {
+            String top = stack.peek();
+            if (!map.containsKey(top) || map.get(top).isEmpty()) {
+                res.addFirst(top);
+                stack.pop();
+            } else {
+                stack.push(map.get(top).poll());
+            }
+        }
+        System.out.println("\t" + res);
+        return res;
     }
 
     /**

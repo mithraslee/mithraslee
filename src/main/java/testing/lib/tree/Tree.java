@@ -569,6 +569,34 @@ public class Tree <T extends Number> {
             cur = nextLevelStart;
         }
     }
+    // Better version?
+    public void connect3(TreeNodeWithNext<T> n) {
+        TreeNodeWithNext<T> cur = n;
+        TreeNodeWithNext<T> nextLevelStart = null;
+        TreeNodeWithNext<T> nextLevelPre = null;
+
+        while (cur != null) {
+            if (nextLevelStart == null) {
+                nextLevelStart = cur.left == null ? cur.right : cur.left;
+            }
+            if (cur.left != null) {
+                if (nextLevelPre != null)
+                    nextLevelPre.next = cur.left;
+                nextLevelPre = cur.left;
+            }
+            if (cur.right != null) {
+                if (nextLevelPre != null)
+                    nextLevelPre.next = cur.right;
+                nextLevelPre = cur.right;
+            }
+            cur = cur.next;
+            if (cur == null) {
+                cur = nextLevelStart;
+                nextLevelStart = null;
+                nextLevelPre = null;
+            }
+        }
+    }
 
     public Tree<T> rebuildFromInorderAndPreorder() {
         Tree<T> td = new Tree<T>();

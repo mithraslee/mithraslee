@@ -46,6 +46,10 @@ public class TestArray {
         ArrayTest.setZeroes(intMatrix);
         ArrayTest.setZeroes2(intMatrix);
 
+        Integer[] heights = new Integer[]{2,1,5,6,2,3};
+        ArrayTest.largestRectangleArea(heights);
+        ArrayTest.largestRectangleArea2(heights);
+
         int Row = 10;
         int Column = 10;
         Character [][] matrix = new Character [Row][Column];
@@ -72,6 +76,7 @@ public class TestArray {
 
         int num = 4;
         System.out.println("Gray code of " + num + " is " + ArrayTest.grayCode(num));
+        System.out.println("Gray code of " + num + " is " + ArrayTest.grayCode2(num));
 
         ArrayList<ArrayList<Integer>> arrArr = new ArrayList<> ();
         arrArr.add(new ArrayList<> (Arrays.asList(-1)));
@@ -322,14 +327,17 @@ public class TestArray {
         ArrayTest.jumpPath(jumpArr1);
         ArrayTest.jumpPath2(jumpArr1);
         ArrayTest.jumpPath3(jumpArr1);
+        ArrayTest.jumpPath4(jumpArr1);
 
         ArrayTest.jumpPath(jumpArr2);
         ArrayTest.jumpPath2(jumpArr2);
         ArrayTest.jumpPath3(jumpArr2);
+        ArrayTest.jumpPath4(jumpArr2);
 
         ArrayTest.jumpPath(jumpArr3);
         ArrayTest.jumpPath2(jumpArr3);
         ArrayTest.jumpPath3(jumpArr3);
+        ArrayTest.jumpPath4(jumpArr3);
 
         ArrayTest.dragonChallengeDemo(new ArrayList<Integer>(Arrays.asList(new Integer[]{5,6,0,4,2,4,1,0,0,4})));
         ArrayTest.dragonChallengeDemo(new ArrayList<Integer>(Arrays.asList(new Integer[]{5,6,0,4,2,4,1,0,0,0})));
@@ -1052,6 +1060,17 @@ public class TestArray {
 
         ArrayTest.leastIntervalOrdered(new Character[] {'A', 'A', 'A', 'B', 'B', 'B'}, 2);
         ArrayTest.leastIntervalOrdered2(new Character[] {'A', 'A', 'A', 'B', 'B', 'B'}, 2);
+
+        ArrayList<Integer> testList = new ArrayList<>(Arrays.asList(1, 2, 3));
+        ListIterator<Integer> lIter = testList.listIterator();
+        while (lIter.hasNext()) {
+            Integer n = lIter.next();
+            if (n == 2) {
+                lIter.remove();
+            }
+//            System.out.println();
+        }
+        System.out.println("Array = " + testList.toString());
     }
 
 //        try {
